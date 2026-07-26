@@ -1,0 +1,169 @@
+import * as Tone from 'tone'
+import { cadenceVoicings, degreeNote, resolutionDegrees, scaleNotes } from '../theory'
+
+// All musical timing goes through Tone.Transport — never setTimeout.
+// The piano is a local Salamander subset in /samples/piano, bundled so the
+// app works offline; sine-wave triads train the wrong thing.
+
+const SAMPLE_NOTES = [
+  'C2', 'D#2', 'F#2', 'A2',
+  'C3', 'D#3', 'F#3', 'A3',
+  'C4', 'D#4', 'F#4', 'A4',
+  'C5', 'D#5', 'F#5', 'A5',
+  'C6',
+] as const
+
+let sampler: Tone.Sampler | null = null
+let loading: Promise<void> | null = null
+
+export function ensureAudio(): Promise<void> {
+  if (loading) return loading
+  loading = (async () => {
+    await Tone.start()
+    sampler = new Tone.Sampler({
+      urls: Object.fromEntries(SAMPLE_NOTES.map((n) => [n, `${n.replace('#', 's')}.mp3`])),
+      baseUrl: `${import.meta.env.BASE_URL}samples/piano/`,
+      release: 1,
+    }).toDestination()
+    await Tone.loaded()
+    const transport = Tone.getTransport()
+    transport.bpm.value = 90
+  })()
+  loading = loading.catch((err) => {
+    loading = null
+    throw err
+  })
+  return loading
+}
+
+export function audioReady(): boolean {
+  return sampler !== null
+}
+
+function stopPlayback() {
+  const transport = Tone.getTransport()
+  transport.stop()
+  transport.cancel()
+  transport.position = 0
+}
+
+type ScheduledNote = {
+  time: number // seconds relative to transport start
+  notes: string[]
+  duration: number // seconds
+  velocity?: number
+  onStart?: () => void
+}
+
+let activeRun = 0
+
+// Schedule a sequence on the Transport; resolves when the last note ends.
+// UI callbacks fire through Tone.getDraw() so they land on animation frames.
+function play(sequence: ScheduledNote[], onDone?: () => void): Promise<void> {
+  const run = ++activeRun
+  stopPlayback()
+  const transport = Tone.getTransport()
+  const draw = Tone.getDraw()
+  return new Promise((resolve) => {
+    for (const ev of sequence) {
+      transport.schedule((time) => {
+        sampler?.triggerAttackRelease(ev.notes, ev.duration, time, ev.velocity ?? 0.9)
+        if (ev.onStart) draw.schedule(() => { if (run === activeRun) ev.onStart!() }, time)
+      }, ev.time)
+    }
+    const end = Math.max(...sequence.map((ev) => ev.time + ev.duration)) + 0.1
+    transport.schedule((time) => {
+      draw.schedule(() => {
+        if (run === activeRun) {
+          onDone?.()
+          resolve()
+        }
+      }, time)
+      transport.stop(time + 0.05)
+    }, end)
+    transport.start()
+  })
+}
+
+export function stop() {
+  activeRun++
+  stopPlayback()
+}
+
+// The major scale, 1 to 8, with a per-degree UI callback.
+export function playScale(tonic: string, onDegree?: (degree: number) => void): Promise<void> {
+  const notes = scaleNotes(tonic)
+  const step = 0.45
+  return play(
+    notes.map((note, i) => ({
+      time: i * step,
+      notes: [note],
+      duration: step * 0.95,
+      onStart: onDegree ? () => onDegree(i + 1) : undefined,
+    })),
+    onDegree ? () => onDegree(0) : undefined,
+  )
+}
+
+// One degree against a low tonic, for the T2 ruler widget.
+export function playDegreeAgainstTonic(tonic: string, degree: number): Promise<void> {
+  const target = degreeNote(tonic, degree)
+  const low = degreeNote(tonic, 1)
+  return play([
+    { time: 0, notes: [low], duration: 1.6, velocity: 0.55 },
+    { time: 0.5, notes: [target], duration: 1.1 },
+  ])
+}
+
+// I–IV–V–I cadence to establish the key.
+export function playCadence(tonic: string): Promise<void> {
+  const voicings = cadenceVoicings(tonic)
+  const dur = 0.75
+  return play(
+    voicings.map((v, i) => ({
+      time: i * dur,
+      notes: [v.bass, ...v.upper],
+      duration: i === voicings.length - 1 ? dur * 1.6 : dur * 0.98,
+      velocity: 0.8,
+    })),
+  )
+}
+
+// Cadence, a beat of silence, then the target degree.
+export function playCadenceThenDegree(tonic: string, degree: number, onTarget?: () => void): Promise<void> {
+  const voicings = cadenceVoicings(tonic)
+  const dur = 0.75
+  const events: ScheduledNote[] = voicings.map((v, i) => ({
+    time: i * dur,
+    notes: [v.bass, ...v.upper],
+    duration: i === voicings.length - 1 ? dur * 1.5 : dur * 0.98,
+    velocity: 0.8,
+  }))
+  const targetTime = voicings.length * dur + 0.9
+  events.push({
+    time: targetTime,
+    notes: [degreeNote(tonic, degree)],
+    duration: 1.4,
+    onStart: onTarget,
+  })
+  return play(events)
+}
+
+export function playDegree(tonic: string, degree: number): Promise<void> {
+  return play([{ time: 0, notes: [degreeNote(tonic, degree)], duration: 1.4 }])
+}
+
+// Stepwise resolution of a stable degree down to the tonic.
+export function playResolution(tonic: string, degree: number, onDegree?: (degree: number) => void): Promise<void> {
+  const path = resolutionDegrees(degree)
+  const step = 0.55
+  return play(
+    path.map((d, i) => ({
+      time: i * step,
+      notes: [degreeNote(tonic, d)],
+      duration: i === path.length - 1 ? step * 2 : step * 0.95,
+      onStart: onDegree ? () => onDegree(d) : undefined,
+    })),
+    onDegree ? () => onDegree(0) : undefined,
+  )
+}

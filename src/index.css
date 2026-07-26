@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+/*
+ * Oído design tokens — docs/design-system.md.
+ * Key identity lives in the hue angle; light/dark only re-parameterize
+ * lightness and chroma, so the palette is re-lit, never inverted.
+ */
+:root {
+  --key-L: 0.58;
+  --key-C: 0.17;
+  --ground: #d8dad2;
+  --surface: #f7f6f2;
+  --ink: #16171a;
+  --ink-dim: #5c6068;
+  --rule: 2px;
+  --radius: 2px;
+  --grid: 8px;
+
+  /* hue(key) = circleOfFifthsPosition(key) × 30° */
+  --hue-C: 0deg;
+  --hue-G: 30deg;
+  --hue-D: 60deg;
+  --hue-A: 90deg;
+  --hue-E: 120deg;
+  --hue-B: 150deg;
+  --hue-Gb: 180deg;
+  --hue-Db: 210deg;
+  --hue-Ab: 240deg;
+  --hue-Eb: 270deg;
+  --hue-Bb: 300deg;
+  --hue-F: 330deg;
+
+  --active-key-hue: 0deg;
+
+  /* type scale, 1.25 ratio */
+  --fs-0: 11px;
+  --fs-1: 13px;
+  --fs-2: 16px;
+  --fs-3: 20px;
+  --fs-4: 25px;
+  --fs-5: 31px;
+  --fs-6: 39px;
+  --fs-7: 49px;
+  --fs-8: 61px;
+
+  --font-display: 'Archivo Black', sans-serif;
+  --font-body: 'Archivo', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme='dark'] {
+  --key-L: 0.74;
+  --key-C: 0.14;
+  --ground: #17181b;
+  --surface: #1f2124;
+  --ink: #edebe6;
+  --ink-dim: #9498a0;
+  --rule: 1px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-2);
+    line-height: 1.45;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border-radius: var(--radius);
+  }
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.key-field {
+  background: oklch(var(--key-L) var(--key-C) var(--active-key-hue));
+  color: #f7f6f2;
+}
+
+[data-theme='dark'] .key-field {
+  color: #16171a;
+}
+
+.key-chip {
+  background: oklch(var(--key-L) var(--key-C) var(--active-key-hue));
+}
+
+.chromatic {
+  color: oklch(var(--key-L) var(--key-C) calc(var(--active-key-hue) + 180deg));
+}
+
+/* "Reduce color coding" fallback: monochrome + labels (§15.4). */
+[data-reduce-color='true'] .key-field,
+[data-reduce-color='true'] .key-chip {
+  background: var(--surface);
+  border: var(--rule) solid var(--ink);
+}
+[data-reduce-color='true'] .key-field {
+  color: var(--ink);
+}
+[data-reduce-color='true'] .cof-seg {
+  fill: var(--surface) !important;
+  stroke: var(--ink-dim);
+}
+
+/* Motion is sparse and mechanical: straight paths, snaps, no easing curves
+   beyond linear. Reduced motion replaces the lot with instant cuts. */
+.snap {
+  transition:
+    background-color 120ms linear,
+    color 120ms linear,
+    transform 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
