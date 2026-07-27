@@ -44,6 +44,51 @@ const strings = {
   'theory.index.eyebrow': { es: '{id} · 3 min', en: '{id} · 3 min' },
   'theory.soon': { es: 'Próximamente', en: 'Coming soon' },
 
+  // T1 lesson — the harmonic series
+  't1.eyebrow': { es: 'T1 · 3 min', en: 'T1 · 3 min' },
+  't1.title': { es: 'La serie armónica', en: 'The harmonic series' },
+  't1.claim': {
+    es: 'Al final de esta lección vas a entender de dónde sale la consonancia: la octava y la quinta son estables porque ya están presentes en la propia vibración de una cuerda.',
+    en: "By the end of this lesson you will understand where consonance comes from: the octave and the fifth are stable because they are already present in a single string's own vibration.",
+  },
+  't1.demo.heading': { es: 'Una cuerda, muchas vibraciones', en: 'One string, many vibrations' },
+  't1.demo.body': {
+    es: 'Una cuerda no vibra de una sola manera: vibra entera y también en mitades, tercios, cuartos… cada modo añade un parcial. El parcial 2 duplica la nota fundamental —la octava—; el parcial 3 añade una nota nueva, la quinta por encima de esa octava. Tónica: {key}.',
+    en: "A string does not vibrate just one way: it vibrates as a whole and also in halves, thirds, quarters — each mode adds a partial. Partial 2 doubles the fundamental note — the octave; partial 3 adds a new note, the fifth above that octave. Tonic: {key}.",
+  },
+  't1.demo.play': { es: 'Tocar la serie', en: 'Play the series' },
+  't1.widget.heading': { es: 'Tócala tú', en: 'Now you play it' },
+  't1.widget.body': {
+    es: 'Elige hasta qué parcial quieres oír la pila. Después compara la quinta contra la tónica: su estabilidad viene de que ya suena dentro de la propia serie.',
+    en: 'Pick how many partials to hear in the stack. Then compare the fifth against the tonic: its stability comes from already sounding inside the series itself.',
+  },
+  't1.widget.depth': { es: 'Hasta el parcial {n}', en: 'Up to partial {n}' },
+  't1.widget.playFifth': { es: 'Tocar 1 y 5 juntos', en: 'Play 1 and 5 together' },
+  't1.widget.caption': {
+    es: 'El grado 5 es estable porque ya aparece en la serie armónica de la tónica.',
+    en: "Degree 5 is stable because it already appears in the tonic's own harmonic series.",
+  },
+  't1.q1.prompt': {
+    es: '¿Qué parcial suena la misma nota que la fundamental, una octava más arriba?',
+    en: 'Which partial sounds the same note as the fundamental, one octave higher?',
+  },
+  't1.q2.prompt': {
+    es: '¿Qué parcial es el primero en introducir una clase de nota nueva?',
+    en: 'Which partial is the first to introduce a new pitch class?',
+  },
+  't1.q3.prompt': {
+    es: 'Además del grado 1, ¿qué grado de la escala hace estable la serie armónica?',
+    en: 'Besides degree 1, which scale degree does the harmonic series make stable?',
+  },
+  't1.q4.prompt': {
+    es: 'Hasta el parcial 4 (inclusive), ¿cuántas clases de nota distintas han sonado?',
+    en: 'Up through partial 4, how many distinct pitch classes have sounded?',
+  },
+  't1.complete.body': {
+    es: 'Desbloqueaste E0: retención de la tónica.',
+    en: 'You unlocked E0: tonic retention.',
+  },
+
   // T2 lesson
   't2.eyebrow': { es: 'T2 · 3 min', en: 'T2 · 3 min' },
   't2.title': {
@@ -312,6 +357,202 @@ const strings = {
   't7.complete.body': {
     es: 'Desbloqueaste E6: función diatónica, presentada después de una cadencia.',
     en: 'You unlocked E6: diatonic function, presented after a cadence.',
+  },
+
+  // T8 lesson — functional harmony: tonic, subdominant, dominant
+  't8.eyebrow': { es: 'T8 · 3 min', en: 'T8 · 3 min' },
+  't8.title': { es: 'Armonía funcional', en: 'Functional harmony' },
+  't8.claim': {
+    es: 'Al final de esta lección vas a oír que cada acorde de una tonalidad cumple uno de tres trabajos: estar en casa, alejarse de casa, o tirar hacia casa.',
+    en: 'By the end of this lesson you will hear that every chord in a key does one of three jobs: sit at home, move away from home, or pull back home.',
+  },
+  't8.demo.heading': { es: 'Tres trabajos, una progresión', en: 'Three jobs, one progression' },
+  't8.demo.body': {
+    es: 'En {key} mayor, I es la tónica (T): casa. IV es la subdominante (S): te alejas. V es la dominante (D): tira de vuelta a casa. Escucha I–IV–V–I y sigue la letra de función bajo cada numeral.',
+    en: 'In {key} major, I is the tonic (T): home. IV is the subdominant (S): you move away. V is the dominant (D): it pulls back home. Listen to I–IV–V–I and follow the function letter under each numeral.',
+  },
+  't8.demo.play': { es: 'Tocar I–IV–V–I', en: 'Play I–IV–V–I' },
+  't8.demo.stop': { es: 'Detener', en: 'Stop' },
+  't8.widget.heading': { es: 'Cada familia, y dos caminos a casa', en: 'Each family, and two paths home' },
+  't8.widget.body': {
+    es: 'Toca cada familia para oír sus acordes. Después compara dos frases con las mismas piezas en distinto orden: T→S→D→T y T→D→S→T. ¿Cuál de las dos cierra con más fuerza?',
+    en: 'Tap each family to hear its chords. Then compare two phrases built from the same pieces in a different order: T→S→D→T and T→D→S→T. Which one closes harder?',
+  },
+  't8.widget.playT': { es: 'Familia T (I, vi, iii)', en: 'T family (I, vi, iii)' },
+  't8.widget.playS': { es: 'Familia S (IV, ii)', en: 'S family (IV, ii)' },
+  't8.widget.playD': { es: 'Familia D (V, vii°)', en: 'D family (V, vii°)' },
+  't8.widget.phraseTSDT': { es: 'T→S→D→T', en: 'T→S→D→T' },
+  't8.widget.phraseTDST': { es: 'T→D→S→T', en: 'T→D→S→T' },
+  't8.widget.lastPhrase': { es: 'Última frase: {phrase}', en: 'Last phrase: {phrase}' },
+  't8.q1.prompt': {
+    es: '¿Qué familia tira con más fuerza hacia casa?',
+    en: 'Which family pulls hardest toward home?',
+  },
+  't8.q2.prompt': {
+    es: '¿Qué numerales forman la familia de la tónica?',
+    en: 'Which numerals make up the tonic family?',
+  },
+  't8.q3.prompt': { es: '¿A qué familia pertenece ii?', en: 'Which family does ii belong to?' },
+  't8.q4.prompt': { es: '¿Hacia qué numeral quiere resolver V?', en: 'Which numeral does V want to resolve to?' },
+  't8.complete.body': {
+    es: 'Desbloqueaste E6 (función diatónica) y E7 (movimientos de dos acordes).',
+    en: 'You unlocked E6 (diatonic function) and E7 (two-chord motions).',
+  },
+
+  // T9 lesson — cadences and phrase structure
+  't9.eyebrow': { es: 'T9 · 3 min', en: 'T9 · 3 min' },
+  't9.title': { es: 'Cadencias y frases', en: 'Cadences and phrase structure' },
+  't9.claim': {
+    es: 'Al final de esta lección vas a reconocer cuatro finales de frase por cómo cierran: con fuerza, en el aire, hacia atrás o con sorpresa.',
+    en: 'By the end of this lesson you will recognize four phrase endings by how they close: hard, in the air, backward, or with a surprise.',
+  },
+  't9.demo.heading': { es: 'Cuatro finales, una frase', en: 'Four endings, one phrase' },
+  't9.demo.body': {
+    es: 'La misma frase de cuatro acordes en {key} mayor puede terminar de formas distintas. La cadencia auténtica (V–I) cierra con más fuerza; la semicadencia se detiene en V, en el aire; la plagal cierra con IV–I; la rota sustituye el I final por vi, una sorpresa.',
+    en: 'The same four-chord phrase in {key} major can end in different ways. The authentic cadence (V–I) closes hardest; the half cadence stops on V, in the air; the plagal cadence closes with IV–I; the deceptive cadence swaps the final I for vi, a surprise.',
+  },
+  't9.demo.authentic': { es: 'Auténtica', en: 'Authentic' },
+  't9.demo.half': { es: 'Semicadencia', en: 'Half' },
+  't9.demo.plagal': { es: 'Plagal', en: 'Plagal' },
+  't9.demo.deceptive': { es: 'Rota', en: 'Deceptive' },
+  't9.widget.heading': { es: 'Misma frase, cuatro finales', en: 'Same phrase, four endings' },
+  't9.widget.body': {
+    es: 'La apertura I–IV se queda fija. Elige el final y escucha la frase completa. ¿Cuál cierra con más fuerza y cuál te deja esperando?',
+    en: 'The opening I–IV stays fixed. Pick the ending and hear the full phrase. Which one closes hardest, and which one leaves you waiting?',
+  },
+  't9.widget.opening': { es: 'Apertura fija: I–IV', en: 'Fixed opening: I–IV' },
+  't9.q1.prompt': { es: '¿Qué final cierra con más fuerza?', en: 'Which ending closes hardest?' },
+  't9.q2.prompt': {
+    es: 'El final de sorpresa sustituye el I final por:',
+    en: 'The surprise ending replaces the final I with:',
+  },
+  't9.q3.prompt': { es: '¿En qué acorde se detiene una semicadencia?', en: 'Which chord does a half cadence stop on?' },
+  't9.q4.prompt': {
+    es: 'El final IV–I se llama plagal. ¿Qué numeral precede al I?',
+    en: 'The IV–I ending is called plagal. Which numeral precedes the I?',
+  },
+  't9.complete.body': {
+    es: 'Desbloqueaste E7: movimientos de dos acordes.',
+    en: 'You unlocked E7: two-chord motions.',
+  },
+
+  // T10 lesson — seventh chords and the tritone
+  't10.eyebrow': { es: 'T10 · 3 min', en: 'T10 · 3 min' },
+  't10.title': { es: 'Acordes de séptima y el tritono', en: 'Seventh chords and the tritone' },
+  't10.claim': {
+    es: 'Al final de esta lección vas a oír por qué añadir la séptima a V lo hace tirar con más fuerza hacia I: dos grados de dentro del acorde chocan y se resuelven.',
+    en: 'By the end of this lesson you will hear why adding the seventh to V makes it pull harder toward I: two degrees inside the chord clash and resolve.',
+  },
+  't10.demo.heading': { es: 'Con y sin la séptima', en: 'With and without the seventh' },
+  't10.demo.body': {
+    es: 'En {key} mayor, V–I ya tira hacia casa. Añade la séptima a V y el tirón se siente más fuerte: dentro del acorde, los grados 4 y 7 rozan entre sí y se resuelven colapsando hacia 3 y 1.',
+    en: 'In {key} major, V–I already pulls home. Add the seventh to V and the pull feels stronger: inside the chord, degrees 4 and 7 rub against each other and resolve by collapsing into 3 and 1.',
+  },
+  't10.demo.playTriad': { es: 'V – I (tríada)', en: 'V – I (triad)' },
+  't10.demo.playSeventh': { es: 'V7 – I', en: 'V7 – I' },
+  't10.demo.playTritone': { es: 'Tocar 4 y 7 juntos', en: 'Play 4 and 7 together' },
+  't10.demo.playResolved': { es: 'Tocar 3 y 1, resueltos', en: 'Play 3 and 1, resolved' },
+  't10.widget.heading': { es: 'Añade la séptima tú', en: 'Add the seventh yourself' },
+  't10.widget.body': {
+    es: 'Activa la séptima sobre V y vuelve a oír la resolución hacia I. Después toca los dos grados internos solos, y luego resueltos.',
+    en: 'Turn on the seventh over V and hear the resolution into I again. Then play the two inner degrees alone, and then resolved.',
+  },
+  't10.widget.toggleOn': { es: '7ª activada — tocar V7 → I', en: '7th on — play V7 → I' },
+  't10.widget.toggleOff': { es: '7ª desactivada — tocar V → I', en: '7th off — play V → I' },
+  't10.widget.playInner': { es: 'Tocar los grados internos (4, 7)', en: 'Play the inner degrees (4, 7)' },
+  't10.widget.playInnerResolved': { es: 'Tocar la resolución (3, 1)', en: 'Play the resolution (3, 1)' },
+  't10.q1.prompt': {
+    es: '¿Qué dos grados de la escala rozan dentro de V7?',
+    en: 'Which two scale degrees rub against each other inside V7?',
+  },
+  't10.q2.prompt': { es: '¿A qué dos grados resuelven?', en: 'Which two degrees do they resolve to?' },
+  't10.q3.prompt': { es: '¿Cuántas notas distintas tiene V7?', en: 'How many distinct pitches does V7 contain?' },
+  't10.q4.prompt': {
+    es: 'El grado del acorde que se añade a V para formar V7 es su:',
+    en: 'The chord degree added to V to build V7 is its:',
+  },
+  't10.complete.body': {
+    es: 'Desbloqueaste E5 (calidad de acordes) y F3 (séptimas en el diapasón).',
+    en: 'You unlocked E5 (chord quality) and F3 (seventh-chord shells on the fretboard).',
+  },
+
+  // T11 lesson — voice leading and guide tones
+  't11.eyebrow': { es: 'T11 · 3 min', en: 'T11 · 3 min' },
+  't11.title': { es: 'Conducción de voces y notas guía', en: 'Voice leading and guide tones' },
+  't11.claim': {
+    es: 'Al final de esta lección vas a oír que los mismos acordes pueden viajar mucho o casi nada, según cómo se conducen las voces.',
+    en: 'By the end of this lesson you will hear that the same chords can travel a lot or almost nothing, depending on how the voices are led.',
+  },
+  't11.demo.heading': { es: 'Mismos acordes, distinta distancia', en: 'Same chords, different distance' },
+  't11.demo.body': {
+    es: 'En {key} mayor, ii–V–I puede tocarse en bloques que saltan de raíz en raíz, o con las voces conducidas para moverse lo menos posible. Compara las dos versiones.',
+    en: 'In {key} major, ii–V–I can be played in blocks that jump from root to root, or with the voices led to move as little as possible. Compare the two versions.',
+  },
+  't11.demo.playBlock': { es: 'En bloques', en: 'In blocks' },
+  't11.demo.playVoiced': { es: 'Voces conducidas', en: 'Voice-led' },
+  't11.widget.heading': { es: 'El mismo contraste, un bucle más largo', en: 'The same contrast, a longer loop' },
+  't11.widget.body': {
+    es: 'Compara otra vez sobre I–vi–ii–V. En cada acorde, el 3 y el 7 son las notas guía: son las que cargan el cambio de armonía mientras el resto se mantiene quieto.',
+    en: 'Compare again over I–vi–ii–V. In every chord, the 3rd and the 7th are the guide tones: they carry the change in harmony while everything else sits still.',
+  },
+  't11.q1.prompt': {
+    es: 'Además del bajo, ¿cuántas voces suenan en estas voces superiores?',
+    en: 'Besides the bass, how many voices sound in these upper voicings?',
+  },
+  't11.q2.prompt': {
+    es: '¿Qué grados del acorde se llaman notas guía?',
+    en: 'Which chord degrees are called the guide tones?',
+  },
+  't11.q3.prompt': {
+    es: 'En las dos versiones, ¿qué grado del acorde toca siempre el bajo?',
+    en: 'In both versions, which chord degree does the bass always play?',
+  },
+  't11.q4.prompt': {
+    es: 'En la versión con voces conducidas, ¿de cuántas posiciones de escala se mueven como máximo las voces superiores?',
+    en: 'In the voice-led version, by how many scale positions do the upper voices move at most?',
+  },
+  't11.complete.body': {
+    es: 'Desbloqueaste F4 y F6: conducción de voces y líneas de notas guía en el diapasón.',
+    en: 'You unlocked F4 and F6: voice leading and guide-tone lines on the fretboard.',
+  },
+
+  // T12 lesson — inversions and slash chords
+  't12.eyebrow': { es: 'T12 · 3 min', en: 'T12 · 3 min' },
+  't12.title': { es: 'Inversiones y acordes con bajo', en: 'Inversions and slash chords' },
+  't12.claim': {
+    es: 'Al final de esta lección vas a oír que el mismo acorde suena distinto según qué grado suyo esté en el bajo, y a leer esa nota en la notación con barra.',
+    en: 'By the end of this lesson you will hear that the same chord sounds different depending on which of its degrees sits in the bass, and read that note in slash notation.',
+  },
+  't12.demo.heading': { es: 'Mismo acorde, distinto piso', en: 'Same chord, different floor' },
+  't12.demo.body': {
+    es: 'El acorde mayor de {key} suena igual arriba en las tres posiciones; lo único que cambia es qué grado suyo está abajo, en el bajo.',
+    en: 'The {key} major chord sounds the same on top in all three positions; the only thing that changes is which of its degrees sits at the bottom, in the bass.',
+  },
+  't12.demo.inv0': { es: 'Fundamental (bajo: 1)', en: 'Root position (bass: 1)' },
+  't12.demo.inv1': { es: '1ª inversión (bajo: 3)', en: '1st inversion (bass: 3)' },
+  't12.demo.inv2': { es: '2ª inversión (bajo: 5)', en: '2nd inversion (bass: 5)' },
+  't12.widget.heading': { es: 'Elige la calidad y la inversión', en: 'Pick the quality and the inversion' },
+  't12.widget.body': {
+    es: 'Cambia entre mayor y menor, y entre las tres inversiones. La notación con barra nombra el acorde y, después de la barra, la nota que está en el bajo.',
+    en: 'Switch between major and minor, and between the three inversions. Slash notation names the chord and, after the slash, the note sitting in the bass.',
+  },
+  't12.widget.caption': { es: 'Notación: {chord}/{bass}', en: 'Notation: {chord}/{bass}' },
+  't12.q1.prompt': {
+    es: '¿Qué grado del acorde queda en el bajo en la primera inversión?',
+    en: 'Which chord degree sits in the bass in first inversion?',
+  },
+  't12.q2.prompt': { es: '¿Y en la segunda inversión?', en: 'And in second inversion?' },
+  't12.q3.prompt': {
+    es: '¿Cuántos pisos de bajo distintos ofrece una tríada?',
+    en: 'How many distinct bass floors does a triad offer?',
+  },
+  't12.q4.prompt': {
+    es: 'En posición fundamental, ¿qué grado del acorde está en el bajo?',
+    en: 'In root position, which chord degree sits in the bass?',
+  },
+  't12.complete.body': {
+    es: 'Desbloqueaste E11 y F2: inversiones al oído y en el diapasón.',
+    en: 'You unlocked E11 and F2: inversions by ear and on the fretboard.',
   },
 
   // E1 drill

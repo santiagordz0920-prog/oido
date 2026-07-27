@@ -3,11 +3,17 @@ import { Header } from './components/Header'
 import { Home } from './features/Home'
 import { T2Lesson } from './features/T2Lesson'
 import { TheoryIndex } from './features/lessons/TheoryIndex'
+import { T1Lesson } from './features/lessons/T1Lesson'
 import { T3Lesson } from './features/lessons/T3Lesson'
 import { T4Lesson } from './features/lessons/T4Lesson'
 import { T5Lesson } from './features/lessons/T5Lesson'
 import { T6Lesson } from './features/lessons/T6Lesson'
 import { T7Lesson } from './features/lessons/T7Lesson'
+import { T8Lesson } from './features/lessons/T8Lesson'
+import { T9Lesson } from './features/lessons/T9Lesson'
+import { T10Lesson } from './features/lessons/T10Lesson'
+import { T11Lesson } from './features/lessons/T11Lesson'
+import { T12Lesson } from './features/lessons/T12Lesson'
 import { E1Drill } from './features/E1Drill'
 import { SessionSetup } from './features/SessionSetup'
 import { SessionRunner } from './features/SessionRunner'
@@ -23,12 +29,18 @@ import type { SessionMode } from './session/modes'
 type View =
   | { name: 'home' }
   | { name: 'theory' }
+  | { name: 't1' }
   | { name: 't2' }
   | { name: 't3' }
   | { name: 't4' }
   | { name: 't5' }
   | { name: 't6' }
   | { name: 't7' }
+  | { name: 't8' }
+  | { name: 't9' }
+  | { name: 't10' }
+  | { name: 't11' }
+  | { name: 't12' }
   | { name: 'e1' }
   | { name: 'session-setup' }
   | { name: 'session'; mode: SessionMode }
@@ -37,12 +49,18 @@ type View =
 // Theory index → lesson view routing. Only lessons with a built screen are
 // listed here; TheoryIndex never offers a CTA for a node that has no entry.
 const LESSON_VIEW: Partial<Record<string, View>> = {
+  T1: { name: 't1' },
   T2: { name: 't2' },
   T3: { name: 't3' },
   T4: { name: 't4' },
   T5: { name: 't5' },
   T6: { name: 't6' },
   T7: { name: 't7' },
+  T8: { name: 't8' },
+  T9: { name: 't9' },
+  T10: { name: 't10' },
+  T11: { name: 't11' },
+  T12: { name: 't12' },
 }
 
 export default function App() {
@@ -90,6 +108,9 @@ export default function App() {
           }}
         />
       ) : null}
+      {view.name === 't1' ? (
+        <T1Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
       {view.name === 't2' ? (
         <T2Lesson activeKey={activeKey} onKeyChange={setActiveKey} onGoToDrill={() => setView({ name: 'e1' })} />
       ) : null}
@@ -111,6 +132,21 @@ export default function App() {
       ) : null}
       {view.name === 't7' ? (
         <T7Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't8' ? (
+        <T8Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't9' ? (
+        <T9Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't10' ? (
+        <T10Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't11' ? (
+        <T11Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't12' ? (
+        <T12Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
       ) : null}
       {view.name === 'e1' ? <E1Drill onKeyChange={setActiveKey} /> : null}
       {view.name === 'session-setup' ? (
