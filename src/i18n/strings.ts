@@ -396,6 +396,19 @@ const strings = {
   'node.P4.title': { es: 'Improvisación con límites', en: 'Constrained improvisation' },
   'node.P5.title': { es: 'Improvisación libre con análisis', en: 'Free improvisation with analysis' },
 
+  // Lesson shell (shared by all theory lessons)
+  'lesson.check.heading': { es: 'Comprueba', en: 'Check yourself' },
+  'lesson.check.think': {
+    es: 'Responde en tu cabeza antes de mirar las opciones.',
+    en: 'Answer in your head before looking at the options.',
+  },
+  'lesson.check.showOptions': { es: 'Ver opciones', en: 'Show options' },
+  'lesson.check.correct': { es: 'Correcto.', en: 'Correct.' },
+  'lesson.check.incorrect': { es: 'No. Inténtalo otra vez.', en: 'No. Try again.' },
+  'lesson.check.progress': { es: 'Pregunta {n} de {total}', en: 'Question {n} of {total}' },
+  'lesson.complete.title': { es: 'Lección completada', en: 'Lesson complete' },
+  'lesson.cta.session': { es: 'Practicarlo en una sesión', en: 'Practice it in a session' },
+
   // Corpus Coverage
   'coverage.label': { es: 'Cobertura del corpus', en: 'Corpus coverage' },
   'coverage.claim': {

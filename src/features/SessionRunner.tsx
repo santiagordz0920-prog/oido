@@ -345,6 +345,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       {meta}
       {note}
       <TheoryCheckItem
+        nodeId={current.item.nodeId}
         checkId={String(current.item.params.checkId)}
         nextLabel={t('e1.next')}
         onResult={handleResult}

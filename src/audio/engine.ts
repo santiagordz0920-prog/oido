@@ -3,6 +3,7 @@ import {
   cadenceVoicings,
   chordCloseVoicing,
   degreeNote,
+  parseNumeral,
   progressionVoicings,
   resolutionDegrees,
   scaleFormNotes,
@@ -172,6 +173,70 @@ export function playCadenceThenDegree(
 
 export function playDegree(tonic: string, degree: number): Promise<void> {
   return play([{ time: 0, notes: [degreeNote(tonic, degree)], duration: 1.4 }])
+}
+
+// Arbitrary simultaneous notes, for lesson demos (e.g. T10's tritone pair).
+export function playNotes(notes: string[], durationSeconds = 1.6): Promise<void> {
+  return play([{ time: 0, notes, duration: durationSeconds }])
+}
+
+// The harmonic series as pure sine partials, for T1. This is the one
+// deliberate exception to "sampled instruments only": the demo IS about the
+// physics of a single vibrating string, so sines are the honest timbre.
+// Partials accumulate: each step adds the next partial over the held stack.
+export function playPartials(fundamentalHz: number, count: number, onPartial?: (n: number) => void): Promise<void> {
+  const run = ++activeRun
+  stopPlayback()
+  const transport = Tone.getTransport()
+  const draw = Tone.getDraw()
+  const synth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'sine' },
+    envelope: { attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.4 },
+  }).toDestination()
+  synth.volume.value = -10
+  const step = 0.8
+  return new Promise((resolve) => {
+    for (let n = 1; n <= count; n++) {
+      transport.schedule((time) => {
+        // each partial fades as the next enters, so the stack stays clear
+        synth.triggerAttackRelease(fundamentalHz * n, step * 2.2, time, Math.max(0.15, 0.8 / n))
+        if (onPartial) draw.schedule(() => { if (run === activeRun) onPartial(n) }, time)
+      }, (n - 1) * step)
+    }
+    const end = count * step + 2
+    transport.schedule((time) => {
+      draw.schedule(() => {
+        if (run === activeRun) {
+          onPartial?.(0)
+          resolve()
+        }
+        synth.dispose()
+      }, time)
+      transport.stop(time + 0.05)
+    }, end)
+    transport.start()
+  })
+}
+
+// A progression in flat root-position blocks — deliberately unmusical, the
+// "before" in T11's voice-leading contrast. The voiced version is
+// playProgression.
+export function playProgressionBlock(
+  tonic: string,
+  numerals: string[],
+  { chordSeconds = 1.1, onChord }: ProgressionOptions = {},
+): Promise<void> {
+  const voicings = progressionVoicings(tonic, numerals)
+  return play(
+    voicings.map((v, i) => ({
+      time: i * chordSeconds,
+      notes: [v.bass, ...chordCloseVoicing(parseNumeral(tonic, numerals[i]), 0)],
+      duration: i === voicings.length - 1 ? chordSeconds * 1.6 : chordSeconds * 0.98,
+      velocity: 0.8,
+      onStart: onChord ? () => onChord(i) : undefined,
+    })),
+    onChord ? () => onChord(-1) : undefined,
+  )
 }
 
 // One scale form ascending, for E4 (minor in three forms vs parallel major).

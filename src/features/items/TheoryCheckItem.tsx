@@ -1,21 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../../state/settings'
-import { t2Check } from '../../curriculum/t2Checks'
+import { lessonCheck } from '../../curriculum/checks'
 import type { ItemResult } from './E1Item'
 
 // One theory check question served as a review item inside a session.
 // Unlike the lesson, this is one-shot retrieval: pick, see the verdict, move on.
 
 type Props = {
+  nodeId: string
   checkId: string
   nextLabel: string
   onResult: (r: ItemResult) => void
   onNext: () => void
 }
 
-export function TheoryCheckItem({ checkId, nextLabel, onResult, onNext }: Props) {
+export function TheoryCheckItem({ nodeId, checkId, nextLabel, onResult, onNext }: Props) {
   const t = useT()
-  const check = t2Check(checkId)
+  const check = lessonCheck(nodeId, checkId)
   const [picked, setPicked] = useState<string | null>(null)
   const shownAt = useRef(0)
 

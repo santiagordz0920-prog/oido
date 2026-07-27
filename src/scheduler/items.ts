@@ -1,5 +1,5 @@
 import { KEYS } from '../theory/keys'
-import { T2_CHECKS } from '../curriculum/t2Checks'
+import { LESSON_CHECKS } from '../curriculum/checks'
 import type { ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
@@ -367,19 +367,22 @@ function e9Items(): DrillItem[] {
   return items
 }
 
-function t2Items(): DrillItem[] {
-  return T2_CHECKS.map((check) => ({
-    id: `T2|${check.id}`,
-    nodeId: 'T2',
-    kind: 'theory-check',
-    context: check.id,
-    params: { checkId: check.id },
-    seedRating: 1000,
-  }))
+// Every registered lesson's check questions become FSRS items.
+function theoryItems(): DrillItem[] {
+  return Object.entries(LESSON_CHECKS).flatMap(([nodeId, checks]) =>
+    checks.map((check) => ({
+      id: `${nodeId}|${check.id}`,
+      nodeId,
+      kind: 'theory-check' as const,
+      context: check.id,
+      params: { checkId: check.id },
+      seedRating: 1000,
+    })),
+  )
 }
 
 export const ITEMS: DrillItem[] = [
-  ...t2Items(),
+  ...theoryItems(),
   ...e0Items(),
   ...e1Items(),
   ...e2Items(),
