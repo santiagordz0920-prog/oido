@@ -1,5 +1,15 @@
 import * as Tone from 'tone'
-import { cadenceVoicings, degreeNote, progressionVoicings, resolutionDegrees, scaleNotes } from '../theory'
+import {
+  cadenceVoicings,
+  chordCloseVoicing,
+  degreeNote,
+  progressionVoicings,
+  resolutionDegrees,
+  scaleFormNotes,
+  scaleNotes,
+  type ChordSpec,
+  type ScaleForm,
+} from '../theory'
 
 // All musical timing goes through Tone.Transport — never setTimeout.
 // The piano is a local Salamander subset in /samples/piano, bundled so the
@@ -162,6 +172,51 @@ export function playCadenceThenDegree(
 
 export function playDegree(tonic: string, degree: number): Promise<void> {
   return play([{ time: 0, notes: [degreeNote(tonic, degree)], duration: 1.4 }])
+}
+
+// One scale form ascending, for E4 (minor in three forms vs parallel major).
+export function playScaleForm(tonic: string, form: ScaleForm, onDegree?: (degree: number) => void): Promise<void> {
+  const notes = scaleFormNotes(tonic, form)
+  const step = 0.45
+  return play(
+    notes.map((note, i) => ({
+      time: i * step,
+      notes: [note],
+      duration: step * 0.95,
+      onStart: onDegree ? () => onDegree(i + 1) : undefined,
+    })),
+    onDegree ? () => onDegree(0) : undefined,
+  )
+}
+
+// A single chord in close position, twice (block, then again), for E5
+// quality drills. No cadence — quality identification is context-free.
+export function playChordQuality(spec: ChordSpec, inversion = 0): Promise<void> {
+  const notes = chordCloseVoicing(spec, inversion)
+  return play([
+    { time: 0, notes, duration: 1.5, velocity: 0.85 },
+    { time: 1.8, notes, duration: 1.8, velocity: 0.8 },
+  ])
+}
+
+// Cadence, a breath, then one diatonic chord voiced in context, for E6.
+export function playCadenceThenNumeral(tonic: string, numeral: string, onTarget?: () => void): Promise<void> {
+  const cadence = cadenceVoicings(tonic)
+  const target = progressionVoicings(tonic, [numeral])[0]
+  const dur = 0.75
+  const events: ScheduledNote[] = cadence.map((v, i) => ({
+    time: i * dur,
+    notes: [v.bass, ...v.upper],
+    duration: i === cadence.length - 1 ? dur * 1.5 : dur * 0.98,
+    velocity: 0.8,
+  }))
+  events.push({
+    time: cadence.length * dur + 0.9,
+    notes: [target.bass, ...target.upper],
+    duration: 2,
+    onStart: onTarget,
+  })
+  return play(events)
 }
 
 export type ProgressionOptions = {

@@ -27,6 +27,23 @@ export function scaleNotes(tonic: string): string[] {
   return [1, 2, 3, 4, 5, 6, 7, 8].map((d) => degreeNote(tonic, d))
 }
 
+// The three minor forms plus parallel major, for E4/T5. tonal names natural
+// minor plainly "minor".
+export type ScaleForm = 'major' | 'natural minor' | 'harmonic minor' | 'melodic minor'
+
+const TONAL_SCALE_NAME: Record<ScaleForm, string> = {
+  major: 'major',
+  'natural minor': 'minor',
+  'harmonic minor': 'harmonic minor',
+  'melodic minor': 'melodic minor',
+}
+
+export function scaleFormNotes(tonic: string, form: ScaleForm): string[] {
+  const oct = tonicOctave(tonic)
+  const degrees = Scale.degrees(`${tonic}${oct} ${TONAL_SCALE_NAME[form]}`)
+  return [1, 2, 3, 4, 5, 6, 7, 8].map((d) => degrees(d))
+}
+
 // Functional resolutions (Karpinski-style). Stable degrees walk down to the
 // tonic; active degrees resolve by tendency: 2→1, 4→3, 6→5, 7→8. The number
 // 8 is the tonic an octave up — display it as "1".
@@ -205,4 +222,29 @@ export function chordSymbol(spec: ChordSpec): string {
 // Play-Along engine: everything renders from the same numeral data.
 export function progressionVoicings(tonic: string, numerals: string[]): Voicing[] {
   return voiceLead(numerals.map((n) => chordSymbol(parseNumeral(tonic, n))))
+}
+
+// A single chord in close position for quality drills (E5). The requested
+// inversion rotates the stack; no separate bass note, because a doubled root
+// in the bass would give the inversion away.
+export function chordCloseVoicing(spec: ChordSpec, inversion = 0): string[] {
+  const pcs = Chord.get(chordSymbol(spec)).notes
+  if (pcs.length < 3) throw new Error(`Unvoiceable chord: ${chordSymbol(spec)}`)
+  const rot = inversion % pcs.length
+  const rotated = [...pcs.slice(rot), ...pcs.slice(0, rot)]
+  const notes: string[] = []
+  let oct = 4
+  let prevMidi = -Infinity
+  for (const pc of rotated) {
+    let note = `${pc}${oct}`
+    let midi = Note.midi(note)!
+    while (midi <= prevMidi) {
+      oct++
+      note = `${pc}${oct}`
+      midi = Note.midi(note)!
+    }
+    notes.push(note)
+    prevMidi = midi
+  }
+  return notes
 }

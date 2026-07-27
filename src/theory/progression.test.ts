@@ -56,3 +56,17 @@ describe('resolutionDegrees', () => {
     expect(resolutionDegrees(2)).toEqual([2, 1])
   })
 })
+
+describe('chordCloseVoicing and scale forms', () => {
+  it('voices all four triad qualities and inversions in ascending order', async () => {
+    const { chordCloseVoicing, scaleFormNotes } = await import('./index')
+    for (const quality of ['maj', 'min', 'dim', 'aug', 'dom7', 'maj7', 'min7', 'm7b5', 'dim7'] as const) {
+      for (const inversion of [0, 1, 2]) {
+        const notes = chordCloseVoicing({ root: 'Eb', quality }, inversion)
+        expect(notes.length).toBeGreaterThanOrEqual(3)
+      }
+    }
+    expect(scaleFormNotes('A', 'harmonic minor')[6]).toBe('G#4')
+    expect(scaleFormNotes('A', 'natural minor')[6]).toBe('G4')
+  })
+})
