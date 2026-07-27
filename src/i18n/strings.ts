@@ -784,8 +784,8 @@ const strings = {
   'session.warmup.nextKey': { es: 'Otra tonalidad', en: 'New key' },
   'session.warmup.skip': { es: 'Pasar a los ejercicios', en: 'Skip to the drills' },
   'session.fallback.bench': {
-    es: 'Los bloques de diapasón y producción llegan en las fases 3 y 4; hoy este bloque usa teoría y oído.',
-    en: 'Fretboard and production blocks arrive in Phases 3 and 4; today this block runs theory and ear.',
+    es: 'Este bloque necesita la guitarra en las manos. Si el micrófono no está listo, cada ejercicio tiene su modo sin micrófono.',
+    en: 'This block wants the guitar in your hands. If the mic is not ready, every drill has its no-mic mode.',
   },
   'session.fallback.deep': {
     es: 'Las tareas y el banco de transcripción llegan en la fase 5; hoy esta sesión es repaso mixto.',
@@ -1045,6 +1045,64 @@ const strings = {
     es: 'El audio no pudo iniciarse. Toca la pantalla e inténtalo de nuevo.',
     en: 'Audio could not start. Tap the screen and try again.',
   },
+
+  // Track F — fretboard drills (F0, F1, F5) and the shared Fretboard
+  // component. Grading is always by pitch class (docs behind F-drills brief,
+  // rule 2), never by exact MIDI, so no string here ever names an interval.
+  'fretboard.ariaLabel': { es: 'Diagrama del diapasón', en: 'Fretboard diagram' },
+  'fretboard.tap.switch': { es: 'Sin micrófono', en: 'Without the mic' },
+  'fretboard.tap.body': {
+    es: 'Sin micrófono no puedo verificar lo que suena. Toca la posición en el diapasón.',
+    en: 'Without the mic I cannot verify what sounded. Tap the position on the fretboard.',
+  },
+  'fretboard.needsCalibration': {
+    es: 'Calibra el micrófono para que este ejercicio te escuche.',
+    en: 'Calibrate the mic so this drill can hear you.',
+  },
+  'fretboard.listening': { es: 'Escuchando…', en: 'Listening…' },
+  'fretboard.heard': { es: 'Oigo {note}', en: 'I hear {note}' },
+  'fretboard.timeout': {
+    es: 'Sin señal clara. Toca la posición en el diapasón.',
+    en: 'No clear signal. Tap the position on the fretboard.',
+  },
+  'fretboard.pitchIs': { es: 'Nota: {key}', en: 'Note: {key}' },
+  'fretboard.rootIs': { es: 'Raíz: {key}', en: 'Root: {key}' },
+  'fretboard.keyIs': { es: 'Tonalidad: {key} mayor', en: 'Key: {key} major' },
+
+  // F0 — note names in all positions under time pressure
+  'f0.prompt': { es: '{note} en la cuerda {string}', en: '{note} on string {string}' },
+  'f0.countdown': { es: 'Tiempo: {s} s', en: 'Time: {s} s' },
+  'f0.correct': { es: 'Sí: {note}.', en: 'Yes: {note}.' },
+  'f0.incorrect': {
+    es: 'Eso es {note}. Busca {target} en la cuerda {string}.',
+    en: 'That is {note}. Find {target} on string {string}.',
+  },
+  'f0.fretHint': {
+    es: 'En la cuerda {string}, eso es el traste {fret}.',
+    en: 'On string {string}, that would be fret {fret}.',
+  },
+
+  // F1 — degrees from a given root across string pairs
+  'f1.prompt': {
+    es: 'Toca el grado {degree} en las cuerdas {a} y {b}',
+    en: 'Play degree {degree} on strings {a} and {b}',
+  },
+  'f1.correct': { es: 'Sí: grado {degree}.', en: 'Yes: degree {degree}.' },
+  'f1.incorrect': {
+    es: 'Ese no es el grado {degree}. Oigo {note}.',
+    en: 'That is not degree {degree}. I hear {note}.',
+  },
+
+  // F5 — scale degree relative to a moving root
+  'f5.listening': { es: 'Progresión…', en: 'Progression…' },
+  'f5.chordIs': { es: 'Acorde actual: {numeral}', en: 'Current chord: {numeral}' },
+  'f5.prompt': { es: 'Toca el grado {degree} de este acorde', en: 'Play degree {degree} of this chord' },
+  'f5.correct': { es: 'Sí: grado {degree}.', en: 'Yes: degree {degree}.' },
+  'f5.incorrect': {
+    es: 'Ese no es el grado {degree}. Oigo {note}.',
+    en: 'That is not degree {degree}. I hear {note}.',
+  },
+  'f5.replay': { es: 'Repetir', en: 'Replay' },
 } as const
 
 export type StringKey = keyof typeof strings

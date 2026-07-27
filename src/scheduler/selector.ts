@@ -20,9 +20,16 @@ function bannedNode(recentNodeIds: string[]): string | null {
 // Priority within a pool: due reviews first (earliest due — weakest first),
 // then unseen cards (introduce new material), then the earliest-due card as
 // an extra review so a session never runs dry.
+//
+// A never-reviewed card is created already due, so it has to be excluded
+// from the review pool explicitly. Without that, every fresh card counts as
+// an overdue review and the earliest-created one always wins, which on a new
+// install serves one node's cards in creation order — theory checks for a
+// whole session — instead of mixing tracks the way new material should be
+// introduced.
 function best(pool: CardRow[], now: Date, random: () => number): CardRow | null {
   if (pool.length === 0) return null
-  const due = pool.filter((c) => isDue(c, now))
+  const due = pool.filter((c) => !isNew(c) && isDue(c, now))
   if (due.length > 0) return due.reduce((a, b) => (a.due <= b.due ? a : b))
   const fresh = pool.filter(isNew)
   if (fresh.length > 0) return fresh[Math.floor(random() * fresh.length)]

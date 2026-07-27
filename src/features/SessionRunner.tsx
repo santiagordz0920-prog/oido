@@ -17,8 +17,21 @@ import { E7Item } from './items/E7Item'
 import { E8Item } from './items/E8Item'
 import { E9Item } from './items/E9Item'
 import { P0Item } from './items/P0Item'
+import { F0Item } from './items/F0Item'
+import { F1Item } from './items/F1Item'
+import { F5Item } from './items/F5Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
 import type { DrillItem } from '../scheduler/items'
+
+// Each fretboard node keys its "current key" hue off a different params
+// field — F0's is a bare pitch class, F1 and F5 are rooted keys — so the
+// tonic used for coloring is resolved per node id, same pattern as
+// recognitionTonic above.
+function fretboardTonic(item: DrillItem): string {
+  if (item.nodeId === 'F0') return String(item.params.pitchClass)
+  if (item.nodeId === 'F1') return String(item.params.rootPitchClass)
+  return String(item.params.tonic)
+}
 
 // E5's context is a chromatic root, not a diatonic key; every other
 // recognition node's context is the tonic of a major key.
@@ -98,6 +111,8 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       onKeyChange(keyByTonic(recognitionTonic(found.item)))
     } else if (found.item.kind === 'production') {
       onKeyChange(keyByTonic(String(found.item.params.tonic)))
+    } else if (found.item.kind === 'fretboard') {
+      onKeyChange(keyByTonic(fretboardTonic(found.item)))
     }
     setCurrent(found)
   }
@@ -358,6 +373,62 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
             onResult={handleResult}
             onNext={handleNext}
           />
+          {endButton}
+        </div>
+      </div>
+    )
+  }
+
+  if (current.item.kind === 'fretboard') {
+    const nodeId = current.item.nodeId
+    const itemKey = keyByTonic(fretboardTonic(current.item))
+    const nextLabel = t('e1.next')
+    let fretboardItem
+    let keyLine: string
+    if (nodeId === 'F0') {
+      keyLine = t('fretboard.pitchIs', { key: itemKey.label })
+      fretboardItem = (
+        <F0Item
+          pitchClass={itemKey}
+          stringNumber={Number(current.item.params.stringIndex)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'F1') {
+      const [a, b] = String(current.item.params.stringSet).split('-').map(Number)
+      keyLine = t('fretboard.rootIs', { key: itemKey.label })
+      fretboardItem = (
+        <F1Item
+          root={itemKey}
+          degree={Number(current.item.params.degree)}
+          stringSet={[a, b]}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else {
+      keyLine = t('fretboard.keyIs', { key: itemKey.label })
+      fretboardItem = (
+        <F5Item
+          itemKey={itemKey}
+          numeralIndex={Number(current.item.params.numeralIndex)}
+          degree={String(current.item.params.degree)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    }
+    return (
+      <div className="key-field flex-1 p-4">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          {meta}
+          {note}
+          <div className="mono text-[length:var(--fs-1)]">{keyLine}</div>
+          {fretboardItem}
           {endButton}
         </div>
       </div>

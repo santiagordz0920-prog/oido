@@ -6,7 +6,7 @@ import type { ChordQuality, ScaleForm } from '../theory'
 // names the FSRS card it belongs to; its seed rating positions it for Elo
 // until real attempts move it.
 
-export type ItemKind = 'recognition' | 'theory-check' | 'production'
+export type ItemKind = 'recognition' | 'theory-check' | 'production' | 'fretboard'
 
 export type DrillItem = {
   id: string
@@ -404,6 +404,107 @@ function p0Items(): DrillItem[] {
   return items
 }
 
+// F0: note names in all positions under time pressure, over all 12 pitch
+// classes (`pitchClass` reuses the KEYS tonic spelling so the item's context
+// carries a hue for free — every pitch class already sits somewhere on the
+// twelve-hue wheel) and all 6 strings. Naturals seed lower than the five
+// sharp/flat pitch classes: a natural's letter name is its own answer, while
+// an accidental adds a step of recall (§7 F0).
+const F0_NATURAL_SEED = 1000
+const F0_ACCIDENTAL_SEED = 1080
+const F0_NATURAL_TONICS = new Set(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
+
+function f0Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    const seedRating = F0_NATURAL_TONICS.has(key.tonic) ? F0_NATURAL_SEED : F0_ACCIDENTAL_SEED
+    for (let stringIndex = 1; stringIndex <= 6; stringIndex++) {
+      items.push({
+        id: `F0|${key.tonic}|${stringIndex}`,
+        nodeId: 'F0',
+        kind: 'fretboard',
+        context: key.tonic,
+        params: { pitchClass: key.tonic, stringIndex },
+        seedRating,
+      })
+    }
+  }
+  return items
+}
+
+// F1: degrees from a given root across string pairs (§7 F1). `stringSet` is
+// stored as "a-b" (DrillItem.params only carries string|number) and parsed
+// back to a pair at render time. The five adjacent pairs (6-5 .. 2-1) and
+// four skip-one pairs (6-4 .. 3-1) cover the fretboard symmetrically; skip
+// pairs seed harder, since the shape under the fingers is less familiar than
+// a same-fret adjacent pair. Degree 1 is excluded — it is the root itself,
+// already shown as the target marker.
+export const F1_STRING_SETS: Array<[number, number]> = [
+  [6, 5],
+  [5, 4],
+  [4, 3],
+  [3, 2],
+  [2, 1],
+  [6, 4],
+  [5, 3],
+  [4, 2],
+  [3, 1],
+]
+const F1_ADJACENT_SEED = 1000
+const F1_SKIP_SEED = 1040
+const F1_DEGREE_OFFSET: Record<number, number> = { 2: 0, 6: 0, 3: 10, 5: 10, 4: 30, 7: 30 }
+
+function f1Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const degree of [2, 3, 4, 5, 6, 7]) {
+      for (const [a, b] of F1_STRING_SETS) {
+        const adjacent = Math.abs(a - b) === 1
+        const base = adjacent ? F1_ADJACENT_SEED : F1_SKIP_SEED
+        items.push({
+          id: `F1|${key.tonic}|${degree}|${a}-${b}`,
+          nodeId: 'F1',
+          kind: 'fretboard',
+          context: key.tonic,
+          params: { rootPitchClass: key.tonic, degree, stringSet: `${a}-${b}` },
+          seedRating: base + F1_DEGREE_OFFSET[degree],
+        })
+      }
+    }
+  }
+  return items
+}
+
+// F5: scale degree relative to a moving root (§7 F5). The progression is
+// fixed and deliberately simple — I-IV-V-vi, drawn from the four numerals
+// the brief allows — so item generation never touches the corpus tables
+// (that is E-track work). `degree` is a string so '♭7' can be written 'b7'
+// without a separate type; F5Item transposes chordRootPc + the offset below
+// and grades the result by pitch class, same as every other fretboard item.
+export const F5_NUMERALS = ['I', 'IV', 'V', 'vi']
+export const F5_DEGREES = ['1', '3', '5', 'b7'] as const
+export const F5_DEGREE_OFFSET: Record<string, number> = { '1': 0, '3': 4, '5': 7, b7: 10 }
+const F5_DEGREE_SEED: Record<string, number> = { '1': 1000, '5': 1020, '3': 1040, b7: 1080 }
+
+function f5Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let numeralIndex = 0; numeralIndex < F5_NUMERALS.length; numeralIndex++) {
+      for (const degree of F5_DEGREES) {
+        items.push({
+          id: `F5|${key.tonic}|${numeralIndex}|${degree}`,
+          nodeId: 'F5',
+          kind: 'fretboard',
+          context: key.tonic,
+          params: { tonic: key.tonic, numeralIndex, degree },
+          seedRating: F5_DEGREE_SEED[degree],
+        })
+      }
+    }
+  }
+  return items
+}
+
 export const ITEMS: DrillItem[] = [
   ...theoryItems(),
   ...p0Items(),
@@ -417,6 +518,9 @@ export const ITEMS: DrillItem[] = [
   ...e7Items(),
   ...e8Items(),
   ...e9Items(),
+  ...f0Items(),
+  ...f1Items(),
+  ...f5Items(),
 ]
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]))

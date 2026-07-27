@@ -6,6 +6,10 @@ import {
   E7_POOL_SIZE,
   E8_POOL_SIZE,
   E9_RANK_COUNT,
+  F1_STRING_SETS,
+  F5_DEGREES,
+  F5_DEGREE_OFFSET,
+  F5_NUMERALS,
   isDiatonicProgression,
   ITEMS,
   NUMERAL_DEGREE,
@@ -217,5 +221,88 @@ describe('drill items', () => {
     // rank 5 of 0..11: distance-1 neighbors are 4 and 6 (tie), then distance-2 is 3 and 7 (tie) — lower rank wins each tie.
     expect(distractorRanks(5, 12, 3)).toEqual([4, 6, 3])
     expect(distractorRanks(5, 12, 3)).toEqual(distractorRanks(5, 12, 3))
+  })
+
+  for (const nodeId of ['F0', 'F1', 'F5']) {
+    it(`${nodeId} covers all 12 key contexts`, () => {
+      const contexts = contextsForNode(nodeId)
+      expect(new Set(contexts).size).toBe(12)
+      for (const key of KEYS) expect(contexts).toContain(key.tonic)
+    })
+  }
+
+  it('F0 params are well-formed: pitchClass one of the 12 tonics, stringIndex 1-6, all 6 strings covered per pitch class', () => {
+    const f0 = ITEMS.filter((i) => i.nodeId === 'F0')
+    expect(f0.length).toBeGreaterThan(0)
+    for (const item of f0) {
+      expect(item.context).toBe(item.params.pitchClass)
+      expect(typeof item.params.pitchClass).toBe('string')
+      expect(KEYS.map((k) => k.tonic)).toContain(item.params.pitchClass)
+      expect(item.params.stringIndex).toBeGreaterThanOrEqual(1)
+      expect(item.params.stringIndex).toBeLessThanOrEqual(6)
+    }
+    for (const key of KEYS) {
+      const strings = f0.filter((i) => i.params.pitchClass === key.tonic).map((i) => i.params.stringIndex)
+      expect(new Set(strings)).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+    }
+  })
+
+  it('F0 seeds naturals lower than sharps/flats', () => {
+    const natural = ITEMS.find((i) => i.nodeId === 'F0' && i.params.pitchClass === 'C' && i.params.stringIndex === 6)!
+    const accidental = ITEMS.find((i) => i.nodeId === 'F0' && i.params.pitchClass === 'F#' && i.params.stringIndex === 6)!
+    expect(natural.seedRating).toBeLessThan(accidental.seedRating)
+  })
+
+  it('F1 params are well-formed: rootPitchClass, degree in 2-7, stringSet one of the nine pairs, no root (degree 1)', () => {
+    const f1 = ITEMS.filter((i) => i.nodeId === 'F1')
+    expect(f1.length).toBeGreaterThan(0)
+    const stringSetStrings = new Set(F1_STRING_SETS.map(([a, b]) => `${a}-${b}`))
+    for (const item of f1) {
+      expect(item.context).toBe(item.params.rootPitchClass)
+      expect(typeof item.params.rootPitchClass).toBe('string')
+      expect(item.params.degree).toBeGreaterThanOrEqual(2)
+      expect(item.params.degree).toBeLessThanOrEqual(7)
+      expect(stringSetStrings).toContain(item.params.stringSet)
+    }
+    for (const key of KEYS) {
+      const forKey = f1.filter((i) => i.params.rootPitchClass === key.tonic)
+      expect(forKey).toHaveLength(6 * F1_STRING_SETS.length)
+      const degrees = new Set(forKey.map((i) => i.params.degree))
+      expect(degrees).toEqual(new Set([2, 3, 4, 5, 6, 7]))
+      const sets = new Set(forKey.map((i) => i.params.stringSet))
+      expect(sets).toEqual(stringSetStrings)
+    }
+  })
+
+  it('F1 has 9 string sets: 5 adjacent, 4 skip-one, none repeated', () => {
+    expect(F1_STRING_SETS).toHaveLength(9)
+    const keys = F1_STRING_SETS.map(([a, b]) => `${a}-${b}`)
+    expect(new Set(keys).size).toBe(9)
+    const adjacent = F1_STRING_SETS.filter(([a, b]) => Math.abs(a - b) === 1)
+    const skip = F1_STRING_SETS.filter(([a, b]) => Math.abs(a - b) === 2)
+    expect(adjacent).toHaveLength(5)
+    expect(skip).toHaveLength(4)
+  })
+
+  it('F5 params are well-formed: tonic, numeralIndex within the fixed progression, degree in the four-degree set', () => {
+    const f5 = ITEMS.filter((i) => i.nodeId === 'F5')
+    expect(f5.length).toBeGreaterThan(0)
+    for (const item of f5) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(item.params.numeralIndex).toBeGreaterThanOrEqual(0)
+      expect(item.params.numeralIndex).toBeLessThan(F5_NUMERALS.length)
+      expect(F5_DEGREES).toContain(item.params.degree)
+    }
+    for (const key of KEYS) {
+      const forKey = f5.filter((i) => i.params.tonic === key.tonic)
+      expect(forKey).toHaveLength(F5_NUMERALS.length * F5_DEGREES.length)
+      const indices = new Set(forKey.map((i) => i.params.numeralIndex))
+      expect(indices).toEqual(new Set(F5_NUMERALS.map((_, i) => i)))
+    }
+  })
+
+  it('F5_DEGREE_OFFSET maps 1/3/5/b7 to their semitone offset from the chord root', () => {
+    expect(F5_DEGREE_OFFSET).toEqual({ '1': 0, '3': 4, '5': 7, b7: 10 })
   })
 })
