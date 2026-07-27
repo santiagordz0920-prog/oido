@@ -166,7 +166,7 @@ export function P1Item({ itemKey, nextLabel, onResult, onNext, onOpenCalibration
 
   const mic = useMic({
     active: listening,
-    config: configFor(micSettings.noiseFloorRms),
+    config: configFor(micSettings.noiseFloorRms, micSettings.gateMarginDb),
     onNote: (event) => {
       if (event.kind === 'note') setHeardMidi(event.midi)
       const finished = capture.current.push(event)
@@ -305,7 +305,11 @@ export function P1Item({ itemKey, nextLabel, onResult, onNext, onOpenCalibration
             </p>
           ) : (
             <>
-              <InputMeter rms={mic.rms} floorRms={micSettings.noiseFloorRms} />
+              <InputMeter
+                rms={mic.rms}
+                floorRms={micSettings.noiseFloorRms}
+                gateMarginDb={micSettings.gateMarginDb ?? undefined}
+              />
               <p className="mono text-[length:var(--fs-2)]" role="status">
                 {heardMidi === null ? t('p1.listening') : t('p1.heard', { note: noteLabel(heardMidi) })}
               </p>

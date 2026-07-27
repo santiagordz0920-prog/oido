@@ -53,7 +53,7 @@ export function P0Item({ itemKey, degree, nextLabel, onResult, onNext, onOpenCal
 
   const mic = useMic({
     active: listening,
-    config: configFor(micSettings.noiseFloorRms),
+    config: configFor(micSettings.noiseFloorRms, micSettings.gateMarginDb),
     onNote: (event) => {
       if (event.kind !== 'note') return
       setHeardMidi(event.midi)
@@ -177,7 +177,11 @@ export function P0Item({ itemKey, degree, nextLabel, onResult, onNext, onOpenCal
             </p>
           ) : (
             <>
-              <InputMeter rms={mic.rms} floorRms={micSettings.noiseFloorRms} />
+              <InputMeter
+                rms={mic.rms}
+                floorRms={micSettings.noiseFloorRms}
+                gateMarginDb={micSettings.gateMarginDb ?? undefined}
+              />
               <p className="mono text-[length:var(--fs-2)]" role="status">
                 {heardMidi === null ? t('p0.listening') : t('p0.heard', { note: noteLabel(heardMidi) })}
               </p>

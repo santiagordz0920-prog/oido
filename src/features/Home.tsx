@@ -9,6 +9,7 @@ type Props = {
   onOpenSession: () => void
   onOpenConstellation: () => void
   onOpenCalibration: () => void
+  onOpenMicCheck: () => void
 }
 
 export function Home({
@@ -17,6 +18,7 @@ export function Home({
   onOpenSession,
   onOpenConstellation,
   onOpenCalibration,
+  onOpenMicCheck,
 }: Props) {
   const t = useT()
   const t2Complete = useNodeCompleted('T2')
@@ -86,9 +88,14 @@ export function Home({
             {calibratedAt === null ? t('home.mic.calibrate') : t('cal.recalibrate')}
           </button>
           {calibratedAt !== null ? (
-            <span className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
-              {t('home.mic.ready')}
-            </span>
+            <>
+              <button className={action} onClick={onOpenMicCheck}>
+                {t('home.mic.check')}
+              </button>
+              <span className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
+                {t('home.mic.ready')}
+              </span>
+            </>
           ) : null}
         </div>
       </section>

@@ -79,7 +79,7 @@ export function F1Item({ root, degree, stringSet, nextLabel, onResult, onNext, o
 
   const mic = useMic({
     active: listening,
-    config: configFor(micSettings.noiseFloorRms),
+    config: configFor(micSettings.noiseFloorRms, micSettings.gateMarginDb),
     onNote: (event) => {
       if (event.kind !== 'note') return
       setHeardMidi(event.midi)
@@ -169,7 +169,11 @@ export function F1Item({ root, degree, stringSet, nextLabel, onResult, onNext, o
               </p>
             ) : (
               <>
-                <InputMeter rms={mic.rms} floorRms={micSettings.noiseFloorRms} />
+                <InputMeter
+                rms={mic.rms}
+                floorRms={micSettings.noiseFloorRms}
+                gateMarginDb={micSettings.gateMarginDb ?? undefined}
+              />
                 <p className="mono text-[length:var(--fs-2)]" role="status">
                   {heardMidi === null ? t('fretboard.listening') : t('fretboard.heard', { note: heardLabel(heardMidi) })}
                 </p>

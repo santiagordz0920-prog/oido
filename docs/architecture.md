@@ -156,3 +156,24 @@ Grade by comparing the detected pitch-class set against the expected template pl
 The Basic Pitch model and the instrument samples are the heavy assets, so lazy-load both. The app must be fully usable for Tracks T and E before the polyphonic model finishes downloading, since that is the airport case and the most common one.
 
 ---
+
+## Tier 1 input as built (Phase 3 addendum)
+
+Input is an acoustic guitar into a laptop mic (phases.md open question 5), which decides most of what follows.
+
+**Detection.** MPM (`pitchy`) over 4096-sample frames at a 1024 hop, inside an AudioWorklet. MPM is the right choice here rather than a default one: a laptop mic rolls off below roughly 100–150 Hz, so the open low E's fundamental at 82.4 Hz arrives attenuated or missing, and MPM detects *periodicity* — which a missing fundamental does not change. Measured against a synthetic signal with the fundamental removed entirely, it still reports 82.41 Hz at 0.999 clarity.
+
+**Octave errors.** When detection does slip on this input it slips an octave up, so the worklet also reports the magnitude at 1.5× the candidate frequency (a pair of Goertzel evaluations, cheaper and more precise than an FFT bin). A partial there can only belong to a fundamental an octave below, which makes the test survive the very roll-off that causes the problem — unlike looking for the fundamental itself. `src/audio/input/spectrum.ts`, with the guard tested in both directions.
+
+**Calibration measures two numbers, not one** (`src/features/Calibration.tsx`, `src/state/mic.ts`):
+
+1. *The noise floor.* A short moving average over the frame RMS, then a **low** percentile of the smoothed signal. Both halves matter. Raw frames carry single-frame transients — a chair, a car, a keystroke — so a high percentile of the raw signal reports the room's loudest moment as its floor. Averaging alone does not fix it either, since a loud burst still drags a mean upward. Smoothing removes the spikes and a low percentile answers the question actually being asked: what level does this room sit at when nothing is happening?
+2. *The gate margin.* Derived from the separation this room and this guitar actually achieve, not assumed. The gate sits at the midpoint in dB between the measured floor and the level the guitar reached, clamped to 4–12 dB. A fixed margin fails in both directions: too wide and a room with normal background noise blocks the guitar (this was a real reported failure, not a hypothetical), too tight and the room reaches the detector.
+
+Biasing the floor low is safe because volume is not the only gate. Clarity, the pitch range, and multi-frame agreement all have to agree before a note is reported, and room noise satisfies none of them.
+
+The summary screen shows all three figures — room, guitar, gate — so a misfiring setup is diagnosable rather than mysterious.
+
+**Reaching the drills.** `MicCheck` (`src/features/MicCheck.tsx`) runs a single P0 item straight from the microphone card. P0 otherwise lives in a session's production block fifteen minutes in, which is right for practice and wrong for answering "is my mic working?". The attempt is recorded like any other, so a setup check is never wasted practice.
+
+**Dials.** `DEFAULT_CONFIG` in `src/audio/input/stabilize.ts` holds every threshold — clarity, gate margin, onset blanking, agreement window, release.

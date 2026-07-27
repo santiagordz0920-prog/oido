@@ -1061,6 +1061,20 @@ const strings = {
   },
   'home.mic.calibrate': { es: 'Calibrar', en: 'Calibrate' },
   'home.mic.ready': { es: 'Calibrado', en: 'Calibrated' },
+  'home.mic.check': { es: 'Probar', en: 'Test it' },
+
+  // Quick mic check — one production item, outside a session
+  'miccheck.eyebrow': { es: 'Comprobación', en: 'Quick check' },
+  'miccheck.title': { es: '¿Te oye?', en: 'Can it hear you?' },
+  'miccheck.body': {
+    es: 'Un solo ejercicio de producción, fuera de sesión, para confirmar que el micrófono te registra antes de sentarte a practicar. Cuenta como intento real.',
+    en: 'A single production drill, outside any session, to confirm the mic registers you before you sit down to practise. It counts as a real attempt.',
+  },
+  'miccheck.again': { es: 'Otra nota', en: 'Another note' },
+  'miccheck.needsCalibration': {
+    es: 'Calibra primero: sin el ruido de tu sala medido, el umbral es una suposición.',
+    en: 'Calibrate first: without your room measured, the gate is a guess.',
+  },
 
   // Microphone calibration
   'cal.eyebrow': { es: 'Micrófono', en: 'Microphone' },
@@ -1101,17 +1115,17 @@ const strings = {
   'cal.lowE.retry': { es: 'Probar otra vez', en: 'Try again' },
 
   'cal.done.heading': { es: 'Listo', en: 'Ready' },
-  'cal.done.body': {
-    es: 'Ruido de fondo en {db} dB. La guitarra tiene que superarlo por {margin} dB para contar como nota.',
-    en: 'Background noise at {db} dB. The guitar has to clear it by {margin} dB to count as a note.',
+  'cal.done.room': { es: 'Tu sala', en: 'Your room' },
+  'cal.done.guitar': { es: 'Tu guitarra', en: 'Your guitar' },
+  'cal.done.gate': { es: 'Umbral', en: 'Gate' },
+  'cal.done.tight': {
+    es: 'Tu guitarra solo supera la sala por {db} dB. Funciona, pero si algún ejercicio no te oye, acércate al portátil o baja el ruido de fondo.',
+    en: 'Your guitar clears the room by only {db} dB. That works, but if a drill misses you, move closer to the laptop or lower the background noise.',
   },
+  'cal.done.check': { es: 'Probar un ejercicio', en: 'Try one drill' },
   'cal.done.unconfirmed': {
     es: 'El mi grave no se confirmó. Los ejercicios funcionan igual, pero las cuerdas graves pueden fallar más.',
     en: 'The low E was not confirmed. Drills still work, but the low strings may miss more often.',
-  },
-  'cal.done.noisy': {
-    es: 'Tu sala está ruidosa. Si los ejercicios fallan, prueba con menos ruido de fondo o más cerca del portátil.',
-    en: 'Your room is noisy. If drills misfire, try less background noise or sit closer to the laptop.',
   },
   'cal.done.continue': { es: 'Continuar', en: 'Continue' },
   'cal.recalibrate': { es: 'Calibrar otra vez', en: 'Calibrate again' },

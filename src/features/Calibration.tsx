@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../state/settings'
-import { configFor, noiseFloorFrom, useMicSettings } from '../state/mic'
+import {
+  MIN_GATE_MARGIN_DB,
+  configFor,
+  gateMarginFor,
+  noiseFloorFrom,
+  useMicSettings,
+} from '../state/mic'
 import { useMic } from '../audio/input/useMic'
 import { noteNameOf } from '../audio/input/notes'
 import { InputMeter } from '../components/InputMeter'
@@ -8,12 +14,15 @@ import { DEFAULT_CONFIG } from '../audio/input/stabilize'
 import type { StringKey } from '../i18n/strings'
 
 // The calibration screen the brief makes mandatory before any mic session.
-// Two measurements: the room's noise floor, then an open low E — the note a
-// laptop mic is most likely to lose, so confirming it is the honest test.
+// It measures two things, because one is not enough: the level the room sits
+// at, and how far above it this guitar actually gets. A fixed margin over the
+// floor fails in both directions — too wide and a normal room blocks the
+// guitar, too tight and the room reaches the detector.
 
 const FLOOR_MS = 2500
 const LOW_E_MIDI = 40
 const LOW_E_TIMEOUT_MS = 20_000
+const TIGHT_SEPARATION_DB = 8
 
 type Phase = 'intro' | 'floor' | 'lowE' | 'done'
 
@@ -21,11 +30,17 @@ function noteLabel(midi: number): string {
   return noteNameOf(midi).replace('#', '♯')
 }
 
-type Props = {
-  onDone: () => void
+function toDb(rms: number | null): number | null {
+  if (rms === null || rms <= 0) return null
+  return Math.round(20 * Math.log10(rms))
 }
 
-export function Calibration({ onDone }: Props) {
+type Props = {
+  onDone: () => void
+  onOpenCheck?: () => void
+}
+
+export function Calibration({ onDone, onOpenCheck }: Props) {
   const t = useT()
   const saved = useMicSettings()
   const [phase, setPhase] = useState<Phase>('intro')
@@ -33,26 +48,43 @@ export function Calibration({ onDone }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(Math.ceil(FLOOR_MS / 1000))
   const [heardMidi, setHeardMidi] = useState<number | null>(null)
   const [lowETimedOut, setLowETimedOut] = useState(false)
+  const [result, setResult] = useState<{ floor: number; margin: number; peak: number | null } | null>(null)
 
   const samples = useRef<number[]>([])
+  const notePeak = useRef<number | null>(null)
+  const floorRef = useRef<number | null>(saved.noiseFloorRms)
+  floorRef.current = floorRms
+  const phaseRef = useRef<Phase>(phase)
+  phaseRef.current = phase
+
   const active = phase === 'floor' || phase === 'lowE'
+
+  function commit(confirmed: boolean) {
+    const floor = floorRef.current ?? DEFAULT_CONFIG.noiseFloorRms
+    const peak = notePeak.current
+    const margin = gateMarginFor(floor, confirmed ? peak : null)
+    saved.save({ noiseFloorRms: floor, gateMarginDb: margin, notePeakRms: peak, lowEConfirmed: confirmed })
+    setResult({ floor, margin, peak })
+    setPhase('done')
+  }
 
   const mic = useMic({
     active,
-    config: configFor(phase === 'lowE' ? floorRms : null),
+    // While hunting for the low E the gate is deliberately permissive: the
+    // separation is not known yet, and a gate guessed too high here would
+    // hide the very note being measured. Clarity and range still filter the
+    // room out, and the real margin is computed from what this step observes.
+    config: configFor(phase === 'lowE' ? floorRms : null, MIN_GATE_MARGIN_DB),
     onFrame: (frame) => {
-      if (phase === 'floor') samples.current.push(frame.rms)
+      if (phaseRef.current === 'floor') samples.current.push(frame.rms)
+      else if (phaseRef.current === 'lowE') {
+        notePeak.current = Math.max(notePeak.current ?? 0, frame.rms)
+      }
     },
     onNote: (event) => {
-      if (phase !== 'lowE' || event.kind !== 'note') return
+      if (phaseRef.current !== 'lowE' || event.kind !== 'note') return
       setHeardMidi(event.midi)
-      if (event.midi === LOW_E_MIDI) {
-        setFloorRms((floor) => {
-          saved.save({ noiseFloorRms: floor ?? DEFAULT_CONFIG.noiseFloorRms, lowEConfirmed: true })
-          return floor
-        })
-        setPhase('done')
-      }
+      if (event.midi === LOW_E_MIDI) commit(true)
     },
   })
 
@@ -67,6 +99,7 @@ export function Calibration({ onDone }: Props) {
       if (left <= 0) {
         clearInterval(id)
         setFloorRms(noiseFloorFrom(samples.current))
+        notePeak.current = null
         setHeardMidi(null)
         setLowETimedOut(false)
         setPhase('lowE')
@@ -85,15 +118,9 @@ export function Calibration({ onDone }: Props) {
   const chip =
     'mono snap border-[length:var(--rule)] border-[var(--ink)] bg-[var(--surface)] px-4 py-2 text-[length:var(--fs-2)] font-bold text-[color:var(--ink)]'
 
-  function saveAndFinish(confirmed: boolean) {
-    saved.save({
-      noiseFloorRms: floorRms ?? DEFAULT_CONFIG.noiseFloorRms,
-      lowEConfirmed: confirmed,
-    })
-    setPhase('done')
-  }
-
-  const floorDb = floorRms !== null && floorRms > 0 ? Math.round(20 * Math.log10(floorRms)) : null
+  const floorDb = toDb(result?.floor ?? floorRms)
+  const peakDb = toDb(result?.peak ?? null)
+  const separationDb = floorDb !== null && peakDb !== null ? peakDb - floorDb : null
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
@@ -147,7 +174,7 @@ export function Calibration({ onDone }: Props) {
         <section className={section}>
           <h2 className="display mb-2 text-[length:var(--fs-3)]">{t('cal.lowE.heading')}</h2>
           <p className="mb-4 max-w-[65ch]">{t('cal.lowE.body')}</p>
-          <InputMeter rms={mic.rms} floorRms={floorRms} />
+          <InputMeter rms={mic.rms} floorRms={floorRms} gateMarginDb={MIN_GATE_MARGIN_DB} />
           <p className="mono mt-3 text-[length:var(--fs-3)]" role="status">
             {heardMidi === null ? t('cal.lowE.waiting') : t('cal.lowE.heard', { note: noteLabel(heardMidi) })}
           </p>
@@ -168,7 +195,7 @@ export function Calibration({ onDone }: Props) {
                 >
                   {t('cal.lowE.retry')}
                 </button>
-                <button className={chip} onClick={() => saveAndFinish(false)}>
+                <button className={chip} onClick={() => commit(false)}>
                   {t('cal.lowE.skip')}
                 </button>
               </div>
@@ -185,15 +212,39 @@ export function Calibration({ onDone }: Props) {
           ) : (
             <p className="mb-2 max-w-[65ch]">{t('cal.done.unconfirmed')}</p>
           )}
+
+          {/* The three numbers that decide whether a note counts, shown
+              plainly so a misfiring room is diagnosable rather than mysterious. */}
           {floorDb !== null ? (
-            <p className="mb-2 max-w-[65ch]">
-              {t('cal.done.body', { db: floorDb, margin: DEFAULT_CONFIG.gateMarginDb })}
+            <dl className="mono my-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[length:var(--fs-1)]">
+              <dt className="text-[color:var(--ink-dim)]">{t('cal.done.room')}</dt>
+              <dd>{floorDb} dB</dd>
+              {peakDb !== null ? (
+                <>
+                  <dt className="text-[color:var(--ink-dim)]">{t('cal.done.guitar')}</dt>
+                  <dd>{peakDb} dB</dd>
+                </>
+              ) : null}
+              <dt className="text-[color:var(--ink-dim)]">{t('cal.done.gate')}</dt>
+              <dd>
+                {floorDb + Math.round(result?.margin ?? DEFAULT_CONFIG.gateMarginDb)} dB (+
+                {Math.round(result?.margin ?? DEFAULT_CONFIG.gateMarginDb)})
+              </dd>
+            </dl>
+          ) : null}
+
+          {separationDb !== null && separationDb < TIGHT_SEPARATION_DB ? (
+            <p className="mb-2 max-w-[65ch] text-[color:var(--ink-dim)]">
+              {t('cal.done.tight', { db: separationDb })}
             </p>
           ) : null}
-          {floorDb !== null && floorDb > -40 ? (
-            <p className="mb-2 max-w-[65ch] text-[color:var(--ink-dim)]">{t('cal.done.noisy')}</p>
-          ) : null}
+
           <div className="mt-4 flex flex-wrap gap-3">
+            {onOpenCheck ? (
+              <button className={chip} onClick={onOpenCheck}>
+                {t('cal.done.check')}
+              </button>
+            ) : null}
             <button className={chip} onClick={onDone}>
               {t('cal.done.continue')}
             </button>
@@ -202,6 +253,8 @@ export function Calibration({ onDone }: Props) {
               onClick={() => {
                 setHeardMidi(null)
                 setLowETimedOut(false)
+                setResult(null)
+                notePeak.current = null
                 setPhase('floor')
               }}
             >
