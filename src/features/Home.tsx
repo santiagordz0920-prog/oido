@@ -3,13 +3,13 @@ import { useDueCount, useNodeCompleted } from '../state/progress'
 import { CorpusCoverage } from './CorpusCoverage'
 
 type Props = {
-  onOpenT2: () => void
+  onOpenTheory: () => void
   onOpenE1: () => void
   onOpenSession: () => void
   onOpenConstellation: () => void
 }
 
-export function Home({ onOpenT2, onOpenE1, onOpenSession, onOpenConstellation }: Props) {
+export function Home({ onOpenTheory, onOpenE1, onOpenSession, onOpenConstellation }: Props) {
   const t = useT()
   const t2Complete = useNodeCompleted('T2')
   const due = useDueCount()
@@ -44,18 +44,12 @@ export function Home({ onOpenT2, onOpenE1, onOpenSession, onOpenConstellation }:
       </section>
 
       <section className={card}>
-        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
-          {t('home.lessons')} · {t('t2.eyebrow')}
-        </div>
-        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('t2.title')}</h2>
-        <div className="flex items-center gap-3">
-          <button className={action} onClick={onOpenT2}>
-            {t2Complete ? t('home.review') : t('home.start')}
-          </button>
-          {t2Complete ? (
-            <span className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.done')}</span>
-          ) : null}
-        </div>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.theory.eyebrow')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('home.theory.title')}</h2>
+        <p className="mb-3 max-w-[65ch]">{t('home.theory.body')}</p>
+        <button className={action} onClick={onOpenTheory}>
+          {t('home.theory.cta')}
+        </button>
       </section>
 
       <section className={card}>

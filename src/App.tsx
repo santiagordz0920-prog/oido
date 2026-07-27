@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import { Header } from './components/Header'
 import { Home } from './features/Home'
 import { T2Lesson } from './features/T2Lesson'
+import { TheoryIndex } from './features/lessons/TheoryIndex'
+import { T3Lesson } from './features/lessons/T3Lesson'
+import { T4Lesson } from './features/lessons/T4Lesson'
+import { T5Lesson } from './features/lessons/T5Lesson'
+import { T6Lesson } from './features/lessons/T6Lesson'
+import { T7Lesson } from './features/lessons/T7Lesson'
 import { E1Drill } from './features/E1Drill'
 import { SessionSetup } from './features/SessionSetup'
 import { SessionRunner } from './features/SessionRunner'
@@ -16,11 +22,28 @@ import type { SessionMode } from './session/modes'
 
 type View =
   | { name: 'home' }
+  | { name: 'theory' }
   | { name: 't2' }
+  | { name: 't3' }
+  | { name: 't4' }
+  | { name: 't5' }
+  | { name: 't6' }
+  | { name: 't7' }
   | { name: 'e1' }
   | { name: 'session-setup' }
   | { name: 'session'; mode: SessionMode }
   | { name: 'constellation' }
+
+// Theory index → lesson view routing. Only lessons with a built screen are
+// listed here; TheoryIndex never offers a CTA for a node that has no entry.
+const LESSON_VIEW: Partial<Record<string, View>> = {
+  T2: { name: 't2' },
+  T3: { name: 't3' },
+  T4: { name: 't4' },
+  T5: { name: 't5' },
+  T6: { name: 't6' },
+  T7: { name: 't7' },
+}
 
 export default function App() {
   const { theme, locale, reduceColor } = useSettings()
@@ -53,14 +76,41 @@ export default function App() {
       <Header activeKey={activeKey} onHome={view.name !== 'home' ? goHome : undefined} />
       {view.name === 'home' ? (
         <Home
-          onOpenT2={() => setView({ name: 't2' })}
+          onOpenTheory={() => setView({ name: 'theory' })}
           onOpenE1={() => setView({ name: 'e1' })}
           onOpenSession={() => setView({ name: 'session-setup' })}
           onOpenConstellation={() => setView({ name: 'constellation' })}
         />
       ) : null}
+      {view.name === 'theory' ? (
+        <TheoryIndex
+          onOpenLesson={(id) => {
+            const target = LESSON_VIEW[id]
+            if (target) setView(target)
+          }}
+        />
+      ) : null}
       {view.name === 't2' ? (
         <T2Lesson activeKey={activeKey} onKeyChange={setActiveKey} onGoToDrill={() => setView({ name: 'e1' })} />
+      ) : null}
+      {view.name === 't3' ? (
+        <T3Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't4' ? (
+        <T4Lesson
+          activeKey={activeKey}
+          onKeyChange={setActiveKey}
+          onComplete={() => setView({ name: 'session-setup' })}
+        />
+      ) : null}
+      {view.name === 't5' ? (
+        <T5Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't6' ? (
+        <T6Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
+      ) : null}
+      {view.name === 't7' ? (
+        <T7Lesson activeKey={activeKey} onComplete={() => setView({ name: 'session-setup' })} />
       ) : null}
       {view.name === 'e1' ? <E1Drill onKeyChange={setActiveKey} /> : null}
       {view.name === 'session-setup' ? (

@@ -26,17 +26,24 @@ describe('skill graph', () => {
   it('gates drills on the theory that unlocks them', () => {
     expect(isAvailable('E1', nothing)).toBe(false)
     expect(isAvailable('E1', only('T2'))).toBe(true)
-    // Any one of the unlocking lessons suffices.
+    // E5 is unlocked by either T6 or T10; T10 has no content yet, so only
+    // T6 counts as a real gate until it ships.
+    expect(isAvailable('E5', nothing)).toBe(false)
     expect(isAvailable('E5', only('T6'))).toBe(true)
-    expect(isAvailable('E5', only('T10'))).toBe(true)
+    expect(isAvailable('E5', only('T10'))).toBe(false)
   })
 
-  it('does not let unbuilt theory lessons gate drills either', () => {
-    // E0, E2 and E3 have content; their unlocking lessons (T1, T3, T4) do
-    // not exist yet, so the drills must be reachable from a fresh install.
+  it('does not let unbuilt theory lessons gate drills that have no built lesson yet', () => {
+    // E0's unlocking lesson (T1) has no content yet, so it must be reachable
+    // from a fresh install.
     expect(isAvailable('E0', nothing)).toBe(true)
-    expect(isAvailable('E2', nothing)).toBe(true)
-    expect(isAvailable('E3', nothing)).toBe(true)
+  })
+
+  it('gates E2 and E3 now that their lessons (T3, T4) are built', () => {
+    expect(isAvailable('E2', nothing)).toBe(false)
+    expect(isAvailable('E2', only('T3'))).toBe(true)
+    expect(isAvailable('E3', nothing)).toBe(false)
+    expect(isAvailable('E3', only('T4'))).toBe(true)
   })
 
   it('keeps a completed node available regardless of its gates', () => {

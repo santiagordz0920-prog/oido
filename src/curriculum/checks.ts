@@ -1,5 +1,10 @@
 import type { StringKey } from '../i18n/strings'
 import { T2_CHECKS } from './t2Checks'
+import { T3_CHECKS } from './t3Checks'
+import { T4_CHECKS } from './t4Checks'
+import { T5_CHECKS } from './t5Checks'
+import { T6_CHECKS } from './t6Checks'
+import { T7_CHECKS } from './t7Checks'
 
 // Check questions for every theory lesson, keyed by node id. Shared by the
 // lesson screens and by the scheduler, because theory checks are FSRS items
@@ -16,6 +21,11 @@ export type TheoryCheck = {
 
 export const LESSON_CHECKS: Record<string, TheoryCheck[]> = {
   T2: T2_CHECKS,
+  T3: T3_CHECKS,
+  T4: T4_CHECKS,
+  T5: T5_CHECKS,
+  T6: T6_CHECKS,
+  T7: T7_CHECKS,
 }
 
 export function lessonCheck(nodeId: string, checkId: string): TheoryCheck {

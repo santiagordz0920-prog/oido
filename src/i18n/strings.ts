@@ -31,6 +31,19 @@ const strings = {
   'home.start': { es: 'Empezar', en: 'Start' },
   'home.review': { es: 'Repasar', en: 'Review' },
 
+  // Home — theory index card
+  'home.theory.eyebrow': { es: 'Teoría', en: 'Theory' },
+  'home.theory.title': { es: 'Lecciones de teoría', en: 'Theory lessons' },
+  'home.theory.body': {
+    es: 'Reglas de la tonalidad, siempre audibles y manipulables.',
+    en: 'Rules of the key, always audible and manipulable.',
+  },
+  'home.theory.cta': { es: 'Ver lecciones', en: 'View lessons' },
+
+  // Theory index screen
+  'theory.index.eyebrow': { es: '{id} · 3 min', en: '{id} · 3 min' },
+  'theory.soon': { es: 'Próximamente', en: 'Coming soon' },
+
   // T2 lesson
   't2.eyebrow': { es: 'T2 · 3 min', en: 'T2 · 3 min' },
   't2.title': {
@@ -86,6 +99,220 @@ const strings = {
     en: 'You unlocked E1: stable degrees of the major scale.',
   },
   't2.complete.cta': { es: 'Ir al ejercicio E1', en: 'Go to drill E1' },
+
+  // T3 lesson — tendency and resolution
+  't3.eyebrow': { es: 'T3 · 3 min', en: 'T3 · 3 min' },
+  't3.title': { es: 'Tendencia y resolución', en: 'Tendency and resolution' },
+  't3.claim': {
+    es: 'Al final de esta lección vas a sentir por qué el grado 7 tira hacia 1 y el grado 4 se inclina hacia 3 — el resto de la tonalidad se organiza alrededor de esos dos tirones.',
+    en: 'By the end of this lesson you will feel why degree 7 pulls toward 1 and degree 4 leans toward 3 — the rest of the key organizes itself around those two pulls.',
+  },
+  't3.demo.heading': { es: 'Escúchalo primero', en: 'Hear it first' },
+  't3.demo.body': {
+    es: 'En {key} mayor, el grado 7 es inestable: apoyado sobre la tónica quiere subir un paso a 1. El grado 4 también es inestable: quiere bajar un paso a 3. Ningún nombre de intervalo — solo el tirón.',
+    en: 'In {key} major, degree 7 is unstable: held against the tonic it wants to step up to 1. Degree 4 is unstable too: it wants to step down to 3. No interval names — just the pull.',
+  },
+  't3.demo.play7': { es: 'Tocar 7 contra la tónica', en: 'Play 7 against the tonic' },
+  't3.demo.resolve7': { es: 'Tocar la resolución: 7 → 1', en: 'Play the resolution: 7 → 1' },
+  't3.demo.play4': { es: 'Tocar 4 contra la tónica', en: 'Play 4 against the tonic' },
+  't3.demo.resolve4': { es: 'Tocar la resolución: 4 → 3', en: 'Play the resolution: 4 → 3' },
+  't3.widget.heading': { es: 'Tócalos tú', en: 'Now you tap them' },
+  't3.widget.body': {
+    es: 'Toca cualquier grado: lo oyes contra la tónica y después su resolución completa. Fíjate en cuáles caen solos y cuáles necesitan moverse.',
+    en: 'Tap any degree: you hear it against the tonic, then its full resolution. Notice which ones already sit at rest and which ones need to move.',
+  },
+  't3.widget.caption': { es: 'Camino de resolución: {path}', en: 'Resolution path: {path}' },
+  't3.widget.captionEmpty': {
+    es: 'Toca un grado para ver su camino de resolución.',
+    en: 'Tap a degree to see its resolution path.',
+  },
+  't3.q1.prompt': {
+    es: '¿Qué grado tira hacia arriba, hacia el 1?',
+    en: 'Which degree pulls upward, toward 1?',
+  },
+  't3.q2.prompt': { es: '¿Hacia dónde quiere caer el grado 4?', en: 'Where does degree 4 want to fall?' },
+  't3.q3.prompt': { es: '¿Qué grados están estables, en reposo?', en: 'Which degrees are stable, at rest?' },
+  't3.q4.prompt': {
+    es: 'En la mayor (A), ¿qué nota es el grado 7, el que tira hacia la tónica?',
+    en: 'In A major, which note is degree 7, the one that pulls toward the tonic?',
+  },
+  't3.complete.body': {
+    es: 'Desbloqueaste E2: grados activos por tendencia.',
+    en: 'You unlocked E2: active degrees by tendency.',
+  },
+
+  // T4 lesson — key signatures and the circle of fifths
+  't4.eyebrow': { es: 'T4 · 3 min', en: 'T4 · 3 min' },
+  't4.title': {
+    es: 'Armaduras y el círculo de quintas',
+    en: 'Key signatures and the circle of fifths',
+  },
+  't4.claim': {
+    es: 'Al final de esta lección vas a leer el círculo de quintas como un mapa de distancias entre tonalidades, no como una tabla que hay que memorizar.',
+    en: 'By the end of this lesson you will read the circle of fifths as a map of distance between keys, not a table to memorize.',
+  },
+  't4.demo.heading': { es: 'Un mapa, no una lista', en: 'A map, not a list' },
+  't4.demo.body': {
+    es: 'Tonalidades vecinas en el círculo comparten todas sus notas menos una. Toca la cadencia en {key} y luego muévete un paso a cada lado — el cambio se oye cercano porque casi todo se queda igual.',
+    en: 'Neighboring keys on the circle share every note but one. Play the cadence in {key}, then move one step either way — the change sounds close because almost everything stays the same.',
+  },
+  't4.demo.play': { es: 'Tocar la cadencia', en: 'Play the cadence' },
+  't4.demo.stepRight': { es: 'Un paso a la derecha', en: 'One step right' },
+  't4.demo.stepLeft': { es: 'Un paso a la izquierda', en: 'One step left' },
+  't4.widget.heading': { es: 'Toca cualquier tonalidad', en: 'Tap any key' },
+  't4.widget.body': {
+    es: 'Cada ficha es una tonalidad. Tócala para oír su cadencia y ver cuántas alteraciones lleva su armadura.',
+    en: 'Each chip is a key. Tap it to hear its cadence and see how many accidentals its signature carries.',
+  },
+  't4.widget.caption.none': { es: '{key} mayor: sin alteraciones.', en: '{key} major: no accidentals.' },
+  't4.widget.caption.some': {
+    es: '{key} mayor: {count} alteraciones ({glyphs}).',
+    en: '{key} major: {count} accidentals ({glyphs}).',
+  },
+  't4.q1.prompt': {
+    es: '¿Qué tonalidad está un paso en sentido horario desde sol (G) mayor?',
+    en: 'Which key sits one step clockwise from G major?',
+  },
+  't4.q2.prompt': {
+    es: '¿Cuántas alteraciones tiene mi mayor (E)?',
+    en: 'How many accidentals does E major carry?',
+  },
+  't4.q3.prompt': {
+    es: 'Dos tonalidades vecinas en el círculo se diferencian por cuántas notas de la escala?',
+    en: 'Two neighboring keys on the circle differ by how many scale notes?',
+  },
+  't4.q4.prompt': {
+    es: '¿Qué tonalidad está en el punto opuesto a do (C) en el círculo?',
+    en: 'Which key sits at the point opposite C on the circle?',
+  },
+  't4.complete.body': {
+    es: 'Desbloqueaste E3: la escala mayor completa, entrelazada.',
+    en: 'You unlocked E3: the full major scale, interleaved.',
+  },
+
+  // T5 lesson — minor in three forms
+  't5.eyebrow': { es: 'T5 · 3 min', en: 'T5 · 3 min' },
+  't5.title': { es: 'El menor en tres formas', en: 'Minor in three forms' },
+  't5.claim': {
+    es: 'Al final de esta lección vas a saber por qué el menor tiene tres formas y qué grado cambia en cada una.',
+    en: 'By the end of this lesson you will know why minor has three forms and which degree changes in each.',
+  },
+  't5.demo.heading': { es: 'Tres formas, un menor', en: 'Three forms, one minor' },
+  't5.demo.body': {
+    es: 'La menor natural es la relativa exacta de la mayor. La armónica sube el grado 7 para que empuje hacia 1. La melódica ascendente sube también el grado 6, para suavizar el salto que deja el 7 subido.',
+    en: 'Natural minor is the exact relative of major. Harmonic minor raises degree 7 so it pushes toward 1. Melodic minor ascending also raises degree 6, to smooth the gap the raised 7 leaves behind.',
+  },
+  't5.demo.natural': { es: 'Menor natural', en: 'Natural minor' },
+  't5.demo.harmonic': { es: 'Menor armónica', en: 'Harmonic minor' },
+  't5.demo.melodic': { es: 'Menor melódica', en: 'Melodic minor' },
+  't5.widget.heading': { es: 'Compárala tú', en: 'Compare it yourself' },
+  't5.widget.body': {
+    es: 'Elige una forma y compárala contra la mayor paralela. Oyes la mayor primero y la forma elegida después, misma tónica.',
+    en: 'Pick a form and compare it against the parallel major. You hear major first, then the chosen form, same tonic.',
+  },
+  't5.widget.compare': { es: 'Comparar con la mayor', en: 'Compare with major' },
+  't5.widget.selected': { es: 'Forma elegida: {form}', en: 'Selected form: {form}' },
+  't5.q1.prompt': { es: '¿Qué grado se sube en la menor armónica?', en: 'Which degree is raised in harmonic minor?' },
+  't5.q2.prompt': {
+    es: 'Al subir el grado 7 en la menor armónica, ¿qué camino de resolución se crea?',
+    en: 'When degree 7 is raised in harmonic minor, what resolution path does it create?',
+  },
+  't5.q3.prompt': {
+    es: '¿Qué dos grados se suben en la menor melódica ascendente?',
+    en: 'Which two degrees are raised in melodic minor ascending?',
+  },
+  't5.q4.prompt': {
+    es: '¿Cuántos grados de la menor natural se apartan de la armadura de su mayor relativa?',
+    en: "How many degrees of natural minor differ from its relative major's key signature?",
+  },
+  't5.complete.body': {
+    es: 'Desbloqueaste E4: el menor contrastado contra la mayor paralela.',
+    en: 'You unlocked E4: minor contrasted against parallel major.',
+  },
+
+  // T6 lesson — triad construction, four qualities
+  't6.eyebrow': { es: 'T6 · 3 min', en: 'T6 · 3 min' },
+  't6.title': { es: 'Construcción de tríadas', en: 'Triad construction' },
+  't6.claim': {
+    es: 'Al final de esta lección vas a saber qué grado del acorde mueves para pasar de mayor a menor, disminuido o aumentado.',
+    en: 'By the end of this lesson you will know which chord degree you move to turn major into minor, diminished or augmented.',
+  },
+  't6.demo.heading': { es: 'Las cuatro calidades', en: 'The four qualities' },
+  't6.demo.body': {
+    es: 'Toda tríada apila un 1, un 3 y un 5. Bajar o subir el 3 o el 5 cambia la calidad completa del acorde.',
+    en: 'Every triad stacks a 1, a 3 and a 5. Lowering or raising the 3 or the 5 changes the whole quality of the chord.',
+  },
+  't6.demo.maj': { es: 'Mayor', en: 'Major' },
+  't6.demo.min': { es: 'Menor', en: 'Minor' },
+  't6.demo.dim': { es: 'Disminuido', en: 'Diminished' },
+  't6.demo.aug': { es: 'Aumentado', en: 'Augmented' },
+  't6.widget.heading': { es: 'Muévelo tú', en: 'Now you move it' },
+  't6.widget.body': {
+    es: 'Empieza en mayor. Cada botón mueve un grado del acorde y nombra el cambio.',
+    en: 'Start from major. Each button moves one chord degree and names the change.',
+  },
+  't6.widget.lower3': { es: 'Bajar el 3 → menor', en: 'Lower the 3 → minor' },
+  't6.widget.lower5ofMinor': {
+    es: 'Bajar el 5 de la menor → disminuido',
+    en: 'Lower the 5 of minor → diminished',
+  },
+  't6.widget.raise5ofMajor': {
+    es: 'Subir el 5 de la mayor → aumentado',
+    en: 'Raise the 5 of major → augmented',
+  },
+  't6.widget.current': { es: 'Acorde actual: {root} {quality}', en: 'Current chord: {root} {quality}' },
+  't6.q1.prompt': {
+    es: '¿Qué grado del acorde distingue mayor de menor?',
+    en: 'Which chord degree distinguishes major from minor?',
+  },
+  't6.q2.prompt': {
+    es: 'Bajar el 5 de una tríada menor da como resultado:',
+    en: 'Lowering the 5 of a minor triad gives:',
+  },
+  't6.q3.prompt': {
+    es: 'Subir el 5 de una tríada mayor da como resultado:',
+    en: 'Raising the 5 of a major triad gives:',
+  },
+  't6.q4.prompt': {
+    es: '¿Cuántas calidades de tríada distintas existen aquí?',
+    en: 'How many distinct triad qualities exist here?',
+  },
+  't6.complete.body': {
+    es: 'Desbloqueaste E5 (calidad de acordes) y F2 (tríadas en el diapasón).',
+    en: 'You unlocked E5 (chord quality) and F2 (triads on the fretboard).',
+  },
+
+  // T7 lesson — harmonizing the scale
+  't7.eyebrow': { es: 'T7 · 3 min', en: 'T7 · 3 min' },
+  't7.title': { es: 'Armonizar la escala', en: 'Harmonizing the scale' },
+  't7.claim': {
+    es: 'Al final de esta lección vas a saber de dónde salen los siete acordes de una tonalidad: se apila la escala sobre sí misma.',
+    en: 'By the end of this lesson you will know where a key\'s seven chords come from: the scale stacked on itself.',
+  },
+  't7.demo.heading': { es: 'Siete acordes, una escala', en: 'Seven chords, one scale' },
+  't7.demo.body': {
+    es: 'Cada acorde nace de un grado de la escala, más los dos grados que salen de saltar uno cada vez: el I usa 1, 3 y 5; el ii usa 2, 4 y 6; y así con cada grado. Escúchalos en orden, del I al vii°.',
+    en: 'Each chord grows out of one scale degree, plus the two degrees you reach by skipping one each time: I uses 1, 3 and 5; ii uses 2, 4 and 6, and so on for every degree. Hear them in order, from I to vii°.',
+  },
+  't7.demo.play': { es: 'Tocar la progresión', en: 'Play the progression' },
+  't7.demo.stop': { es: 'Detener', en: 'Stop' },
+  't7.widget.heading': { es: 'Tócalos tú', en: 'Now you tap them' },
+  't7.widget.body': {
+    es: 'Toca cualquier numeral: oyes una cadencia y después ese acorde en contexto.',
+    en: 'Tap any numeral: you hear a cadence, then that chord in context.',
+  },
+  't7.widget.caption': { es: '{numeral}: raíz {root}', en: '{numeral}: root {root}' },
+  't7.q1.prompt': {
+    es: '¿Qué numerales son menores en una tonalidad mayor?',
+    en: 'Which numerals are minor in a major key?',
+  },
+  't7.q2.prompt': { es: '¿Qué calidad cae en vii?', en: 'What quality lands on vii?' },
+  't7.q3.prompt': { es: '¿Cuáles tres numerales son mayores?', en: 'Which three numerals are major?' },
+  't7.q4.prompt': { es: '¿Hacia dónde quiere ir el acorde V?', en: 'Where does the V chord want to go?' },
+  't7.complete.body': {
+    es: 'Desbloqueaste E6: función diatónica, presentada después de una cadencia.',
+    en: 'You unlocked E6: diatonic function, presented after a cadence.',
+  },
 
   // E1 drill
   'e1.eyebrow': { es: 'E1 · grados estables', en: 'E1 · stable degrees' },
