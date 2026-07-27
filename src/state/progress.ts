@@ -1,19 +1,15 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '../db'
 
-// Phase 0 progress: just enough state to honor "T gates E".
-// Dexie-backed skill state replaces this in Phase 1.
-type ProgressState = {
-  t2Complete: boolean
-  completeT2: () => void
+// Progress now lives in Dexie (Phase 1); these hooks are the React-facing
+// read side. Writes go through src/scheduler/engine.ts.
+
+export function useNodeCompleted(nodeId: string): boolean {
+  return (
+    useLiveQuery(async () => (await db.nodeStats.get(nodeId))?.completedAt !== undefined, [nodeId]) ?? false
+  )
 }
 
-export const useProgress = create<ProgressState>()(
-  persist(
-    (set) => ({
-      t2Complete: false,
-      completeT2: () => set({ t2Complete: true }),
-    }),
-    { name: 'oido-progress' },
-  ),
-)
+export function useDueCount(): number {
+  return useLiveQuery(async () => db.cards.where('due').belowOrEqual(Date.now()).count(), []) ?? 0
+}

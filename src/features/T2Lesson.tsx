@@ -1,26 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { DegreeRuler } from '../components/DegreeRuler'
 import { useT } from '../state/settings'
-import { useProgress } from '../state/progress'
+import { useNodeCompleted } from '../state/progress'
+import { completeLesson } from '../scheduler/engine'
+import { T2_CHECKS as CHECKS } from '../curriculum/t2Checks'
 import { ensureAudio, playDegreeAgainstTonic, playScale, stop } from '../audio/engine'
 import { KEYS, type KeyDef } from '../theory/keys'
-import type { StringKey } from '../i18n/strings'
 
 // T2 — the major scale as the measuring ruler. Four parts per docs/curriculum.md §5:
 // a claim, an audible demonstration, a manipulable widget, and check questions.
-
-type Check = {
-  prompt: StringKey
-  options: string[]
-  answer: string
-}
-
-const CHECKS: Check[] = [
-  { prompt: 't2.q1.prompt', options: ['1', '3', '5', '7'], answer: '1' },
-  { prompt: 't2.q2.prompt', options: ['5', '7', '8', '12'], answer: '7' },
-  { prompt: 't2.q3.prompt', options: ['A', 'B', 'G♯', 'C♯'], answer: 'B' },
-  { prompt: 't2.q4.prompt', options: ['C', 'C♯', 'E♭', 'D'], answer: 'C' },
-]
+// Completing the lesson seeds the FSRS cards for its checks and for E1.
 
 type Props = {
   activeKey: KeyDef
@@ -30,7 +19,7 @@ type Props = {
 
 export function T2Lesson({ activeKey, onKeyChange, onGoToDrill }: Props) {
   const t = useT()
-  const { t2Complete, completeT2 } = useProgress()
+  const t2Complete = useNodeCompleted('T2')
   const [sounding, setSounding] = useState(0)
   const [audioError, setAudioError] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -51,8 +40,8 @@ export function T2Lesson({ activeKey, onKeyChange, onGoToDrill }: Props) {
   }, [])
 
   useEffect(() => {
-    if (done && !t2Complete) completeT2()
-  }, [done, t2Complete, completeT2])
+    if (done && !t2Complete) void completeLesson('T2')
+  }, [done, t2Complete])
 
   async function withAudio(fn: () => Promise<void>) {
     try {

@@ -1,0 +1,161 @@
+import { db, type AttemptRow, type NodeStatRow } from '../db'
+import { ALL_NODES, isAvailable, node, type Track } from '../curriculum/graph'
+import { INITIAL_USER_RATING, pickByDifficulty, updateElo } from './elo'
+import { cardId, newCardRow, reviewCard, type CardRow } from './cards'
+import { contextsForNode, itemsForCard, type DrillItem } from './items'
+import { selectNextCard } from './selector'
+
+// The scheduler's imperative shell: everything here reads and writes Dexie,
+// while the decisions live in the pure modules (selector, elo, cards).
+
+export type NextItem = {
+  card: CardRow
+  item: DrillItem
+  fromFallback: boolean
+}
+
+async function nodeStat(nodeId: string): Promise<NodeStatRow> {
+  const existing = await db.nodeStats.get(nodeId)
+  if (existing) return existing
+  const fresh: NodeStatRow = { nodeId, rating: INITIAL_USER_RATING, attempts: 0, correct: 0 }
+  await db.nodeStats.put(fresh)
+  return fresh
+}
+
+async function isCompleted(nodeId: string): Promise<boolean> {
+  const stat = await db.nodeStats.get(nodeId)
+  return stat?.completedAt !== undefined
+}
+
+// Create the card rows for every context of a node, if missing.
+export async function ensureCards(nodeId: string): Promise<void> {
+  const contexts = contextsForNode(nodeId)
+  const rows: CardRow[] = []
+  for (const context of contexts) {
+    const existing = await db.cards.get(cardId(nodeId, context))
+    if (!existing) rows.push(newCardRow(nodeId, context))
+  }
+  if (rows.length > 0) await db.cards.bulkAdd(rows)
+}
+
+// Mark a theory lesson complete and open what it unlocks.
+export async function completeLesson(nodeId: string): Promise<void> {
+  const stat = await nodeStat(nodeId)
+  if (stat.completedAt === undefined) {
+    await db.nodeStats.put({ ...stat, completedAt: Date.now() })
+  }
+  await ensureCards(nodeId)
+  for (const unlocked of node(nodeId).unlocks) {
+    if (node(unlocked).hasContent) await ensureCards(unlocked)
+  }
+}
+
+// Nodes that can serve items right now: content built and gate open.
+export async function activeNodeIds(): Promise<string[]> {
+  const completed = new Map<string, boolean>()
+  for (const n of ALL_NODES) {
+    if (n.track === 'T') completed.set(n.id, await isCompleted(n.id))
+  }
+  return ALL_NODES.filter((n) => n.hasContent && isAvailable(n.id, (id) => completed.get(id) ?? false)).map(
+    (n) => n.id,
+  )
+}
+
+// Select the next card and item for a session block restricted to `tracks`.
+// Other active tracks serve as the interleaving fallback (§10.3).
+export async function nextItem(tracks: Track[], recentNodeIds: string[]): Promise<NextItem | null> {
+  const active = await activeNodeIds()
+  for (const id of active) await ensureCards(id)
+
+  const eligibleIds = active.filter((id) => tracks.includes(node(id).track))
+  const fallbackIds = active.filter((id) => !tracks.includes(node(id).track))
+  const eligible = await db.cards.where('nodeId').anyOf(eligibleIds).toArray()
+  const fallback = await db.cards.where('nodeId').anyOf(fallbackIds).toArray()
+
+  const selection = selectNextCard(eligible, fallback, recentNodeIds)
+  if (!selection) return null
+
+  const { card } = selection
+  const candidates = itemsForCard(card.nodeId, card.context)
+  if (candidates.length === 0) return null
+
+  const stat = await nodeStat(card.nodeId)
+  const ratings = new Map<string, number>()
+  for (const c of candidates) {
+    const itemStat = await db.itemStats.get(c.id)
+    ratings.set(c.id, itemStat?.rating ?? c.seedRating)
+  }
+  const item = pickByDifficulty(candidates, (c) => ratings.get(c.id)!, stat.rating)
+  return { card, item, fromFallback: selection.fromFallback }
+}
+
+export type AttemptInput = {
+  item: DrillItem
+  correct: boolean
+  latencyMs: number
+  inputMode: AttemptRow['inputMode']
+  response: string
+}
+
+// One attempt updates all three systems: the attempt log (mastery criteria),
+// the FSRS card (when to see this context again), and Elo (which item within
+// the context to serve).
+export async function recordAttempt({ item, correct, latencyMs, inputMode, response }: AttemptInput): Promise<void> {
+  const now = Date.now()
+  await db.attempts.add({ itemId: item.id, nodeId: item.nodeId, ts: now, correct, latencyMs, inputMode, response })
+
+  const row = (await db.cards.get(cardId(item.nodeId, item.context))) ?? newCardRow(item.nodeId, item.context)
+  await db.cards.put(reviewCard(row, correct))
+
+  const stat = await nodeStat(item.nodeId)
+  const itemStat = (await db.itemStats.get(item.id)) ?? {
+    itemId: item.id,
+    nodeId: item.nodeId,
+    rating: item.seedRating,
+    attempts: 0,
+  }
+  const { userRating, itemRating } = updateElo(stat.rating, itemStat.rating, correct)
+  await db.nodeStats.put({
+    ...stat,
+    rating: userRating,
+    attempts: stat.attempts + 1,
+    correct: stat.correct + (correct ? 1 : 0),
+  })
+  await db.itemStats.put({ ...itemStat, rating: itemRating, attempts: itemStat.attempts + 1 })
+}
+
+export type Mastery = {
+  progress: number // 0..1, sizes the constellation node
+  mastered: boolean
+  accuracy: number // over the criterion window
+  windowSize: number
+}
+
+// Mastery against the node's criterion: accuracy over the last minItems
+// attempts, only meaningful once the window is full.
+export async function masteryOf(nodeId: string): Promise<Mastery> {
+  const { masteryCriteria: c, track } = node(nodeId)
+  if (track === 'T') {
+    const completed = await isCompleted(nodeId)
+    const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
+    const window = recent.slice(0, c.minItems)
+    const acc = window.length > 0 ? window.filter((a) => a.correct).length / window.length : 0
+    const retained = window.length >= c.minItems && acc >= c.accuracy
+    return {
+      progress: completed ? (retained ? 1 : 0.6) : 0,
+      mastered: completed && retained,
+      accuracy: acc,
+      windowSize: window.length,
+    }
+  }
+  const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
+  const window = recent.slice(0, c.minItems)
+  const accuracy = window.length > 0 ? window.filter((a) => a.correct).length / window.length : 0
+  const fill = window.length / c.minItems
+  const mastered = window.length >= c.minItems && accuracy >= c.accuracy
+  return { progress: Math.min(1, fill) * accuracy, mastered, accuracy, windowSize: window.length }
+}
+
+export async function dueCount(now: Date = new Date()): Promise<number> {
+  return db.cards.where('due').belowOrEqual(now.getTime()).count()
+}

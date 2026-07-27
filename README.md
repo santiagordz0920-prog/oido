@@ -18,6 +18,14 @@ npm run build
 npm run preview
 ```
 
+## Test
+
+```sh
+npm test
+```
+
 ## Status
 
-Phase 0 (spine): theme system (OKLCH twelve-hue, light + dark), `tonal` wrapper, Tone.js playback with a bundled sampled piano, the T2 theory lesson and the E1 ear drill end to end with tap input, Spanish and English. Phases are defined in `docs/phases.md`.
+Phase 0 (spine): theme system (OKLCH twelve-hue, light + dark), `tonal` wrapper, Tone.js playback with a bundled sampled piano, the T2 theory lesson and the E1 ear drill end to end with tap input, Spanish and English.
+
+Phase 1 (brain): FSRS scheduling (`ts-fsrs`) with one card per skill node and key context, per-node Elo against per-item difficulty targeting 85% expected success, a hard interleaving constraint in the selection loop, Dexie persistence over IndexedDB, the session runner with all four modes (Deskside, Commute, Bench, Deep), and the zoomable skill constellation. Phases are defined in `docs/phases.md`.

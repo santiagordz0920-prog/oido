@@ -1,14 +1,17 @@
 import { useT } from '../state/settings'
-import { useProgress } from '../state/progress'
+import { useDueCount, useNodeCompleted } from '../state/progress'
 
 type Props = {
   onOpenT2: () => void
   onOpenE1: () => void
+  onOpenSession: () => void
+  onOpenConstellation: () => void
 }
 
-export function Home({ onOpenT2, onOpenE1 }: Props) {
+export function Home({ onOpenT2, onOpenE1, onOpenSession, onOpenConstellation }: Props) {
   const t = useT()
-  const t2Complete = useProgress((s) => s.t2Complete)
+  const t2Complete = useNodeCompleted('T2')
+  const due = useDueCount()
 
   const card = 'border-[length:var(--rule)] border-[var(--ink)] bg-[var(--surface)] p-4 sm:p-6'
   const action =
@@ -17,7 +20,23 @@ export function Home({ onOpenT2, onOpenE1 }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
       <p className="max-w-[65ch] text-[color:var(--ink-dim)]">{t('app.tagline')}</p>
-      <p className="max-w-[65ch]">{t('home.empty')}</p>
+      {!t2Complete ? <p className="max-w-[65ch]">{t('home.empty')}</p> : null}
+
+      <section className={card}>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.session.eyebrow')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('home.session.title')}</h2>
+        <p className="mb-3 max-w-[65ch]">{t('home.session.body')}</p>
+        <div className="flex items-center gap-3">
+          <button className={action} onClick={onOpenSession}>
+            {t('home.session.start')}
+          </button>
+          {due > 0 ? (
+            <span className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
+              {t('home.due', { n: due })}
+            </span>
+          ) : null}
+        </div>
+      </section>
 
       <section className={card}>
         <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
@@ -48,6 +67,14 @@ export function Home({ onOpenT2, onOpenE1 }: Props) {
             {t('home.locked', { id: 'T2' })}
           </p>
         )}
+      </section>
+
+      <section className={card}>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.progress')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('const.title')}</h2>
+        <button className={action} onClick={onOpenConstellation}>
+          {t('home.open')}
+        </button>
       </section>
     </div>
   )

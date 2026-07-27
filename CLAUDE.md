@@ -38,4 +38,4 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 0 (spine): scaffold, tonal wrapper, Tone.js playback, T2 lesson, E1 drill, tap input, both themes. Update this pointer at every phase boundary.
+Phase 1 (brain) shipped: FSRS + Elo + interleaving scheduler (`src/scheduler/`), Dexie persistence (`src/db/`), session runner with four modes, skill constellation. Next: Phase 2 (curriculum) — resolve open questions 1 and 2 in docs/phases.md before starting corpus work. Update this pointer at every phase boundary.
