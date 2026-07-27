@@ -224,6 +224,73 @@ export type ProgressionOptions = {
   onChord?: (index: number) => void // fires as each chord sounds; -1 when done
 }
 
+// Establishing cadences by mode: harmonic-minor V in minor, so the key is
+// unambiguous before the target progression sounds.
+const CADENCE_NUMERALS: Record<'major' | 'minor', string[]> = {
+  major: ['I', 'IV', 'V', 'I'],
+  minor: ['i', 'iv', 'V', 'i'],
+}
+
+// Mode-aware cadence, a breath, then a target progression — the E7/E8
+// stimulus. The cadence is slightly softer and quicker than the target so
+// the two read as context vs. question.
+export function playCadenceThenProgression(
+  tonic: string,
+  mode: 'major' | 'minor',
+  numerals: string[],
+  { chordSeconds = 1.0, onChord }: ProgressionOptions = {},
+): Promise<void> {
+  const cadence = progressionVoicings(tonic, CADENCE_NUMERALS[mode])
+  const target = progressionVoicings(tonic, numerals)
+  const cDur = 0.7
+  const events: ScheduledNote[] = cadence.map((v, i) => ({
+    time: i * cDur,
+    notes: [v.bass, ...v.upper],
+    duration: i === cadence.length - 1 ? cDur * 1.4 : cDur * 0.98,
+    velocity: 0.7,
+  }))
+  const start = cadence.length * cDur + 1.0
+  for (const [i, v] of target.entries()) {
+    events.push({
+      time: start + i * chordSeconds,
+      notes: [v.bass, ...v.upper],
+      duration: i === target.length - 1 ? chordSeconds * 1.6 : chordSeconds * 0.98,
+      velocity: 0.9,
+      onStart: onChord ? () => onChord(i) : undefined,
+    })
+  }
+  return play(events, onChord ? () => onChord(-1) : undefined)
+}
+
+// Cadence, then the progression's BASS ROOTS only — E9 bass-line dictation.
+export function playCadenceThenBassLine(
+  tonic: string,
+  mode: 'major' | 'minor',
+  numerals: string[],
+  { chordSeconds = 1.0, onChord }: ProgressionOptions = {},
+): Promise<void> {
+  const cadence = progressionVoicings(tonic, CADENCE_NUMERALS[mode])
+  const target = progressionVoicings(tonic, numerals)
+  const cDur = 0.7
+  const events: ScheduledNote[] = cadence.map((v, i) => ({
+    time: i * cDur,
+    notes: [v.bass, ...v.upper],
+    duration: i === cadence.length - 1 ? cDur * 1.4 : cDur * 0.98,
+    velocity: 0.7,
+  }))
+  const start = cadence.length * cDur + 1.0
+  for (const [i, v] of target.entries()) {
+    events.push({
+      time: start + i * chordSeconds,
+      notes: [v.bass],
+      duration: chordSeconds * 0.95,
+      velocity: 0.95,
+      onStart: onChord ? () => onChord(i) : undefined,
+    })
+  }
+  return play(events, onChord ? () => onChord(-1) : undefined)
+}
+
 // A Roman-numeral progression, voice-led, bass plus upper voices — the shared
 // renderer for E6–E8 drills, checkpoints, and later the Play-Along engine.
 export function playProgression(
