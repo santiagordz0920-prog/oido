@@ -12,6 +12,10 @@ export type ItemResult = {
   correct: boolean
   latencyMs: number
   response: string
+  // How the answer was produced. Tap is the default because most drills are
+  // tap-answered; mic drills report what actually happened, so a self-report
+  // fallback is never recorded as a verified performance.
+  inputMode?: 'tap' | 'sung' | 'played'
 }
 
 const STABLE = [1, 3, 5]

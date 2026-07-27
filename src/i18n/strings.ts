@@ -920,6 +920,40 @@ const strings = {
   'cp.result.retry': { es: 'Reintentar', en: 'Retry' },
   'cp.result.continue': { es: 'Continuar', en: 'Continue' },
 
+  // P0 — sing what you play
+  'p0.eyebrow': { es: 'P0 · canta lo que tocas', en: 'P0 · sing what you play' },
+  'p0.title': { es: 'Canta lo que tocas', en: 'Sing what you play' },
+  'p0.play.prompt': { es: 'Toca el grado {degree}', en: 'Play degree {degree}' },
+  'p0.sing.prompt': { es: 'Ahora cántalo', en: 'Now sing it' },
+  'p0.listening': { es: 'Escuchando…', en: 'Listening…' },
+  'p0.heard': { es: 'Oigo {note}', en: 'I hear {note}' },
+  'p0.wrongDegree': {
+    es: 'Eso es el grado {degree}. Busca el {target}.',
+    en: 'That is degree {degree}. Find {target}.',
+  },
+  'p0.wrongChromatic': {
+    es: 'Esa nota está fuera de la tonalidad. Busca el grado {target}.',
+    en: 'That note is outside the key. Find degree {target}.',
+  },
+  'p0.played': { es: 'Tocado: {note}, grado {degree}.', en: 'Played: {note}, degree {degree}.' },
+  'p0.sung': { es: 'Cantado. Grado {degree} en {key} mayor.', en: 'Sung. Degree {degree} in {key} major.' },
+  'p0.timeout': {
+    es: 'Sin señal clara. Vuelve a intentarlo o pasa al modo sin micrófono.',
+    en: 'No clear signal. Try again, or switch to the no-mic mode.',
+  },
+  'p0.retry': { es: 'Otra vez', en: 'Again' },
+  'p0.tap.switch': { es: 'Sin micrófono', en: 'Without the mic' },
+  'p0.tap.body': {
+    es: 'Sin micrófono no puedo verificar lo que suena, así que esto queda registrado como autoevaluación.',
+    en: 'Without the mic I cannot verify what sounded, so this is recorded as your own assessment.',
+  },
+  'p0.tap.did': { es: 'Lo toqué y lo canté', en: 'Played it and sang it' },
+  'p0.tap.didnt': { es: 'No pude', en: 'Could not' },
+  'p0.needsCalibration': {
+    es: 'Calibra el micrófono para que este ejercicio te escuche.',
+    en: 'Calibrate the mic so this drill can hear you.',
+  },
+
   // Home — microphone card
   'home.mic.eyebrow': { es: 'Entrada', en: 'Input' },
   'home.mic.title': { es: 'Micrófono', en: 'Microphone' },

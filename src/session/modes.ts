@@ -29,18 +29,24 @@ export const MODES: Record<SessionMode, ModeDef> = {
     minutes: 10,
     blocks: [{ kind: 'drill', minutes: 10, tracks: ['T', 'E'] }],
   },
+  // Bench and Deep close on a production block now that Track P has content:
+  // recognition alone produces people who pass tests and cannot improvise.
   bench: {
     id: 'bench',
     minutes: 25,
     blocks: [
       { kind: 'warmup', minutes: 3 },
-      { kind: 'drill', minutes: 22, tracks: ['T', 'E', 'F'], fallbackNote: 'session.fallback.bench' },
+      { kind: 'drill', minutes: 15, tracks: ['T', 'E', 'F'], fallbackNote: 'session.fallback.bench' },
+      { kind: 'drill', minutes: 7, tracks: ['P'], fallbackNote: 'session.fallback.bench' },
     ],
   },
   deep: {
     id: 'deep',
     minutes: 50,
-    blocks: [{ kind: 'drill', minutes: 50, tracks: ['T', 'E'], fallbackNote: 'session.fallback.deep' }],
+    blocks: [
+      { kind: 'drill', minutes: 35, tracks: ['T', 'E'], fallbackNote: 'session.fallback.deep' },
+      { kind: 'drill', minutes: 15, tracks: ['P', 'F'], fallbackNote: 'session.fallback.deep' },
+    ],
   },
 }
 

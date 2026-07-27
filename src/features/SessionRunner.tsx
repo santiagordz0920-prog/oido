@@ -16,6 +16,7 @@ import { E6Item } from './items/E6Item'
 import { E7Item } from './items/E7Item'
 import { E8Item } from './items/E8Item'
 import { E9Item } from './items/E9Item'
+import { P0Item } from './items/P0Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
 import type { DrillItem } from '../scheduler/items'
 
@@ -95,6 +96,8 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
     }
     if (found.item.kind === 'recognition') {
       onKeyChange(keyByTonic(recognitionTonic(found.item)))
+    } else if (found.item.kind === 'production') {
+      onKeyChange(keyByTonic(String(found.item.params.tonic)))
     }
     setCurrent(found)
   }
@@ -137,7 +140,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
     if (!item) return
     setCounts((c) => ({ items: c.items + 1, correct: c.correct + (r.correct ? 1 : 0) }))
     recent.current = [...recent.current.slice(-1), item.nodeId]
-    void recordAttempt({ item, correct: r.correct, latencyMs: r.latencyMs, inputMode: 'tap', response: r.response })
+    void recordAttempt({ item, correct: r.correct, latencyMs: r.latencyMs, inputMode: r.inputMode ?? 'tap', response: r.response })
   }
 
   function handleNext() {
@@ -334,6 +337,27 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
           {note}
           <div className="mono text-[length:var(--fs-1)]">{keyLine}</div>
           {recognitionItem}
+          {endButton}
+        </div>
+      </div>
+    )
+  }
+
+  if (current.item.kind === 'production') {
+    const itemKey = keyByTonic(String(current.item.params.tonic))
+    return (
+      <div className="key-field flex-1 p-4">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+          {meta}
+          {note}
+          <div className="mono text-[length:var(--fs-1)]">{t('e1.keyIs', { key: itemKey.label })}</div>
+          <P0Item
+            itemKey={itemKey}
+            degree={Number(current.item.params.degree)}
+            nextLabel={t('e1.next')}
+            onResult={handleResult}
+            onNext={handleNext}
+          />
           {endButton}
         </div>
       </div>

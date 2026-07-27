@@ -6,7 +6,7 @@ import type { ChordQuality, ScaleForm } from '../theory'
 // names the FSRS card it belongs to; its seed rating positions it for Elo
 // until real attempts move it.
 
-export type ItemKind = 'recognition' | 'theory-check'
+export type ItemKind = 'recognition' | 'theory-check' | 'production'
 
 export type DrillItem = {
   id: string
@@ -381,8 +381,32 @@ function theoryItems(): DrillItem[] {
   )
 }
 
+
+// P0: the app names a degree, the user plays it and then sings it. Stable
+// degrees are the easier find on the neck and in the voice, so they seed
+// lower; the leading tone and the fourth seed highest.
+const P0_DEGREE_SEEDS: Record<number, number> = { 1: 1000, 5: 1040, 3: 1060, 2: 1120, 6: 1140, 4: 1180, 7: 1200 }
+
+function p0Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let degree = 1; degree <= 7; degree++) {
+      items.push({
+        id: `P0|${key.tonic}|${degree}`,
+        nodeId: 'P0',
+        kind: 'production',
+        context: key.tonic,
+        params: { tonic: key.tonic, degree },
+        seedRating: P0_DEGREE_SEEDS[degree],
+      })
+    }
+  }
+  return items
+}
+
 export const ITEMS: DrillItem[] = [
   ...theoryItems(),
+  ...p0Items(),
   ...e0Items(),
   ...e1Items(),
   ...e2Items(),
