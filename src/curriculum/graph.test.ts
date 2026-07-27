@@ -31,6 +31,14 @@ describe('skill graph', () => {
     expect(isAvailable('E5', only('T10'))).toBe(true)
   })
 
+  it('does not let unbuilt theory lessons gate drills either', () => {
+    // E0, E2 and E3 have content; their unlocking lessons (T1, T3, T4) do
+    // not exist yet, so the drills must be reachable from a fresh install.
+    expect(isAvailable('E0', nothing)).toBe(true)
+    expect(isAvailable('E2', nothing)).toBe(true)
+    expect(isAvailable('E3', nothing)).toBe(true)
+  })
+
   it('keeps a completed node available regardless of its gates', () => {
     expect(isAvailable('T2', only('T2'))).toBe(true)
   })

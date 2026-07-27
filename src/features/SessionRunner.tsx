@@ -5,7 +5,10 @@ import { nextItem, recordAttempt, type NextItem } from '../scheduler/engine'
 import { MODES, type SessionMode } from '../session/modes'
 import { ensureAudio, playCadence, playDegree, stop } from '../audio/engine'
 import { keyByTonic, randomKey, type KeyDef } from '../theory/keys'
+import { E0Item } from './items/E0Item'
 import { E1Item, type ItemResult } from './items/E1Item'
+import { E2Item } from './items/E2Item'
+import { E3Item } from './items/E3Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
 
 // The session runner: pick a mode, run its timed blocks, feed items from the
@@ -76,7 +79,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       setEmpty(true)
       return
     }
-    if (found.item.nodeId === 'E1') {
+    if (found.item.kind === 'recognition') {
       onKeyChange(keyByTonic(String(found.item.params.tonic)))
     }
     setCurrent(found)
@@ -128,8 +131,10 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
     else void loadNext(blockIndex)
   }
 
+  // text color is explicit because this chip also renders on the key-field,
+  // where the inherited color is the reversed-out field color
   const chip =
-    'mono snap border-[length:var(--rule)] border-[var(--ink)] bg-[var(--surface)] px-4 py-2 text-[length:var(--fs-2)] font-bold'
+    'mono snap border-[length:var(--rule)] border-[var(--ink)] bg-[var(--surface)] px-4 py-2 text-[length:var(--fs-2)] font-bold text-[color:var(--ink)]'
 
   if (phase === 'summary') {
     const accuracy = counts.items > 0 ? Math.round((100 * counts.correct) / counts.items) : 0
@@ -212,19 +217,40 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
 
   if (current.item.kind === 'recognition') {
     const itemKey = keyByTonic(String(current.item.params.tonic))
+    const degree = Number(current.item.params.degree)
+    const nextLabel = t('e1.next')
+    let recognitionItem
+    if (current.item.nodeId === 'E0') {
+      recognitionItem = (
+        <E0Item
+          itemKey={itemKey}
+          degree={degree}
+          gapSeconds={Number(current.item.params.gapSeconds)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (current.item.nodeId === 'E2') {
+      recognitionItem = (
+        <E2Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else if (current.item.nodeId === 'E3') {
+      recognitionItem = (
+        <E3Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else {
+      recognitionItem = (
+        <E1Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    }
     return (
       <div className="key-field flex-1 p-4">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           {meta}
           {note}
           <div className="mono text-[length:var(--fs-1)]">{t('e1.keyIs', { key: itemKey.label })}</div>
-          <E1Item
-            itemKey={itemKey}
-            degree={Number(current.item.params.degree)}
-            nextLabel={t('e1.next')}
-            onResult={handleResult}
-            onNext={handleNext}
-          />
+          {recognitionItem}
           {endButton}
         </div>
       </div>

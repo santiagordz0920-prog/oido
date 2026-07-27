@@ -4,6 +4,7 @@ import { INITIAL_USER_RATING, pickByDifficulty, updateElo } from './elo'
 import { cardId, newCardRow, reviewCard, type CardRow } from './cards'
 import { contextsForNode, itemsForCard, type DrillItem } from './items'
 import { selectNextCard } from './selector'
+import { computeMastery } from './mastery'
 
 // The scheduler's imperative shell: everything here reads and writes Dexie,
 // while the decisions live in the pure modules (selector, elo, cards).
@@ -131,29 +132,25 @@ export type Mastery = {
   windowSize: number
 }
 
-// Mastery against the node's criterion: accuracy over the last minItems
-// attempts, only meaningful once the window is full.
+// Mastery against the node's criterion: accuracy (and, where the criterion
+// sets maxMedianRT, median response time) over the last minItems attempts,
+// only meaningful once the window is full. The arithmetic lives in
+// computeMastery (mastery.ts) so it is unit-testable without Dexie.
 export async function masteryOf(nodeId: string): Promise<Mastery> {
   const { masteryCriteria: c, track } = node(nodeId)
+  const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
+  const { accuracy, windowSize, mastered: retained } = computeMastery(recent, c)
   if (track === 'T') {
     const completed = await isCompleted(nodeId)
-    const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
-    const window = recent.slice(0, c.minItems)
-    const acc = window.length > 0 ? window.filter((a) => a.correct).length / window.length : 0
-    const retained = window.length >= c.minItems && acc >= c.accuracy
     return {
       progress: completed ? (retained ? 1 : 0.6) : 0,
       mastered: completed && retained,
-      accuracy: acc,
-      windowSize: window.length,
+      accuracy,
+      windowSize,
     }
   }
-  const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
-  const window = recent.slice(0, c.minItems)
-  const accuracy = window.length > 0 ? window.filter((a) => a.correct).length / window.length : 0
-  const fill = window.length / c.minItems
-  const mastered = window.length >= c.minItems && accuracy >= c.accuracy
-  return { progress: Math.min(1, fill) * accuracy, mastered, accuracy, windowSize: window.length }
+  const fill = windowSize / c.minItems
+  return { progress: Math.min(1, fill) * accuracy, mastered: retained, accuracy, windowSize }
 }
 
 export async function dueCount(now: Date = new Date()): Promise<number> {

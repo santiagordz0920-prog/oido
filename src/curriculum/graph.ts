@@ -117,7 +117,7 @@ function buildNodes(): Map<string, SkillNode> {
     }
   }
 
-  addTrack('E', E_COUNT, (id) => id === 'E1')
+  addTrack('E', E_COUNT, (id) => id === 'E0' || id === 'E1' || id === 'E2' || id === 'E3')
   addTrack('F', F_COUNT, () => false)
   addTrack('P', P_COUNT, () => false)
 
@@ -145,11 +145,13 @@ export function node(id: string): SkillNode {
 // lesson; drill tracks gate on any one of the theory lessons that unlock them.
 // Two exceptions keep the graph honest while content is still being built:
 // a completed node is always available (its reviews stay live), and a theory
-// lesson that has no content yet cannot gate the sequence.
+// lesson that has no content yet cannot gate anything — otherwise every
+// drill whose unlocking lesson is still unbuilt (E0 behind T1, E2 behind T3)
+// would be unreachable. The real gate snaps into place when the lesson ships.
 export function isAvailable(id: string, completed: (nodeId: string) => boolean): boolean {
   const n = node(id)
   if (completed(id)) return true
-  const gates = n.track === 'T' ? n.prerequisites.filter((p) => node(p).hasContent) : n.prerequisites
+  const gates = n.prerequisites.filter((p) => node(p).hasContent)
   if (gates.length === 0) return true
   return n.track === 'T' ? gates.every(completed) : gates.some(completed)
 }

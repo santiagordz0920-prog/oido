@@ -120,6 +120,60 @@ const strings = {
   },
   'e1.summary.again': { es: 'Otra ronda', en: 'Another round' },
 
+  // E0 drill — tonic retention
+  'e0.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e0.prompt': { es: '¿Es la tónica?', en: 'Is it the tonic?' },
+  'e0.yes': { es: 'Sí, es 1', en: 'Yes, it is 1' },
+  'e0.no': { es: 'No', en: 'No' },
+  'e0.replay': { es: 'Repetir', en: 'Replay' },
+  'e0.correct': {
+    es: 'Correcto: era el grado {degree}. {note} en {key} mayor.',
+    en: 'Correct: it was degree {degree}. {note} in {key} major.',
+  },
+  'e0.incorrect': {
+    es: 'No: era el grado {degree}. {note} en {key} mayor.',
+    en: 'No: it was degree {degree}. {note} in {key} major.',
+  },
+  'e0.sing': {
+    es: 'Canta la resolución: {path}.',
+    en: 'Sing the resolution: {path}.',
+  },
+  'e0.playResolution': { es: 'Oír la resolución', en: 'Play the resolution' },
+
+  // E2 drill — active degrees by tendency
+  'e2.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e2.prompt': { es: '¿Qué grado es?', en: 'Which degree is it?' },
+  'e2.replay': { es: 'Repetir', en: 'Replay' },
+  'e2.correct': { es: 'Sí: {degree}. {note} en {key} mayor.', en: 'Yes: {degree}. {note} in {key} major.' },
+  'e2.incorrect': {
+    es: 'No: era {degree}. {note} en {key} mayor.',
+    en: 'No: it was {degree}. {note} in {key} major.',
+  },
+  'e2.sing': {
+    es: 'Canta la resolución: {path}.',
+    en: 'Sing the resolution: {path}.',
+  },
+  'e2.playResolution': { es: 'Oír la resolución', en: 'Play the resolution' },
+
+  // E3 drill — full major scale, interleaved
+  'e3.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e3.prompt': { es: '¿Qué grado es?', en: 'Which degree is it?' },
+  'e3.replay': { es: 'Repetir', en: 'Replay' },
+  'e3.correct': { es: 'Sí: {degree}. {note} en {key} mayor.', en: 'Yes: {degree}. {note} in {key} major.' },
+  'e3.incorrect': {
+    es: 'No: era {degree}. {note} en {key} mayor.',
+    en: 'No: it was {degree}. {note} in {key} major.',
+  },
+  'e3.rtHint': {
+    es: 'Apunta a responder en menos de 3 segundos.',
+    en: 'Aim to answer in under 3 seconds.',
+  },
+  'e3.sing': {
+    es: 'Canta la resolución: {path}.',
+    en: 'Sing the resolution: {path}.',
+  },
+  'e3.playResolution': { es: 'Oír la resolución', en: 'Play the resolution' },
+
   // Home, Phase 1 additions
   'home.session.eyebrow': { es: 'Práctica programada', en: 'Scheduled practice' },
   'home.session.title': { es: 'Empezar una sesión', en: 'Start a session' },
