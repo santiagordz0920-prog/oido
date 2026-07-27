@@ -284,6 +284,44 @@ export function playCadenceThenNumeral(tonic: string, numeral: string, onTarget?
   return play(events)
 }
 
+// A short melodic fragment given as scale degrees, optionally after a
+// cadence that establishes the key. This is P2's stimulus: the user hears it
+// and plays it back, so it is deliberately short and evenly paced.
+export function playDegreeSequence(
+  tonic: string,
+  degrees: number[],
+  { withCadence = true, noteSeconds = 0.55, onDegree }: {
+    withCadence?: boolean
+    noteSeconds?: number
+    onDegree?: (index: number) => void
+  } = {},
+): Promise<void> {
+  const events: ScheduledNote[] = []
+  let start = 0
+  if (withCadence) {
+    const cadence = cadenceVoicings(tonic)
+    const dur = 0.7
+    cadence.forEach((v, i) => {
+      events.push({
+        time: i * dur,
+        notes: [v.bass, ...v.upper],
+        duration: i === cadence.length - 1 ? dur * 1.4 : dur * 0.98,
+        velocity: 0.7,
+      })
+    })
+    start = cadence.length * dur + 0.9
+  }
+  degrees.forEach((degree, i) => {
+    events.push({
+      time: start + i * noteSeconds,
+      notes: [degreeNote(tonic, degree)],
+      duration: i === degrees.length - 1 ? noteSeconds * 1.8 : noteSeconds * 0.95,
+      onStart: onDegree ? () => onDegree(i) : undefined,
+    })
+  })
+  return play(events, onDegree ? () => onDegree(-1) : undefined)
+}
+
 export type ProgressionOptions = {
   chordSeconds?: number // duration of each chord
   onChord?: (index: number) => void // fires as each chord sounds; -1 when done
