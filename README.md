@@ -32,6 +32,6 @@ Phase 1 (brain): FSRS scheduling (`ts-fsrs`) with one card per skill node and ke
 
 Phase 2 (curriculum): the McGill Billboard corpus (CC0) ingested into a progression-frequency table and a per-song harmonic vocabulary, Corpus Coverage computed conservatively from them, theory lessons T1–T12, ear drills E0–E9, and the CP1–CP3 stage checkpoints.
 
-Phase 3 (ears open, in progress): monophonic pitch input for **an acoustic guitar into the laptop mic** — MPM in an AudioWorklet, an octave-error guard that survives the mic's low-end roll-off, and a calibration screen that measures the room and confirms an open low E. Every mic drill keeps a tap fallback.
+Phase 3 (ears open): monophonic pitch input for **an acoustic guitar into the laptop mic** — MPM in an AudioWorklet, an octave-error guard that survives the mic's low-end roll-off, and a calibration screen that measures the room and confirms an open low E. Production drills P0–P2 and fretboard drills F0, F1 and F5, each with a tap fallback that records honestly whether the answer was verified or self-reported.
 
 Phases are defined in `docs/phases.md`.
