@@ -4,6 +4,8 @@
 // Intra-track order is drawn in the constellation but does not gate, because
 // access to ear/fretboard/production stages is earned through theory.
 
+import { DEVICE_GRANTS } from './devices'
+
 export type Track = 'T' | 'E' | 'F' | 'P'
 
 export type MasteryCriteria = {
@@ -94,7 +96,7 @@ function buildNodes(): Map<string, SkillNode> {
       prerequisites: index === 0 ? [] : [T_ROWS[index - 1][0]],
       unlocks: [...unlocks],
       masteryCriteria: THEORY_CRITERIA,
-      corpusDevices: [],
+      corpusDevices: DEVICE_GRANTS[id] ?? [],
       hasContent: hasContent ?? false,
     })
   })
@@ -109,7 +111,7 @@ function buildNodes(): Map<string, SkillNode> {
         prerequisites: [],
         unlocks: [],
         masteryCriteria: CRITERIA[id] ?? (track === 'P' ? PRODUCTION_CRITERIA : THEORY_CRITERIA),
-        corpusDevices: [],
+        corpusDevices: DEVICE_GRANTS[id] ?? [],
         hasContent: hasContent(id),
       })
     }

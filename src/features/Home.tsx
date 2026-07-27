@@ -1,5 +1,6 @@
 import { useT } from '../state/settings'
 import { useDueCount, useNodeCompleted } from '../state/progress'
+import { CorpusCoverage } from './CorpusCoverage'
 
 type Props = {
   onOpenT2: () => void
@@ -21,6 +22,10 @@ export function Home({ onOpenT2, onOpenE1, onOpenSession, onOpenConstellation }:
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
       <p className="max-w-[65ch] text-[color:var(--ink-dim)]">{t('app.tagline')}</p>
       {!t2Complete ? <p className="max-w-[65ch]">{t('home.empty')}</p> : null}
+
+      <section className={card}>
+        <CorpusCoverage />
+      </section>
 
       <section className={card}>
         <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.session.eyebrow')}</div>

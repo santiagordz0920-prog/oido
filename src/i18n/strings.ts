@@ -268,6 +268,25 @@ const strings = {
   'node.P4.title': { es: 'Improvisación con límites', en: 'Constrained improvisation' },
   'node.P5.title': { es: 'Improvisación libre con análisis', en: 'Free improvisation with analysis' },
 
+  // Corpus Coverage
+  'coverage.label': { es: 'Cobertura del corpus', en: 'Corpus coverage' },
+  'coverage.claim': {
+    es: 'Puedes oír la armonía completa de {songs} de {total} canciones de este corpus.',
+    en: 'You can hear the full harmony of {songs} of {total} songs in this corpus.',
+  },
+  'coverage.next': { es: 'Siguiente desbloqueo: {node}, +{delta}%', en: 'Next unlock: {node}, +{delta}%' },
+  'coverage.sections': {
+    es: 'Por secciones: {percent}% de las secciones (versos, estribillos) ya son tuyas.',
+    en: 'By section: {percent}% of sections (verses, choruses) are already yours.',
+  },
+  'coverage.method.show': { es: 'Cómo se calcula', en: 'How this is computed' },
+  'coverage.method.hide': { es: 'Ocultar', en: 'Hide' },
+  'coverage.method.body': {
+    es: 'Una canción cuenta solo si dominas —no conoces, dominas— cada recurso armónico que usa: cualidades de acorde, funciones, dominantes secundarias, préstamos, inversiones y modulaciones. Fuente: {source}. El cálculo es conservador a propósito: preferimos afirmar de menos.',
+    en: 'A song counts only if you have mastered — not met, mastered — every harmonic device it uses: chord qualities, functions, secondary dominants, borrowed chords, inversions and modulations. Source: {source}. The computation is deliberately conservative: we under-claim.',
+  },
+  'coverage.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
+
   // Audio
   'audio.loading': { es: 'Cargando el piano…', en: 'Loading the piano…' },
   'audio.error': {
