@@ -38,4 +38,4 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 1 (brain) shipped: FSRS + Elo + interleaving scheduler (`src/scheduler/`), Dexie persistence (`src/db/`), session runner with four modes, skill constellation. Next: Phase 2 (curriculum) — resolve open questions 1 and 2 in docs/phases.md before starting corpus work. Update this pointer at every phase boundary.
+Phase 2 (curriculum) in progress. Done: open questions 1 and 2 resolved (docs/phases.md §17), corpus ingest (`scripts/ingest/`, artifacts in `src/data/`), Corpus Coverage live (`src/curriculum/coverage.ts`, home card). Remaining: theory T1–T12, ear E0–E9, checkpoints — delegate to the implementer subagent per the protocol. Update this pointer at every phase boundary.

@@ -23,11 +23,12 @@ Ship something usable at every phase boundary.
 
 Resolve before the phase noted.
 
-1. **Before Phase 2.** Which corpus in §3.2 has licensing terms compatible with shipping both a derived frequency table and a per-song vocabulary table.
-2. **Before Phase 2.** Corpus Coverage calibration. If the conservative definition leaves coverage near 0% for weeks, it demotivates instead of motivating, and the fix is probably scoring per section rather than per song. Needs real data to decide.
+1. **RESOLVED (Phase 2).** McGill Billboard 2.0 is CC0 ("the DDMAL has waived all copyright and related or neighbouring rights"), with a request to cite Burgoyne, Wild & Fujinaga (ISMIR 2011) — both artifacts ship legally and carry the citation in their metadata. Hooktheory rejected (restrictive API terms), Isophonics rejected ("research purposes only").
+2. **RESOLVED (Phase 2).** Calibration over the real corpus (890 songs, 5433 sections; see `scripts/calibrate-coverage.mts`): at the first chord-hearing milestone (E5+E6 mastered) coverage is 9.7% of songs / 30.1% of sections — not the feared near-zero — rising to 30.1% / 59.6% at full current grants. Decision: song-level percent stays the headline (the strong honest claim), with the per-section figure displayed beneath it as the early-progress signal. Before E5/E6, 0% is displayed and is simply true: no chord skill exists yet, and the constellation carries progress until then.
 3. **Before Phase 4.** Basic Pitch model download size and cold-start time in-browser. If cold start exceeds roughly 3 seconds, preload it during Track T and E work.
 4. **Before Phase 5.** Recording Archive storage budget. How many minutes of audio before pruning, and what the user sees when the budget is hit.
 5. **Before Phase 3.** Whether input is electric through an interface or acoustic into a laptop mic. This materially changes detection tuning, so ask and set defaults for the real case.
+6. **Before Phase 6 (new, from calibration).** `f:chromatic` blocks 443 of 890 songs and is currently ungrantable. Blues dominants on diatonic roots are already tagged as diatonic functions, so this mass is mostly modal color (Dorian iv/IV, Mixolydian mixtures) and unresolved secondary-dominant shapes — exactly T15/E12 territory. When those nodes are designed, extend the ingest taxonomy (v2) to split modal-characteristic tags out of `f:chromatic`, and decide grants for the ungranted quality colors (`q:sus` blocks 322 songs, `q:ext` 196, `q:6` 159, `q:min6` 35). Re-run `scripts/ingest/billboard.mjs` and recalibrate.
 
 ## 16. Non-goals
 
