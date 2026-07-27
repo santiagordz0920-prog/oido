@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALL_NODES, isAvailable, node } from './graph'
+import { ALL_NODES, CHECKPOINT_GATES, isAvailable, node } from './graph'
 
 const nothing = () => false
 const only = (...ids: string[]) => (id: string) => ids.includes(id)
@@ -67,5 +67,24 @@ describe('skill graph', () => {
 
   it('keeps a completed node available regardless of its gates', () => {
     expect(isAvailable('T2', only('T2'))).toBe(true)
+  })
+
+  it('checkpoint gates: T5 unavailable with T4 complete but CP1 not; available with both', () => {
+    expect(CHECKPOINT_GATES.T5).toBe('CP1')
+    expect(isAvailable('T5', only('T4'))).toBe(false)
+    expect(isAvailable('T5', only('T4', 'CP1'))).toBe(true)
+    // The checkpoint alone, without the prerequisite lesson, is not enough.
+    expect(isAvailable('T5', only('CP1'))).toBe(false)
+  })
+
+  it('checkpoint gates: T8 unavailable with T7 complete but CP2 not; available with both', () => {
+    expect(CHECKPOINT_GATES.T8).toBe('CP2')
+    expect(isAvailable('T8', only('T7'))).toBe(false)
+    expect(isAvailable('T8', only('T7', 'CP2'))).toBe(true)
+    expect(isAvailable('T8', only('CP2'))).toBe(false)
+  })
+
+  it('a completed gated node stays available even without its checkpoint recorded', () => {
+    expect(isAvailable('T5', only('T5'))).toBe(true)
   })
 })

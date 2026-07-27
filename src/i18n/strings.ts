@@ -896,6 +896,30 @@ const strings = {
   },
   'coverage.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
 
+  // Theory index — checkpoint gating (docs/curriculum.md "Stages and
+  // checkpoints")
+  'theory.checkpoint.cta': { es: 'Hacer el control {id}', en: 'Take checkpoint {id}' },
+  'theory.checkpoint.passed': { es: '{id} ✓', en: '{id} ✓' },
+
+  // Checkpoints (CP1/CP2/CP3): timed challenges on real corpus progressions
+  'cp.CP1.title': { es: 'Control 1 · Grados', en: 'Checkpoint 1 · Degrees' },
+  'cp.CP2.title': { es: 'Control 2 · Acordes', en: 'Checkpoint 2 · Chords' },
+  'cp.CP3.title': { es: 'Control 3 · Progresiones', en: 'Checkpoint 3 · Progressions' },
+  'cp.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
+  'cp.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'cp.itemCount': { es: '{current} / {total}', en: '{current} / {total}' },
+  'cp.timeLeft': { es: '{clock} restantes', en: '{clock} left' },
+  'cp.keyIs.major': { es: 'Tonalidad: {key} mayor', en: 'Key: {key} major' },
+  'cp.keyIs.minor': { es: 'Tonalidad: {key} menor', en: 'Key: {key} minor' },
+  'cp.cp1.prompt': { es: 'Toca los dos grados del bajo, en orden.', en: 'Tap the two bass degrees, in order.' },
+  'cp.cp2.prompt': { es: '¿Qué numeral es el segundo acorde?', en: 'What numeral is the second chord?' },
+  'cp.cp3.prompt': { es: '¿Qué progresión es?', en: 'Which progression is it?' },
+  'cp.clear': { es: 'Borrar', en: 'Clear' },
+  'cp.result.pass': { es: 'Aprobado. {correct} de {total}.', en: 'Passed. {correct} of {total}.' },
+  'cp.result.fail': { es: 'No esta vez. {correct} de {total}.', en: 'Not this time. {correct} of {total}.' },
+  'cp.result.retry': { es: 'Reintentar', en: 'Retry' },
+  'cp.result.continue': { es: 'Continuar', en: 'Continue' },
+
   // Audio
   'audio.loading': { es: 'Cargando el piano…', en: 'Loading the piano…' },
   'audio.error': {

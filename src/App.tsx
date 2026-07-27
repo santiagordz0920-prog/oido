@@ -18,6 +18,7 @@ import { E1Drill } from './features/E1Drill'
 import { SessionSetup } from './features/SessionSetup'
 import { SessionRunner } from './features/SessionRunner'
 import { Constellation } from './features/Constellation'
+import { Checkpoint } from './features/Checkpoint'
 import { useSettings } from './state/settings'
 import { useNodeCompleted } from './state/progress'
 import { keyByTonic, type KeyDef } from './theory/keys'
@@ -25,6 +26,7 @@ import { stop } from './audio/engine'
 import { migratePhase0 } from './db'
 import { completeLesson } from './scheduler/engine'
 import type { SessionMode } from './session/modes'
+import type { CheckpointId } from './curriculum/checkpoints'
 
 type View =
   | { name: 'home' }
@@ -45,6 +47,7 @@ type View =
   | { name: 'session-setup' }
   | { name: 'session'; mode: SessionMode }
   | { name: 'constellation' }
+  | { name: 'checkpoint'; checkpointId: CheckpointId }
 
 // Theory index → lesson view routing. Only lessons with a built screen are
 // listed here; TheoryIndex never offers a CTA for a node that has no entry.
@@ -106,6 +109,7 @@ export default function App() {
             const target = LESSON_VIEW[id]
             if (target) setView(target)
           }}
+          onOpenCheckpoint={(id) => setView({ name: 'checkpoint', checkpointId: id as CheckpointId })}
         />
       ) : null}
       {view.name === 't1' ? (
@@ -160,6 +164,13 @@ export default function App() {
         <SessionRunner mode={view.mode} onKeyChange={setActiveKey} onExit={goHome} />
       ) : null}
       {view.name === 'constellation' ? <Constellation /> : null}
+      {view.name === 'checkpoint' ? (
+        <Checkpoint
+          checkpointId={view.checkpointId}
+          onKeyChange={setActiveKey}
+          onExit={() => setView({ name: 'theory' })}
+        />
+      ) : null}
     </div>
   )
 }

@@ -135,3 +135,19 @@ The payoff is longitudinal. Playing a June improvisation over a minor ii-V-i aga
 Auto-logged from in-app activity, with manual entry for off-app practice such as jamming or playing with others. Records time, content and self-rating. Feeds the consistency band and the heatmap. Exportable.
 
 ---
+
+## Stages and checkpoints (Phase 2 addendum)
+
+The curriculum built so far in this phase runs in three stages, each closed by a checkpoint: a timed challenge built from real corpus progressions, never a synthetic single-degree item. A checkpoint is pass/fail, and passing hard-gates the next stage's first theory lesson — a checkpoint the user cannot fail teaches nothing (docs/pedagogy.md §4.1).
+
+| Checkpoint | After stage | Gates | Content |
+|---|---|---|---|
+| CP1 | Degrees (T1–T4, E0–E3) | T5 | Bass roots of corpus two-chord motions: a cadence, then two bass roots, major mode, plain-diatonic entries only. The answer is both degrees, in order, tapped into two slots from the seven degree chips. 8 items. |
+| CP2 | Chords (T5–T7, E4–E6) | T8 | Corpus two-chord motions as full chords, major mode, the top 12 ranks. The answer is the second chord's Roman numeral, tapped from the seven diatonic numeral chips. 8 items. |
+| CP3 | Progressions (T8–T12, E7–E9) | none yet (records completion; will gate Phase 3 tracks later) | Corpus four-chord progressions, major ranks 0–9 and minor ranks 0–5 combined, with a mode-aware cadence. The answer is picking the progression from four deterministic nearest-rank options. 8 items. |
+
+Each item shows a visible 12-second countdown starting when the stimulus finishes; answering late fails the item and auto-advances. Passing requires at least 7 of the 8 items — no partial credit, no consolation on a miss. Stimulus replay is not offered during a checkpoint, unlike every other drill in the app: it is a test, not practice.
+
+Checkpoints are timed corpus challenges, not FSRS items, and are kept out of the skill graph (`src/curriculum/graph.ts`) entirely rather than becoming a fourth track value. The graph only records which theory node each checkpoint gates (`CHECKPOINT_GATES`); item generation and pool selection live in `src/curriculum/checkpoints.ts`, and the challenge screen is `src/features/Checkpoint.tsx`, routed from the theory index once a lesson's only remaining gate is its checkpoint.
+
+---

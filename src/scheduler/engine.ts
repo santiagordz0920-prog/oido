@@ -51,6 +51,20 @@ export async function completeLesson(nodeId: string): Promise<void> {
   }
 }
 
+// Mark a stage checkpoint (CP1/CP2/CP3, src/curriculum/checkpoints.ts) as
+// passed. Mirrors completeLesson but without card creation — checkpoints are
+// timed corpus challenges, not FSRS items, and are not registered in the
+// node graph at all, so there is nothing to unlock cards for. Recording
+// completion this way (a db.nodeStats row keyed by the checkpoint id) is
+// what lets isAvailable's CHECKPOINT_GATES check and useNodeCompleted work
+// unchanged for checkpoint ids.
+export async function completeCheckpoint(checkpointId: string): Promise<void> {
+  const stat = await nodeStat(checkpointId)
+  if (stat.completedAt === undefined) {
+    await db.nodeStats.put({ ...stat, completedAt: Date.now() })
+  }
+}
+
 // Nodes that can serve items right now: content built and gate open.
 export async function activeNodeIds(): Promise<string[]> {
   const completed = new Map<string, boolean>()

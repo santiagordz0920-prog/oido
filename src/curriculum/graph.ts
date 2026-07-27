@@ -155,6 +155,28 @@ export function node(id: string): SkillNode {
   return n
 }
 
+// Stage checkpoints (docs/pedagogy.md §4.1, docs/curriculum.md "Stages and
+// checkpoints") close each stage and hard-gate the next stage's first theory
+// lesson. Checkpoints are timed corpus challenges, not FSRS items, so they
+// deliberately stay OUT of the node graph above rather than becoming a new
+// track value — this map is the only place the graph knows about them.
+// Completion is recorded the same way theory-lesson completion is (a
+// db.nodeStats row keyed by the checkpoint id with completedAt set), via
+// completeCheckpoint in src/scheduler/engine.ts.
+export const CHECKPOINT_GATES: Record<string, string> = { T5: 'CP1', T8: 'CP2' }
+
+// Prerequisite theory-lesson gates only, ignoring any checkpoint gate. Split
+// out from isAvailable so callers (the theory index) can tell "blocked by
+// the previous lesson" apart from "blocked only by its checkpoint", which
+// gets a different UI treatment (a Checkpoint button instead of a locked
+// line).
+export function prerequisitesMet(id: string, completed: (nodeId: string) => boolean): boolean {
+  const n = node(id)
+  const gates = n.prerequisites.filter((p) => node(p).hasContent)
+  if (gates.length === 0) return true
+  return n.track === 'T' ? gates.every(completed) : gates.some(completed)
+}
+
 // A node is available when every gate is open. Theory gates on the previous
 // lesson; drill tracks gate on any one of the theory lessons that unlock them.
 // Two exceptions keep the graph honest while content is still being built:
@@ -162,10 +184,11 @@ export function node(id: string): SkillNode {
 // lesson that has no content yet cannot gate anything — otherwise every
 // drill whose unlocking lesson is still unbuilt (E0 behind T1, E2 behind T3)
 // would be unreachable. The real gate snaps into place when the lesson ships.
+// A theory node listed in CHECKPOINT_GATES additionally requires its
+// checkpoint to be complete, on top of its normal prerequisites.
 export function isAvailable(id: string, completed: (nodeId: string) => boolean): boolean {
-  const n = node(id)
   if (completed(id)) return true
-  const gates = n.prerequisites.filter((p) => node(p).hasContent)
-  if (gates.length === 0) return true
-  return n.track === 'T' ? gates.every(completed) : gates.some(completed)
+  if (!prerequisitesMet(id, completed)) return false
+  const checkpoint = CHECKPOINT_GATES[id]
+  return checkpoint ? completed(checkpoint) : true
 }

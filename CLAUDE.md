@@ -38,4 +38,4 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 2 (curriculum) in progress. Done: open questions 1 and 2 resolved (docs/phases.md §17), corpus ingest, Corpus Coverage live, progression engine, ear track E0–E9 in sessions, theory track complete T1–T12 with the theory index and sequential gating. Remaining: checkpoints (stage-end timed challenges on corpus progressions), then the phase gate. Update this pointer at every phase boundary.
+Phase 2 (curriculum) shipped: corpus artifacts + Corpus Coverage live (`src/curriculum/coverage.ts`), theory T1–T12 on the lesson framework, ear E0–E9 in sessions, checkpoints CP1–CP3 gating stages (`src/curriculum/checkpoints.ts`). Gate: human verifies Corpus Coverage displays a real computed number. Next: Phase 3 (ears open) — resolve open question 5 in docs/phases.md (electric vs acoustic input) with the human BEFORE mic work. Update this pointer at every phase boundary.

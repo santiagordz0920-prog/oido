@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db'
 import { useT } from '../../state/settings'
-import { ALL_NODES, isAvailable } from '../../curriculum/graph'
+import { ALL_NODES, CHECKPOINT_GATES, isAvailable, prerequisitesMet } from '../../curriculum/graph'
 import type { StringKey } from '../../i18n/strings'
 
 // The theory track index (docs/curriculum.md §5): every T-track node in
@@ -9,35 +9,52 @@ import type { StringKey } from '../../i18n/strings'
 // drives every card's state, which keeps this to one hook regardless of how
 // many lessons exist (looping useNodeCompleted per row would violate the
 // rules of hooks).
+//
+// A node whose only remaining gate is a stage checkpoint (CHECKPOINT_GATES,
+// docs/curriculum.md "Stages and checkpoints") gets a distinct 'checkpoint'
+// card state — its previous-lesson prerequisite is already satisfied, so it
+// shows a "take the checkpoint" CTA instead of the generic locked line.
 
 type Props = {
   onOpenLesson: (nodeId: string) => void
+  onOpenCheckpoint: (checkpointId: string) => void
 }
 
-type CardState = 'available' | 'locked' | 'soon'
+type CardState = 'available' | 'checkpoint' | 'locked' | 'soon'
 
 type CardView = {
   id: string
   state: CardState
   completed: boolean
   lockedBehind?: string
+  checkpointId?: string
+  checkpointPassed: boolean
 }
 
-export function TheoryIndex({ onOpenLesson }: Props) {
+export function TheoryIndex({ onOpenLesson, onOpenCheckpoint }: Props) {
   const t = useT()
 
   const views = useLiveQuery(async (): Promise<CardView[]> => {
     const stats = await db.nodeStats.toArray()
     const completedSet = new Set(stats.filter((s) => s.completedAt !== undefined).map((s) => s.nodeId))
+    const completed = (id: string) => completedSet.has(id)
     return ALL_NODES.filter((n) => n.track === 'T').map((n) => {
-      const completed = completedSet.has(n.id)
-      if (!n.hasContent) return { id: n.id, state: 'soon', completed }
-      const available = isAvailable(n.id, (id) => completedSet.has(id))
+      const isComplete = completed(n.id)
+      const checkpointId = CHECKPOINT_GATES[n.id]
+      const checkpointPassed = checkpointId ? completed(checkpointId) : false
+      if (!n.hasContent) return { id: n.id, state: 'soon', completed: isComplete, checkpointId, checkpointPassed }
+      const available = isAvailable(n.id, completed)
+      if (available) return { id: n.id, state: 'available', completed: isComplete, checkpointId, checkpointPassed }
+      if (checkpointId && prerequisitesMet(n.id, completed)) {
+        return { id: n.id, state: 'checkpoint', completed: isComplete, checkpointId, checkpointPassed }
+      }
       return {
         id: n.id,
-        state: available ? 'available' : 'locked',
-        completed,
-        lockedBehind: available ? undefined : n.prerequisites[0],
+        state: 'locked',
+        completed: isComplete,
+        lockedBehind: n.prerequisites[0],
+        checkpointId,
+        checkpointPassed,
       }
     })
   }, [])
@@ -63,6 +80,10 @@ export function TheoryIndex({ onOpenLesson }: Props) {
             <button className={action} onClick={() => onOpenLesson(v.id)}>
               {v.completed ? t('home.review') : t('home.start')}
             </button>
+          ) : v.state === 'checkpoint' ? (
+            <button className={action} onClick={() => onOpenCheckpoint(v.checkpointId!)}>
+              {t('theory.checkpoint.cta', { id: v.checkpointId! })}
+            </button>
           ) : v.state === 'locked' ? (
             <p className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
               {t('home.locked', { id: v.lockedBehind ?? '' })}
@@ -70,6 +91,11 @@ export function TheoryIndex({ onOpenLesson }: Props) {
           ) : (
             <p className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('theory.soon')}</p>
           )}
+          {v.checkpointId && v.checkpointPassed ? (
+            <p className="mono mt-2 text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
+              {t('theory.checkpoint.passed', { id: v.checkpointId })}
+            </p>
+          ) : null}
         </section>
       ))}
     </div>
