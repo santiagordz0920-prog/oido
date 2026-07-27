@@ -174,6 +174,48 @@ const strings = {
   },
   'e3.playResolution': { es: 'Oír la resolución', en: 'Play the resolution' },
 
+  // E4 drill — minor in three forms, against parallel major
+  'e4.listening': { es: 'Escala…', en: 'Scale…' },
+  'e4.prompt': { es: '¿Qué forma es?', en: 'Which form is it?' },
+  'e4.replay': { es: 'Repetir', en: 'Replay' },
+  'e4.tonicIs': { es: 'Tónica: {key}', en: 'Tonic: {key}' },
+  'e4.correct': { es: 'Sí: {form}.', en: 'Yes: {form}.' },
+  'e4.incorrect': { es: 'No: era {form}.', en: 'No: it was {form}.' },
+  'e4.form.major': { es: 'Mayor', en: 'Major' },
+  'e4.form.naturalMinor': { es: 'Menor natural', en: 'Natural minor' },
+  'e4.form.harmonicMinor': { es: 'Menor armónica', en: 'Harmonic minor' },
+  'e4.form.melodicMinor': { es: 'Menor melódica', en: 'Melodic minor' },
+
+  // E5 drill — chord quality (context-free: no cadence, no key)
+  'e5.listening': { es: 'Acorde…', en: 'Chord…' },
+  'e5.prompt': { es: '¿Qué calidad es?', en: 'Which quality is it?' },
+  'e5.replay': { es: 'Repetir', en: 'Replay' },
+  'e5.rootIs': { es: 'Nota base: {note}', en: 'Root note: {note}' },
+  'e5.correct': { es: 'Sí: {quality}.', en: 'Yes: {quality}.' },
+  'e5.incorrect': { es: 'No: era {quality}.', en: 'No: it was {quality}.' },
+  'e5.quality.maj': { es: 'Mayor', en: 'Major' },
+  'e5.quality.min': { es: 'Menor', en: 'Minor' },
+  'e5.quality.dim': { es: 'Disminuido', en: 'Diminished' },
+  'e5.quality.aug': { es: 'Aumentado', en: 'Augmented' },
+  'e5.quality.maj7': { es: 'Maj7', en: 'Maj7' },
+  'e5.quality.min7': { es: 'm7', en: 'm7' },
+  'e5.quality.dom7': { es: '7', en: '7' },
+  'e5.quality.m7b5': { es: 'm7♭5', en: 'm7♭5' },
+  'e5.quality.dim7': { es: '°7', en: '°7' },
+
+  // E6 drill — diatonic function in major, after a tonic cadence
+  'e6.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e6.prompt': { es: '¿Qué función es?', en: 'Which function is it?' },
+  'e6.replay': { es: 'Repetir', en: 'Replay' },
+  'e6.correct': {
+    es: 'Sí: {numeral} — {note} en {key} mayor.',
+    en: 'Yes: {numeral} — {note} in {key} major.',
+  },
+  'e6.incorrect': {
+    es: 'No: era {numeral} — {note} en {key} mayor.',
+    en: 'No: it was {numeral} — {note} in {key} major.',
+  },
+
   // Home, Phase 1 additions
   'home.session.eyebrow': { es: 'Práctica programada', en: 'Scheduled practice' },
   'home.session.title': { es: 'Empezar una sesión', en: 'Start a session' },

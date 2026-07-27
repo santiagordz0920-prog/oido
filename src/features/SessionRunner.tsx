@@ -5,11 +5,22 @@ import { nextItem, recordAttempt, type NextItem } from '../scheduler/engine'
 import { MODES, type SessionMode } from '../session/modes'
 import { ensureAudio, playCadence, playDegree, stop } from '../audio/engine'
 import { keyByTonic, randomKey, type KeyDef } from '../theory/keys'
+import type { ChordQuality, ScaleForm } from '../theory'
 import { E0Item } from './items/E0Item'
 import { E1Item, type ItemResult } from './items/E1Item'
 import { E2Item } from './items/E2Item'
 import { E3Item } from './items/E3Item'
+import { E4Item } from './items/E4Item'
+import { E5Item, type ChordTier } from './items/E5Item'
+import { E6Item } from './items/E6Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
+import type { DrillItem } from '../scheduler/items'
+
+// E5's context is a chromatic root, not a diatonic key; every other
+// recognition node's context is the tonic of a major key.
+function recognitionTonic(item: DrillItem): string {
+  return String(item.nodeId === 'E5' ? item.params.root : item.params.tonic)
+}
 
 // The session runner: pick a mode, run its timed blocks, feed items from the
 // scheduler, save the session. The clock here is wall time for pacing the
@@ -80,7 +91,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       return
     }
     if (found.item.kind === 'recognition') {
-      onKeyChange(keyByTonic(String(found.item.params.tonic)))
+      onKeyChange(keyByTonic(recognitionTonic(found.item)))
     }
     setCurrent(found)
   }
@@ -216,11 +227,14 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
   ) : null
 
   if (current.item.kind === 'recognition') {
-    const itemKey = keyByTonic(String(current.item.params.tonic))
-    const degree = Number(current.item.params.degree)
+    const nodeId = current.item.nodeId
+    const itemKey = keyByTonic(recognitionTonic(current.item))
     const nextLabel = t('e1.next')
     let recognitionItem
-    if (current.item.nodeId === 'E0') {
+    let keyLine: string
+    if (nodeId === 'E0') {
+      const degree = Number(current.item.params.degree)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
       recognitionItem = (
         <E0Item
           itemKey={itemKey}
@@ -231,15 +245,47 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
           onNext={handleNext}
         />
       )
-    } else if (current.item.nodeId === 'E2') {
+    } else if (nodeId === 'E2') {
+      const degree = Number(current.item.params.degree)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
       recognitionItem = (
         <E2Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
       )
-    } else if (current.item.nodeId === 'E3') {
+    } else if (nodeId === 'E3') {
+      const degree = Number(current.item.params.degree)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
       recognitionItem = (
         <E3Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
       )
+    } else if (nodeId === 'E4') {
+      const form = String(current.item.params.form) as ScaleForm
+      keyLine = t('e4.tonicIs', { key: itemKey.label })
+      recognitionItem = (
+        <E4Item itemKey={itemKey} form={form} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else if (nodeId === 'E5') {
+      const quality = String(current.item.params.quality) as ChordQuality
+      const tier = String(current.item.params.tier) as ChordTier
+      keyLine = t('e5.rootIs', { note: itemKey.label })
+      recognitionItem = (
+        <E5Item
+          root={itemKey.tonic}
+          quality={quality}
+          tier={tier}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'E6') {
+      const numeral = String(current.item.params.numeral)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
+      recognitionItem = (
+        <E6Item itemKey={itemKey} numeral={numeral} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
     } else {
+      const degree = Number(current.item.params.degree)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
       recognitionItem = (
         <E1Item itemKey={itemKey} degree={degree} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
       )
@@ -249,7 +295,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           {meta}
           {note}
-          <div className="mono text-[length:var(--fs-1)]">{t('e1.keyIs', { key: itemKey.label })}</div>
+          <div className="mono text-[length:var(--fs-1)]">{keyLine}</div>
           {recognitionItem}
           {endButton}
         </div>

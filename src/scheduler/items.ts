@@ -1,5 +1,6 @@
 import { KEYS } from '../theory/keys'
 import { T2_CHECKS } from '../curriculum/t2Checks'
+import type { ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
 // names the FSRS card it belongs to; its seed rating positions it for Elo
@@ -122,6 +123,116 @@ function e3Items(): DrillItem[] {
   return items
 }
 
+// E4: minor in three forms against parallel major, over all 12 tonics.
+// Seed ratings rise with how far the form departs from the parallel major:
+// major itself is the easiest; natural minor changes three tones; harmonic
+// and melodic minor add the raised leading tone (and, for melodic, the
+// raised 6th ascending), which is the harder discrimination (§6 T5).
+const E4_FORMS: ScaleForm[] = ['major', 'natural minor', 'harmonic minor', 'melodic minor']
+const E4_FORM_SEEDS: Record<ScaleForm, number> = {
+  major: 1000,
+  'natural minor': 1050,
+  'harmonic minor': 1120,
+  'melodic minor': 1140,
+}
+
+function e4Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const form of E4_FORMS) {
+      items.push({
+        id: `E4|${key.tonic}|${form}`,
+        nodeId: 'E4',
+        kind: 'recognition',
+        context: key.tonic,
+        params: { tonic: key.tonic, form },
+        seedRating: E4_FORM_SEEDS[form],
+      })
+    }
+  }
+  return items
+}
+
+// E5: chord quality, two tiers sharing one node — triads and sevenths — each
+// generated for all 12 chromatic roots, inversion 0 only for now. Seed
+// ratings tier by how easily the ear catches the defining interval: maj/min
+// are the anchor pair (as is maj7, the seventh that simply extends a major
+// triad); dim/aug are harder because both are symmetric-ish and less
+// common; dom7/min7 sit mid; m7b5/dim7 are seeded hardest (§6 T6/T10).
+const E5_TRIAD_QUALITIES: ChordQuality[] = ['maj', 'min', 'dim', 'aug']
+const E5_SEVENTH_QUALITIES: ChordQuality[] = ['maj7', 'min7', 'dom7', 'm7b5', 'dim7']
+const E5_QUALITY_SEEDS: Record<ChordQuality, number> = {
+  maj: 1000,
+  min: 1020,
+  dim: 1080,
+  aug: 1100,
+  maj7: 1010,
+  min7: 1140,
+  dom7: 1160,
+  m7b5: 1220,
+  dim7: 1240,
+}
+
+function e5Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const quality of E5_TRIAD_QUALITIES) {
+      items.push({
+        id: `E5|${key.tonic}|triad|${quality}`,
+        nodeId: 'E5',
+        kind: 'recognition',
+        context: key.tonic,
+        params: { root: key.tonic, quality, tier: 'triad' },
+        seedRating: E5_QUALITY_SEEDS[quality],
+      })
+    }
+    for (const quality of E5_SEVENTH_QUALITIES) {
+      items.push({
+        id: `E5|${key.tonic}|seventh|${quality}`,
+        nodeId: 'E5',
+        kind: 'recognition',
+        context: key.tonic,
+        params: { root: key.tonic, quality, tier: 'seventh' },
+        seedRating: E5_QUALITY_SEEDS[quality],
+      })
+    }
+  }
+  return items
+}
+
+// E6: diatonic function in major, presented after a tonic cadence, over all
+// 12 keys. Seed ratings follow how common and how tonally unambiguous each
+// numeral is: I/V/IV (the primary triads) are easiest, ii/vi sit mid, and
+// iii/vii° — the least common and least distinct scale-degree triads — are
+// seeded hardest (§6 T7/T8).
+const E6_NUMERALS = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°']
+const E6_NUMERAL_SEEDS: Record<string, number> = {
+  I: 1000,
+  V: 1010,
+  IV: 1020,
+  ii: 1080,
+  vi: 1090,
+  iii: 1150,
+  'vii°': 1160,
+}
+
+function e6Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const numeral of E6_NUMERALS) {
+      items.push({
+        id: `E6|${key.tonic}|${numeral}`,
+        nodeId: 'E6',
+        kind: 'recognition',
+        context: key.tonic,
+        params: { tonic: key.tonic, numeral },
+        seedRating: E6_NUMERAL_SEEDS[numeral],
+      })
+    }
+  }
+  return items
+}
+
 function t2Items(): DrillItem[] {
   return T2_CHECKS.map((check) => ({
     id: `T2|${check.id}`,
@@ -133,7 +244,16 @@ function t2Items(): DrillItem[] {
   }))
 }
 
-export const ITEMS: DrillItem[] = [...t2Items(), ...e0Items(), ...e1Items(), ...e2Items(), ...e3Items()]
+export const ITEMS: DrillItem[] = [
+  ...t2Items(),
+  ...e0Items(),
+  ...e1Items(),
+  ...e2Items(),
+  ...e3Items(),
+  ...e4Items(),
+  ...e5Items(),
+  ...e6Items(),
+]
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]))
 

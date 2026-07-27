@@ -117,7 +117,11 @@ function buildNodes(): Map<string, SkillNode> {
     }
   }
 
-  addTrack('E', E_COUNT, (id) => id === 'E0' || id === 'E1' || id === 'E2' || id === 'E3')
+  addTrack(
+    'E',
+    E_COUNT,
+    (id) => id === 'E0' || id === 'E1' || id === 'E2' || id === 'E3' || id === 'E4' || id === 'E5' || id === 'E6',
+  )
   addTrack('F', F_COUNT, () => false)
   addTrack('P', P_COUNT, () => false)
 

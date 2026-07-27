@@ -8,7 +8,7 @@ describe('drill items', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  for (const nodeId of ['E0', 'E2', 'E3']) {
+  for (const nodeId of ['E0', 'E2', 'E3', 'E4', 'E5', 'E6']) {
     it(`${nodeId} covers all 12 key contexts`, () => {
       const contexts = contextsForNode(nodeId)
       expect(new Set(contexts).size).toBe(12)
@@ -69,6 +69,61 @@ describe('drill items', () => {
     for (const key of KEYS) {
       const degrees = e3.filter((i) => i.params.tonic === key.tonic).map((i) => i.params.degree)
       expect(new Set(degrees)).toEqual(new Set([1, 2, 3, 4, 5, 6, 7]))
+    }
+  })
+
+  const E4_FORMS = ['major', 'natural minor', 'harmonic minor', 'melodic minor']
+
+  it('E4 params are well-formed: tonic, form in the four-form set, all 12 tonics covered', () => {
+    const e4 = ITEMS.filter((i) => i.nodeId === 'E4')
+    expect(e4.length).toBeGreaterThan(0)
+    for (const item of e4) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(E4_FORMS).toContain(item.params.form)
+    }
+    for (const key of KEYS) {
+      const forms = e4.filter((i) => i.params.tonic === key.tonic).map((i) => i.params.form)
+      expect(new Set(forms)).toEqual(new Set(E4_FORMS))
+    }
+  })
+
+  const E5_TRIAD_QUALITIES = ['maj', 'min', 'dim', 'aug']
+  const E5_SEVENTH_QUALITIES = ['maj7', 'min7', 'dom7', 'm7b5', 'dim7']
+
+  it('E5 params are well-formed: root, tier is triad or seventh, quality matches its tier', () => {
+    const e5 = ITEMS.filter((i) => i.nodeId === 'E5')
+    expect(e5.length).toBeGreaterThan(0)
+    for (const item of e5) {
+      expect(item.context).toBe(item.params.root)
+      expect(typeof item.params.root).toBe('string')
+      expect(['triad', 'seventh']).toContain(item.params.tier)
+      if (item.params.tier === 'triad') expect(E5_TRIAD_QUALITIES).toContain(item.params.quality)
+      else expect(E5_SEVENTH_QUALITIES).toContain(item.params.quality)
+    }
+    for (const key of KEYS) {
+      const rootItems = e5.filter((i) => i.params.root === key.tonic)
+      expect(rootItems).toHaveLength(E5_TRIAD_QUALITIES.length + E5_SEVENTH_QUALITIES.length)
+      const triadQualities = rootItems.filter((i) => i.params.tier === 'triad').map((i) => i.params.quality)
+      expect(new Set(triadQualities)).toEqual(new Set(E5_TRIAD_QUALITIES))
+      const seventhQualities = rootItems.filter((i) => i.params.tier === 'seventh').map((i) => i.params.quality)
+      expect(new Set(seventhQualities)).toEqual(new Set(E5_SEVENTH_QUALITIES))
+    }
+  })
+
+  const E6_NUMERALS = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°']
+
+  it('E6 params are well-formed: tonic, numeral in the seven diatonic numerals, all 12 tonics covered', () => {
+    const e6 = ITEMS.filter((i) => i.nodeId === 'E6')
+    expect(e6.length).toBeGreaterThan(0)
+    for (const item of e6) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(E6_NUMERALS).toContain(item.params.numeral)
+    }
+    for (const key of KEYS) {
+      const numerals = e6.filter((i) => i.params.tonic === key.tonic).map((i) => i.params.numeral)
+      expect(new Set(numerals)).toEqual(new Set(E6_NUMERALS))
     }
   })
 })
