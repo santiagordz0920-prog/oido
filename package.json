@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "dexie": "^4.4.4",
     "dexie-react-hooks": "^4.4.0",
+    "pitchy": "^4.1.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.3",

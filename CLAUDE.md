@@ -38,4 +38,6 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 2 (curriculum) shipped: corpus artifacts + Corpus Coverage live (`src/curriculum/coverage.ts`), theory T1–T12 on the lesson framework, ear E0–E9 in sessions, checkpoints CP1–CP3 gating stages (`src/curriculum/checkpoints.ts`). Gate: human verifies Corpus Coverage displays a real computed number. Next: Phase 3 (ears open) — resolve open question 5 in docs/phases.md (electric vs acoustic input) with the human BEFORE mic work. Update this pointer at every phase boundary.
+Phase 3 (ears open) in progress. Phase 2 shipped: corpus artifacts + Corpus Coverage (`src/curriculum/coverage.ts`), theory T1–T12, ear E0–E9, checkpoints CP1–CP3 (`src/curriculum/checkpoints.ts`).
+
+**Input is an acoustic guitar into the laptop mic** (open question 5, resolved). Tune every detection default for that case: attenuated low-E fundamental, low SNR, per-user noise floor from calibration. Phase 3 builds Tier 1 mono pitch (`src/audio/input/`), the calibration screen, P0–P2, F0/F1/F5, and a tap fallback on every mic drill. Update this pointer at every phase boundary.

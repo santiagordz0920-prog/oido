@@ -920,6 +920,91 @@ const strings = {
   'cp.result.retry': { es: 'Reintentar', en: 'Retry' },
   'cp.result.continue': { es: 'Continuar', en: 'Continue' },
 
+  // Home — microphone card
+  'home.mic.eyebrow': { es: 'Entrada', en: 'Input' },
+  'home.mic.title': { es: 'Micrófono', en: 'Microphone' },
+  'home.mic.body': {
+    es: 'Guitarra acústica al micrófono del portátil. Calíbralo una vez y los ejercicios de producción quedan disponibles.',
+    en: 'Acoustic guitar into the laptop mic. Calibrate once and the production drills open up.',
+  },
+  'home.mic.calibrate': { es: 'Calibrar', en: 'Calibrate' },
+  'home.mic.ready': { es: 'Calibrado', en: 'Calibrated' },
+
+  // Microphone calibration
+  'cal.eyebrow': { es: 'Micrófono', en: 'Microphone' },
+  'cal.title': { es: 'Calibrar la entrada', en: 'Calibrate the input' },
+  'cal.intro.body': {
+    es: 'Antes de tocar, el micrófono necesita conocer tu sala. Mide el ruido de fondo y confirma que tu sexta cuerda al aire llega. Nada de esto sale de tu equipo: el audio se analiza aquí y no se guarda.',
+    en: 'Before you play, the mic needs to learn your room. It measures the background noise and confirms your open low string comes through. None of this leaves your machine: the audio is analysed here and never stored.',
+  },
+  'cal.start': { es: 'Empezar', en: 'Start' },
+  'cal.starting': { es: 'Pidiendo acceso al micrófono…', en: 'Asking for microphone access…' },
+  'cal.level': { es: 'Nivel', en: 'Level' },
+  'cal.floorLabel': { es: 'Ruido de fondo', en: 'Background noise' },
+
+  'cal.floor.heading': { es: 'Silencio, un momento', en: 'Quiet for a moment' },
+  'cal.floor.body': {
+    es: 'No toques nada durante unos segundos. Estoy midiendo el ruido de tu sala para saber dónde empieza la guitarra.',
+    en: 'Play nothing for a few seconds. I am measuring your room so I know where the guitar starts.',
+  },
+  'cal.floor.counting': { es: 'Midiendo… {n}', en: 'Measuring… {n}' },
+
+  'cal.lowE.heading': { es: 'Ahora la sexta cuerda al aire', en: 'Now the open low string' },
+  'cal.lowE.body': {
+    es: 'Toca tu mi grave al aire y déjalo sonar. Es la nota más difícil para el micrófono de un portátil, así que si esta llega, el resto también.',
+    en: 'Play your open low E and let it ring. It is the hardest note for a laptop mic, so if this one arrives, the rest will.',
+  },
+  'cal.lowE.waiting': { es: 'Escuchando…', en: 'Listening…' },
+  'cal.lowE.heard': { es: 'Oigo {note}', en: 'I hear {note}' },
+  'cal.lowE.confirm': { es: 'Confirmado: mi grave al aire.', en: 'Confirmed: open low E.' },
+  'cal.lowE.wrongNote': {
+    es: 'Oigo {note}, no un mi grave. Revisa la afinación o toca la sexta cuerda al aire.',
+    en: 'I hear {note}, not a low E. Check your tuning, or play the open sixth string.',
+  },
+  'cal.lowE.silent': {
+    es: 'No llega señal suficiente. Acerca la guitarra al portátil y apunta la boca hacia el micrófono.',
+    en: 'Not enough signal is arriving. Move the guitar closer and angle the soundhole toward the mic.',
+  },
+  'cal.lowE.skip': { es: 'Continuar sin confirmar', en: 'Continue without confirming' },
+  'cal.lowE.retry': { es: 'Probar otra vez', en: 'Try again' },
+
+  'cal.done.heading': { es: 'Listo', en: 'Ready' },
+  'cal.done.body': {
+    es: 'Ruido de fondo en {db} dB. La guitarra tiene que superarlo por {margin} dB para contar como nota.',
+    en: 'Background noise at {db} dB. The guitar has to clear it by {margin} dB to count as a note.',
+  },
+  'cal.done.unconfirmed': {
+    es: 'El mi grave no se confirmó. Los ejercicios funcionan igual, pero las cuerdas graves pueden fallar más.',
+    en: 'The low E was not confirmed. Drills still work, but the low strings may miss more often.',
+  },
+  'cal.done.noisy': {
+    es: 'Tu sala está ruidosa. Si los ejercicios fallan, prueba con menos ruido de fondo o más cerca del portátil.',
+    en: 'Your room is noisy. If drills misfire, try less background noise or sit closer to the laptop.',
+  },
+  'cal.done.continue': { es: 'Continuar', en: 'Continue' },
+  'cal.recalibrate': { es: 'Calibrar otra vez', en: 'Calibrate again' },
+
+  'cal.error.denied': {
+    es: 'El navegador bloqueó el micrófono. Permítelo en los ajustes del sitio y vuelve a intentarlo.',
+    en: 'The browser blocked the microphone. Allow it in the site settings and try again.',
+  },
+  'cal.error.no-device': {
+    es: 'No hay micrófono disponible. Conecta uno o revisa la entrada de sonido del sistema.',
+    en: 'No microphone is available. Connect one or check the system sound input.',
+  },
+  'cal.error.insecure': {
+    es: 'El micrófono necesita una conexión segura. Abre la app en https o en localhost.',
+    en: 'The microphone needs a secure connection. Open the app over https or on localhost.',
+  },
+  'cal.error.unsupported': {
+    es: 'Este navegador no da acceso al micrófono. Los ejercicios con toque siguen funcionando.',
+    en: 'This browser gives no microphone access. The tap drills still work.',
+  },
+  'cal.error.failed': {
+    es: 'El micrófono no arrancó. Cierra otras apps que lo estén usando y vuelve a intentarlo.',
+    en: 'The microphone did not start. Close other apps using it and try again.',
+  },
+
   // Audio
   'audio.loading': { es: 'Cargando el piano…', en: 'Loading the piano…' },
   'audio.error': {

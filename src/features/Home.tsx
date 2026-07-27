@@ -1,5 +1,6 @@
 import { useT } from '../state/settings'
 import { useDueCount, useNodeCompleted } from '../state/progress'
+import { useMicSettings } from '../state/mic'
 import { CorpusCoverage } from './CorpusCoverage'
 
 type Props = {
@@ -7,12 +8,20 @@ type Props = {
   onOpenE1: () => void
   onOpenSession: () => void
   onOpenConstellation: () => void
+  onOpenCalibration: () => void
 }
 
-export function Home({ onOpenTheory, onOpenE1, onOpenSession, onOpenConstellation }: Props) {
+export function Home({
+  onOpenTheory,
+  onOpenE1,
+  onOpenSession,
+  onOpenConstellation,
+  onOpenCalibration,
+}: Props) {
   const t = useT()
   const t2Complete = useNodeCompleted('T2')
   const due = useDueCount()
+  const calibratedAt = useMicSettings((s) => s.calibratedAt)
 
   const card = 'border-[length:var(--rule)] border-[var(--ink)] bg-[var(--surface)] p-4 sm:p-6'
   const action =
@@ -66,6 +75,22 @@ export function Home({ onOpenTheory, onOpenE1, onOpenSession, onOpenConstellatio
             {t('home.locked', { id: 'T2' })}
           </p>
         )}
+      </section>
+
+      <section className={card}>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.mic.eyebrow')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('home.mic.title')}</h2>
+        <p className="mb-3 max-w-[65ch]">{t('home.mic.body')}</p>
+        <div className="flex items-center gap-3">
+          <button className={action} onClick={onOpenCalibration}>
+            {calibratedAt === null ? t('home.mic.calibrate') : t('cal.recalibrate')}
+          </button>
+          {calibratedAt !== null ? (
+            <span className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
+              {t('home.mic.ready')}
+            </span>
+          ) : null}
+        </div>
       </section>
 
       <section className={card}>
