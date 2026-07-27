@@ -404,6 +404,52 @@ function p0Items(): DrillItem[] {
   return items
 }
 
+// P1: the user sings a phrase, transcribes it, then finds it on the guitar
+// (§8 P1). One item per key: the difficulty here comes from the drill
+// itself (an open-length sung phrase), not from any per-key parameter, so
+// the seed rating is uniform.
+const P1_SEED = 1000
+
+function p1Items(): DrillItem[] {
+  return KEYS.map((key) => ({
+    id: `P1|${key.tonic}`,
+    nodeId: 'P1',
+    kind: 'production' as const,
+    context: key.tonic,
+    params: { tonic: key.tonic },
+    seedRating: P1_SEED,
+  }))
+}
+
+// P2: a cadence plus a 3-5 note fragment sounds, the user reproduces it
+// (§8 P2). The fragment itself is generated at render time from
+// {tonic, length, seed} (src/features/items/P2Item.tsx) rather than stored
+// here, so a replay and a re-review reconstruct the same fragment
+// deterministically. Seed ratings rise with length: a longer fragment is a
+// longer memory span, and its pool is wider (brief §P2.5).
+export const P2_LENGTHS = [3, 4, 5]
+export const P2_SEEDS_PER_LENGTH = 3
+const P2_LENGTH_SEED: Record<number, number> = { 3: 1000, 4: 1060, 5: 1140 }
+
+function p2Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const length of P2_LENGTHS) {
+      for (let seed = 0; seed < P2_SEEDS_PER_LENGTH; seed++) {
+        items.push({
+          id: `P2|${key.tonic}|${length}|${seed}`,
+          nodeId: 'P2',
+          kind: 'production',
+          context: key.tonic,
+          params: { tonic: key.tonic, length, seed },
+          seedRating: P2_LENGTH_SEED[length],
+        })
+      }
+    }
+  }
+  return items
+}
+
 // F0: note names in all positions under time pressure, over all 12 pitch
 // classes (`pitchClass` reuses the KEYS tonic spelling so the item's context
 // carries a hue for free — every pitch class already sits somewhere on the
@@ -508,6 +554,8 @@ function f5Items(): DrillItem[] {
 export const ITEMS: DrillItem[] = [
   ...theoryItems(),
   ...p0Items(),
+  ...p1Items(),
+  ...p2Items(),
   ...e0Items(),
   ...e1Items(),
   ...e2Items(),

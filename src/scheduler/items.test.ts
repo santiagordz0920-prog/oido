@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { KEYS } from '../theory/keys'
+import { generateFragment, P2_POOL_BY_LENGTH } from '../features/items/P2Item'
 import {
   contextsForNode,
   distractorRanks,
@@ -13,6 +14,8 @@ import {
   isDiatonicProgression,
   ITEMS,
   NUMERAL_DEGREE,
+  P2_LENGTHS,
+  P2_SEEDS_PER_LENGTH,
 } from './items'
 
 describe('drill items', () => {
@@ -304,5 +307,60 @@ describe('drill items', () => {
 
   it('F5_DEGREE_OFFSET maps 1/3/5/b7 to their semitone offset from the chord root', () => {
     expect(F5_DEGREE_OFFSET).toEqual({ '1': 0, '3': 4, '5': 7, b7: 10 })
+  })
+
+  it('P1 params are well-formed: one item per key, tonic only, uniform seed rating', () => {
+    const p1 = ITEMS.filter((i) => i.nodeId === 'P1')
+    expect(p1).toHaveLength(12)
+    const seeds = new Set(p1.map((i) => i.seedRating))
+    expect(seeds.size).toBe(1)
+    for (const key of KEYS) {
+      const found = p1.find((i) => i.params.tonic === key.tonic)
+      expect(found).toBeDefined()
+      expect(found!.context).toBe(key.tonic)
+      expect(found!.kind).toBe('production')
+    }
+  })
+
+  it('P2 params are well-formed: tonic, length in {3,4,5}, seed within the per-length count, all 12 keys covered', () => {
+    const p2 = ITEMS.filter((i) => i.nodeId === 'P2')
+    expect(p2.length).toBeGreaterThan(0)
+    for (const item of p2) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(P2_LENGTHS).toContain(item.params.length)
+      expect(item.params.seed).toBeGreaterThanOrEqual(0)
+      expect(item.params.seed).toBeLessThan(P2_SEEDS_PER_LENGTH)
+      expect(item.kind).toBe('production')
+    }
+    for (const key of KEYS) {
+      const forKey = p2.filter((i) => i.params.tonic === key.tonic)
+      expect(forKey).toHaveLength(P2_LENGTHS.length * P2_SEEDS_PER_LENGTH)
+      for (const length of P2_LENGTHS) {
+        const seeds = forKey.filter((i) => i.params.length === length).map((i) => i.params.seed)
+        expect(new Set(seeds)).toEqual(new Set(Array.from({ length: P2_SEEDS_PER_LENGTH }, (_, i) => i)))
+      }
+    }
+  })
+
+  it('P2 seeds rise with fragment length', () => {
+    const seedFor = (length: number) => ITEMS.find((i) => i.nodeId === 'P2' && i.params.tonic === 'C' && i.params.length === length)!.seedRating
+    expect(seedFor(4)).toBeGreaterThan(seedFor(3))
+    expect(seedFor(5)).toBeGreaterThan(seedFor(4))
+  })
+
+  it('every generated P2 fragment has no immediate repeat, and reproduces identically for the same params', () => {
+    const p2 = ITEMS.filter((i) => i.nodeId === 'P2')
+    for (const item of p2) {
+      const tonic = String(item.params.tonic)
+      const length = Number(item.params.length)
+      const seed = Number(item.params.seed)
+      const fragment = generateFragment(tonic, length, seed)
+      expect(fragment).toHaveLength(length)
+      for (const degree of fragment) expect(P2_POOL_BY_LENGTH[length]).toContain(degree)
+      for (let i = 1; i < fragment.length; i++) expect(fragment[i]).not.toBe(fragment[i - 1])
+      // Determinism: the same {tonic, length, seed} must reproduce the same fragment.
+      expect(generateFragment(tonic, length, seed)).toEqual(fragment)
+    }
   })
 })

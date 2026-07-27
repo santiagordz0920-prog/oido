@@ -954,6 +954,104 @@ const strings = {
     en: 'Calibrate the mic so this drill can hear you.',
   },
 
+  // P2 — play what you hear
+  'p2.eyebrow': { es: 'P2 · toca lo que oyes', en: 'P2 · play what you hear' },
+  'p2.title': { es: 'Toca lo que oyes', en: 'Play what you hear' },
+  'p2.listening': { es: 'Escuchando el fragmento…', en: 'Listening to the fragment…' },
+  'p2.notePosition': { es: 'Nota {n} de {total}', en: 'Note {n} of {total}' },
+  'p2.prompt': { es: 'Tócalo de vuelta', en: 'Play it back' },
+  'p2.hearingYou': { es: 'Escuchando…', en: 'Listening…' },
+  'p2.heard': { es: 'Oigo {note}', en: 'I hear {note}' },
+  'p2.needsCalibration': {
+    es: 'Calibra el micrófono para que este ejercicio te escuche.',
+    en: 'Calibrate the mic so this drill can hear you.',
+  },
+  'p2.timeout': {
+    es: 'Sin señal clara. Vuelve a intentarlo o pasa al modo sin micrófono.',
+    en: 'No clear signal. Try again, or switch to the no-mic mode.',
+  },
+  'p2.replay': { es: 'Repetir', en: 'Replay' },
+  'p2.tap.switch': { es: 'Sin micrófono', en: 'Without the mic' },
+  'p2.tap.body': {
+    es: 'Toca los grados que oíste, en orden.',
+    en: 'Tap the degrees you heard, in order.',
+  },
+  'p2.tap.undo': { es: 'Deshacer', en: 'Undo' },
+  'p2.tap.note': {
+    es: 'Esto verifica que lo oíste, no que puedes tocarlo.',
+    en: 'This verifies that you heard it, not that you can play it.',
+  },
+  'p2.correct': { es: 'Correcto.', en: 'Correct.' },
+  'p2.incorrect': { es: 'No exactamente.', en: 'Not quite.' },
+  'p2.position.missing': {
+    es: 'Posición {position}: esperaba el grado {expected}, no oí nada ahí.',
+    en: 'Position {position}: expected degree {expected}, I heard nothing there.',
+  },
+  'p2.position.outside': {
+    es: 'Posición {position}: esperaba el grado {expected}, eso está fuera de la tonalidad.',
+    en: 'Position {position}: expected degree {expected}, that is outside the key.',
+  },
+  'p2.position.wrong': {
+    es: 'Posición {position}: esperaba el grado {expected}, tocaste el grado {played}.',
+    en: 'Position {position}: expected degree {expected}, you played degree {played}.',
+  },
+  'p2.extra': {
+    es: 'Tocaste {n} nota(s) de más.',
+    en: 'You played {n} extra note(s).',
+  },
+
+  // P1 — play what you sing
+  'p1.eyebrow': { es: 'P1 · toca lo que cantas', en: 'P1 · play what you sing' },
+  'p1.title': { es: 'Toca lo que cantas', en: 'Play what you sing' },
+  'p1.cadence.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'p1.sing.prompt': {
+    es: 'Canta una frase corta, de tres a cinco notas.',
+    en: 'Sing a short phrase, three to five notes.',
+  },
+  'p1.play.prompt': { es: 'Ahora tócalo en la guitarra.', en: 'Now play it on the guitar.' },
+  'p1.listening': { es: 'Escuchando…', en: 'Listening…' },
+  'p1.heard': { es: 'Oigo {note}', en: 'I hear {note}' },
+  'p1.done': { es: 'Ya terminé', en: 'Done' },
+  'p1.needsCalibration': {
+    es: 'Calibra el micrófono para que este ejercicio te escuche.',
+    en: 'Calibrate the mic so this drill can hear you.',
+  },
+  'p1.timeout': {
+    es: 'Sin señal clara. Vuelve a intentarlo o pasa al modo sin micrófono.',
+    en: 'No clear signal. Try again, or switch to the no-mic mode.',
+  },
+  'p1.leftKey': {
+    es: 'La frase salió de la tonalidad en más de una nota. Cántala otra vez.',
+    en: 'The phrase left the key on more than one note. Sing it again.',
+  },
+  'p1.singAgain': { es: 'Cantar otra vez', en: 'Sing again' },
+  'p1.transcription.title': { es: 'Lo que canté, en grados:', en: 'What I sang, as degrees:' },
+  'p1.outsideChip': { es: 'fuera', en: 'out' },
+  'p1.outsideWord': { es: 'una nota fuera de la tonalidad', en: 'a note outside the key' },
+  'p1.degreeWord': { es: 'el grado {degree}', en: 'degree {degree}' },
+  'p1.correct': { es: 'Correcto.', en: 'Correct.' },
+  'p1.incorrect': { es: 'No exactamente.', en: 'Not quite.' },
+  'p1.position.missing': {
+    es: 'Posición {position}: cantaste {expected}, no oí nada ahí.',
+    en: 'Position {position}: you sang {expected}, I heard nothing there.',
+  },
+  'p1.position.wrong': {
+    es: 'Posición {position}: cantaste {expected}, tocaste {played}.',
+    en: 'Position {position}: you sang {expected}, you played {played}.',
+  },
+  'p1.tap.switch': { es: 'Sin micrófono', en: 'Without the mic' },
+  'p1.tap.title': { es: 'Sin micrófono', en: 'Without the mic' },
+  'p1.tap.body': {
+    es: 'P1 no funciona sin micrófono, así que aquí tienes un fragmento como grados. Intenta tocarlo en la guitarra.',
+    en: 'P1 cannot work without a mic, so here is a fragment as degrees instead. Try to play it on the guitar.',
+  },
+  'p1.tap.did': { es: 'Lo toqué', en: 'Played it' },
+  'p1.tap.didnt': { es: 'No pude', en: 'Could not' },
+  'p1.tap.note': {
+    es: 'Esto es un auto-reporte: no verificamos que lo tocaste.',
+    en: 'This is a self-report: we do not verify that you played it.',
+  },
+
   // Home — microphone card
   'home.mic.eyebrow': { es: 'Entrada', en: 'Input' },
   'home.mic.title': { es: 'Micrófono', en: 'Microphone' },

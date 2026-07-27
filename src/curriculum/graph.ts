@@ -133,7 +133,7 @@ function buildNodes(): Map<string, SkillNode> {
       id === 'E9',
   )
   addTrack('F', F_COUNT, (id) => id === 'F0' || id === 'F1' || id === 'F5')
-  addTrack('P', P_COUNT, (id) => id === 'P0')
+  addTrack('P', P_COUNT, (id) => id === 'P0' || id === 'P1' || id === 'P2')
 
   // Invert the theory unlock edges into prerequisites.
   for (const tNode of T_ROWS.map(([id]) => nodes.get(id)!)) {

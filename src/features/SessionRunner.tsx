@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useT } from '../state/settings'
 import { db } from '../db'
 import { nextItem, recordAttempt, type NextItem } from '../scheduler/engine'
@@ -17,6 +17,8 @@ import { E7Item } from './items/E7Item'
 import { E8Item } from './items/E8Item'
 import { E9Item } from './items/E9Item'
 import { P0Item } from './items/P0Item'
+import { P1Item } from './items/P1Item'
+import { P2Item } from './items/P2Item'
 import { F0Item } from './items/F0Item'
 import { F1Item } from './items/F1Item'
 import { F5Item } from './items/F5Item'
@@ -351,7 +353,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
           {meta}
           {note}
           <div className="mono text-[length:var(--fs-1)]">{keyLine}</div>
-          {recognitionItem}
+          <Fragment key={current.item.id}>{recognitionItem}</Fragment>
           {endButton}
         </div>
       </div>
@@ -359,20 +361,43 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
   }
 
   if (current.item.kind === 'production') {
+    const nodeId = current.item.nodeId
     const itemKey = keyByTonic(String(current.item.params.tonic))
+    const nextLabel = t('e1.next')
+    let productionItem
+    if (nodeId === 'P1') {
+      productionItem = (
+        <P1Item itemKey={itemKey} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else if (nodeId === 'P2') {
+      productionItem = (
+        <P2Item
+          itemKey={itemKey}
+          length={Number(current.item.params.length)}
+          seed={Number(current.item.params.seed)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else {
+      productionItem = (
+        <P0Item
+          itemKey={itemKey}
+          degree={Number(current.item.params.degree)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    }
     return (
       <div className="key-field flex-1 p-4">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           {meta}
           {note}
           <div className="mono text-[length:var(--fs-1)]">{t('e1.keyIs', { key: itemKey.label })}</div>
-          <P0Item
-            itemKey={itemKey}
-            degree={Number(current.item.params.degree)}
-            nextLabel={t('e1.next')}
-            onResult={handleResult}
-            onNext={handleNext}
-          />
+          <Fragment key={current.item.id}>{productionItem}</Fragment>
           {endButton}
         </div>
       </div>
@@ -428,7 +453,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
           {meta}
           {note}
           <div className="mono text-[length:var(--fs-1)]">{keyLine}</div>
-          {fretboardItem}
+          <Fragment key={current.item.id}>{fretboardItem}</Fragment>
           {endButton}
         </div>
       </div>
@@ -440,6 +465,7 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       {meta}
       {note}
       <TheoryCheckItem
+        key={current.item.id}
         nodeId={current.item.nodeId}
         checkId={String(current.item.params.checkId)}
         nextLabel={t('e1.next')}
