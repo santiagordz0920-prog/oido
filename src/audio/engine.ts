@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import { cadenceVoicings, degreeNote, resolutionDegrees, scaleNotes } from '../theory'
+import { cadenceVoicings, degreeNote, progressionVoicings, resolutionDegrees, scaleNotes } from '../theory'
 
 // All musical timing goes through Tone.Transport — never setTimeout.
 // The piano is a local Salamander subset in /samples/piano, bundled so the
@@ -129,8 +129,19 @@ export function playCadence(tonic: string): Promise<void> {
   )
 }
 
-// Cadence, a beat of silence, then the target degree.
-export function playCadenceThenDegree(tonic: string, degree: number, onTarget?: () => void): Promise<void> {
+export type CadenceThenDegreeOptions = {
+  onTarget?: () => void
+  // Silence between the cadence's last chord and the target note. E0's
+  // difficulty dial: tonic retention is trained by growing this gap (§6).
+  gapSeconds?: number
+}
+
+// Cadence, silence, then the target degree.
+export function playCadenceThenDegree(
+  tonic: string,
+  degree: number,
+  { onTarget, gapSeconds = 0.9 }: CadenceThenDegreeOptions = {},
+): Promise<void> {
   const voicings = cadenceVoicings(tonic)
   const dur = 0.75
   const events: ScheduledNote[] = voicings.map((v, i) => ({
@@ -139,7 +150,7 @@ export function playCadenceThenDegree(tonic: string, degree: number, onTarget?: 
     duration: i === voicings.length - 1 ? dur * 1.5 : dur * 0.98,
     velocity: 0.8,
   }))
-  const targetTime = voicings.length * dur + 0.9
+  const targetTime = voicings.length * dur + gapSeconds
   events.push({
     time: targetTime,
     notes: [degreeNote(tonic, degree)],
@@ -151,6 +162,31 @@ export function playCadenceThenDegree(tonic: string, degree: number, onTarget?: 
 
 export function playDegree(tonic: string, degree: number): Promise<void> {
   return play([{ time: 0, notes: [degreeNote(tonic, degree)], duration: 1.4 }])
+}
+
+export type ProgressionOptions = {
+  chordSeconds?: number // duration of each chord
+  onChord?: (index: number) => void // fires as each chord sounds; -1 when done
+}
+
+// A Roman-numeral progression, voice-led, bass plus upper voices — the shared
+// renderer for E6–E8 drills, checkpoints, and later the Play-Along engine.
+export function playProgression(
+  tonic: string,
+  numerals: string[],
+  { chordSeconds = 1.1, onChord }: ProgressionOptions = {},
+): Promise<void> {
+  const voicings = progressionVoicings(tonic, numerals)
+  return play(
+    voicings.map((v, i) => ({
+      time: i * chordSeconds,
+      notes: [v.bass, ...v.upper],
+      duration: i === voicings.length - 1 ? chordSeconds * 1.6 : chordSeconds * 0.98,
+      velocity: 0.8,
+      onStart: onChord ? () => onChord(i) : undefined,
+    })),
+    onChord ? () => onChord(-1) : undefined,
+  )
 }
 
 // Stepwise resolution of a stable degree down to the tonic.
