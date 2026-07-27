@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { KEYS } from '../theory/keys'
-import { contextsForNode, ITEMS } from './items'
+import {
+  contextsForNode,
+  distractorRanks,
+  E7_POOL_SIZE,
+  E8_POOL_SIZE,
+  E9_RANK_COUNT,
+  isDiatonicProgression,
+  ITEMS,
+  NUMERAL_DEGREE,
+} from './items'
 
 describe('drill items', () => {
   it('has no id collisions across the whole item bank', () => {
@@ -8,7 +17,7 @@ describe('drill items', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  for (const nodeId of ['E0', 'E2', 'E3', 'E4', 'E5', 'E6']) {
+  for (const nodeId of ['E0', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9']) {
     it(`${nodeId} covers all 12 key contexts`, () => {
       const contexts = contextsForNode(nodeId)
       expect(new Set(contexts).size).toBe(12)
@@ -125,5 +134,88 @@ describe('drill items', () => {
       const numerals = e6.filter((i) => i.params.tonic === key.tonic).map((i) => i.params.numeral)
       expect(new Set(numerals)).toEqual(new Set(E6_NUMERALS))
     }
+  })
+
+  it('E7 params are well-formed: tonic, mode major|minor, rank within each mode\'s pool size, all 12 tonics covered', () => {
+    const e7 = ITEMS.filter((i) => i.nodeId === 'E7')
+    expect(e7.length).toBeGreaterThan(0)
+    for (const item of e7) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(['major', 'minor']).toContain(item.params.mode)
+      const mode = item.params.mode as 'major' | 'minor'
+      expect(item.params.rank).toBeGreaterThanOrEqual(0)
+      expect(item.params.rank).toBeLessThan(E7_POOL_SIZE[mode])
+    }
+    for (const key of KEYS) {
+      const ranks = (mode: 'major' | 'minor') =>
+        e7.filter((i) => i.params.tonic === key.tonic && i.params.mode === mode).map((i) => i.params.rank)
+      expect(new Set(ranks('major'))).toEqual(new Set(Array.from({ length: E7_POOL_SIZE.major }, (_, i) => i)))
+      expect(new Set(ranks('minor'))).toEqual(new Set(Array.from({ length: E7_POOL_SIZE.minor }, (_, i) => i)))
+    }
+  })
+
+  it('E7 seeds rise with rank, and minor sits above major at the same rank', () => {
+    const e7 = ITEMS.filter((i) => i.nodeId === 'E7' && i.params.tonic === 'C')
+    const major = (r: number) => e7.find((i) => i.params.mode === 'major' && i.params.rank === r)!
+    const minor = (r: number) => e7.find((i) => i.params.mode === 'minor' && i.params.rank === r)!
+    expect(major(1).seedRating).toBeGreaterThan(major(0).seedRating)
+    expect(minor(0).seedRating).toBeGreaterThan(major(0).seedRating)
+  })
+
+  it('E8 params are well-formed: tonic, mode major|minor, rank within each mode\'s pool size, all 12 tonics covered', () => {
+    const e8 = ITEMS.filter((i) => i.nodeId === 'E8')
+    expect(e8.length).toBeGreaterThan(0)
+    for (const item of e8) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(['major', 'minor']).toContain(item.params.mode)
+      const mode = item.params.mode as 'major' | 'minor'
+      expect(item.params.rank).toBeGreaterThanOrEqual(0)
+      expect(item.params.rank).toBeLessThan(E8_POOL_SIZE[mode])
+    }
+    for (const key of KEYS) {
+      const ranks = (mode: 'major' | 'minor') =>
+        e8.filter((i) => i.params.tonic === key.tonic && i.params.mode === mode).map((i) => i.params.rank)
+      expect(new Set(ranks('major'))).toEqual(new Set(Array.from({ length: E8_POOL_SIZE.major }, (_, i) => i)))
+      expect(new Set(ranks('minor'))).toEqual(new Set(Array.from({ length: E8_POOL_SIZE.minor }, (_, i) => i)))
+    }
+  })
+
+  it('E9 params are well-formed: tonic, mode always major, rank within the diatonic pool size, all 12 tonics covered', () => {
+    const e9 = ITEMS.filter((i) => i.nodeId === 'E9')
+    expect(e9.length).toBeGreaterThan(0)
+    for (const item of e9) {
+      expect(item.context).toBe(item.params.tonic)
+      expect(typeof item.params.tonic).toBe('string')
+      expect(item.params.mode).toBe('major')
+      expect(item.params.rank).toBeGreaterThanOrEqual(0)
+      expect(item.params.rank).toBeLessThan(E9_RANK_COUNT)
+    }
+    for (const key of KEYS) {
+      const ranks = e9.filter((i) => i.params.tonic === key.tonic).map((i) => i.params.rank)
+      expect(new Set(ranks)).toEqual(new Set(Array.from({ length: E9_RANK_COUNT }, (_, i) => i)))
+    }
+  })
+
+  it('E9\'s rank count matches the corpus filtered to plain-diatonic entries in the top-10 major four-chord list', async () => {
+    const { loadProgressionFrequency, topProgressions } = await import('../curriculum/progressions')
+    const data = await loadProgressionFrequency()
+    const pool = topProgressions(data, 'major', 'four', 10).filter((e) => isDiatonicProgression(e.p))
+    expect(pool).toHaveLength(E9_RANK_COUNT)
+  })
+
+  it('NUMERAL_DEGREE maps the seven plain diatonic numerals to their scale degree', () => {
+    expect(NUMERAL_DEGREE).toEqual({ I: 1, ii: 2, iii: 3, IV: 4, V: 5, vi: 6, 'vii°': 7 })
+    expect(isDiatonicProgression(['I', 'IV', 'V', 'I'])).toBe(true)
+    expect(isDiatonicProgression(['I', 'bVII', 'IV', 'I'])).toBe(false)
+  })
+
+  it('distractorRanks is deterministic and picks the nearest other ranks, ties favoring the lower (more frequent) rank', () => {
+    expect(distractorRanks(0, 12, 3)).toEqual([1, 2, 3])
+    expect(distractorRanks(11, 12, 3)).toEqual([10, 9, 8])
+    // rank 5 of 0..11: distance-1 neighbors are 4 and 6 (tie), then distance-2 is 3 and 7 (tie) — lower rank wins each tie.
+    expect(distractorRanks(5, 12, 3)).toEqual([4, 6, 3])
+    expect(distractorRanks(5, 12, 3)).toEqual(distractorRanks(5, 12, 3))
   })
 })

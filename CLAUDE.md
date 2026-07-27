@@ -38,4 +38,4 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 2 (curriculum) in progress. Done: open questions 1 and 2 resolved (docs/phases.md §17), corpus ingest (`scripts/ingest/`, artifacts in `src/data/`), Corpus Coverage live, progression engine (`playProgression` + corpus-ordered lists), ear drills E0–E6 in sessions. Remaining: theory T1, T3–T12, ear E7–E9, checkpoints — delegate to the implementer subagent per the protocol. Update this pointer at every phase boundary.
+Phase 2 (curriculum) in progress. Done: open questions 1 and 2 resolved (docs/phases.md §17), corpus ingest (`scripts/ingest/`, artifacts in `src/data/`), Corpus Coverage live, progression engine, ear track complete E0–E9 in sessions (E9 major-diatonic v1). Remaining: theory T1, T3–T12, checkpoints — delegate to the implementer subagent per the protocol. Update this pointer at every phase boundary.

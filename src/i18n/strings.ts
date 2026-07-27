@@ -216,6 +216,38 @@ const strings = {
     en: 'No: it was {numeral} — {note} in {key} major.',
   },
 
+  // E7 drill — two-chord motions, ordered by corpus frequency
+  'e7.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
+  'e7.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e7.prompt': { es: '¿Qué movimiento es?', en: 'Which motion is it?' },
+  'e7.replay': { es: 'Repetir', en: 'Replay' },
+  'e7.keyIs.major': { es: 'Tonalidad: {key} mayor', en: 'Key: {key} major' },
+  'e7.keyIs.minor': { es: 'Tonalidad: {key} menor', en: 'Key: {key} minor' },
+  'e7.correct': { es: 'Sí: {motion}.', en: 'Yes: {motion}.' },
+  'e7.incorrect': { es: 'No: era {motion}.', en: 'No: it was {motion}.' },
+
+  // E8 drill — four-bar progressions, ordered by corpus frequency
+  'e8.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
+  'e8.listening': { es: 'Cadencia…', en: 'Cadence…' },
+  'e8.prompt': { es: '¿Qué progresión es?', en: 'Which progression is it?' },
+  'e8.replay': { es: 'Repetir', en: 'Replay' },
+  'e8.keyIs.major': { es: 'Tonalidad: {key} mayor', en: 'Key: {key} major' },
+  'e8.keyIs.minor': { es: 'Tonalidad: {key} menor', en: 'Key: {key} minor' },
+  'e8.correct': { es: 'Sí: {motion}.', en: 'Yes: {motion}.' },
+  'e8.incorrect': { es: 'No: era {motion}.', en: 'No: it was {motion}.' },
+
+  // E9 drill — bass-line dictation, root motion only
+  'e9.loading': { es: 'Cargando el corpus…', en: 'Loading the corpus…' },
+  'e9.listening': { es: 'Bajo…', en: 'Bass…' },
+  'e9.prompt': { es: 'Toca los grados del bajo, en orden.', en: 'Tap the bass degrees, in order.' },
+  'e9.replay': { es: 'Repetir', en: 'Replay' },
+  'e9.clear': { es: 'Borrar', en: 'Clear' },
+  'e9.correct': { es: 'Sí: {sequence}.', en: 'Yes: {sequence}.' },
+  'e9.incorrect': {
+    es: 'No: era {sequence}. Tocaste {entered}.',
+    en: 'No: it was {sequence}. You entered {entered}.',
+  },
+
   // Home, Phase 1 additions
   'home.session.eyebrow': { es: 'Práctica programada', en: 'Scheduled practice' },
   'home.session.title': { es: 'Empezar una sesión', en: 'Start a session' },

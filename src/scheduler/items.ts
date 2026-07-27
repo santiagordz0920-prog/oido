@@ -233,6 +233,140 @@ function e6Items(): DrillItem[] {
   return items
 }
 
+// E7/E8/E9 read their progressions from the ingested corpus table
+// (src/curriculum/progressions.ts), never from a guessed list. That table is
+// loaded lazily (a ~400KB JSON) so it must not be imported here — item
+// GENERATION stays synchronous. An item's params carry only
+// { tonic, mode, rank }: the rank is the index into the corpus-ordered pool
+// (topProgressions(data, mode, length, poolSize)), and the item components
+// (E7Item/E8Item/E9Item) resolve rank → numerals at render time, after
+// awaiting the corpus load, exactly like awaiting audio load.
+
+export const E7_POOL_SIZE: Record<'major' | 'minor', number> = { major: 12, minor: 8 }
+export const E8_POOL_SIZE: Record<'major' | 'minor', number> = { major: 10, minor: 6 }
+
+// The seven plain diatonic numerals and the scale degree of each one's root
+// — shared by E6/E9 (E6's chip set is the same seven numerals; E9 grades a
+// bass line by comparing entered degrees against these roots).
+export const NUMERAL_DEGREE: Record<string, number> = {
+  I: 1,
+  ii: 2,
+  iii: 3,
+  IV: 4,
+  V: 5,
+  vi: 6,
+  'vii°': 7,
+}
+
+export function isDiatonicProgression(numerals: string[]): boolean {
+  return numerals.every((n) => n in NUMERAL_DEGREE)
+}
+
+// E9's pool is E8's major four-chord list (top 10), filtered to entries
+// whose numerals are all plain diatonic — no secondary dominants, borrowed
+// chords, or bVII; those arrive with E10. Filtering runs against the live
+// corpus at render time (E9Item.tsx, via isDiatonicProgression above), but
+// item generation needs to know the pool size synchronously. Verified
+// against the current corpus (src/data/progression-frequency.json): of the
+// top 10 major four-chord progressions, 9 are plain diatonic — only
+// "I bVII IV I" (raw rank 7) carries an accidental. Re-verify this count if
+// the corpus is regenerated.
+export const E9_RANK_COUNT = 9
+
+// Deterministic "nearest rank" distractor picker for E7/E8's multiple-choice
+// chips: no Math.random, so replaying an item shows the same three
+// distractors every time. Ties (equal distance above/below) favor the more
+// frequent (lower) rank.
+export function distractorRanks(rank: number, poolSize: number, count: number): number[] {
+  const others: number[] = []
+  for (let r = 0; r < poolSize; r++) {
+    if (r !== rank) others.push(r)
+  }
+  others.sort((a, b) => {
+    const da = Math.abs(a - rank)
+    const db = Math.abs(b - rank)
+    return da !== db ? da - db : a - b
+  })
+  return others.slice(0, count)
+}
+
+// E7: two-chord motions, ordered by corpus frequency, over all 12 tonics.
+// Seed ratings rise with rank — more frequent means an easier, more familiar
+// motion — and minor sits slightly above major at the same rank (§6 T8/T9).
+const E7_MAJOR_BASE = 1000
+const E7_MINOR_BASE = 1020
+const E7_RANK_STEP = 8
+
+function e7Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const mode of ['major', 'minor'] as const) {
+      const base = mode === 'major' ? E7_MAJOR_BASE : E7_MINOR_BASE
+      for (let rank = 0; rank < E7_POOL_SIZE[mode]; rank++) {
+        items.push({
+          id: `E7|${key.tonic}|${mode}|${rank}`,
+          nodeId: 'E7',
+          kind: 'recognition',
+          context: key.tonic,
+          params: { tonic: key.tonic, mode, rank },
+          seedRating: base + rank * E7_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
+// E8: four-bar progressions, ordered by corpus frequency, over all 12
+// tonics. Same tiering rationale as E7, with a higher base — a four-chord
+// progression is a longer memory span than a two-chord motion (§6).
+const E8_MAJOR_BASE = 1050
+const E8_MINOR_BASE = 1070
+const E8_RANK_STEP = 10
+
+function e8Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const mode of ['major', 'minor'] as const) {
+      const base = mode === 'major' ? E8_MAJOR_BASE : E8_MINOR_BASE
+      for (let rank = 0; rank < E8_POOL_SIZE[mode]; rank++) {
+        items.push({
+          id: `E8|${key.tonic}|${mode}|${rank}`,
+          nodeId: 'E8',
+          kind: 'recognition',
+          context: key.tonic,
+          params: { tonic: key.tonic, mode, rank },
+          seedRating: base + rank * E8_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
+// E9: bass-line dictation, root motion only, major only for now (minor and
+// chromatic dictation arrive with E10 — §6 E9 note). Seed ratings rise with
+// rank, same rationale as E7/E8.
+const E9_BASE = 1050
+const E9_RANK_STEP = 10
+
+function e9Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let rank = 0; rank < E9_RANK_COUNT; rank++) {
+      items.push({
+        id: `E9|${key.tonic}|${rank}`,
+        nodeId: 'E9',
+        kind: 'recognition',
+        context: key.tonic,
+        params: { tonic: key.tonic, mode: 'major', rank },
+        seedRating: E9_BASE + rank * E9_RANK_STEP,
+      })
+    }
+  }
+  return items
+}
+
 function t2Items(): DrillItem[] {
   return T2_CHECKS.map((check) => ({
     id: `T2|${check.id}`,
@@ -253,6 +387,9 @@ export const ITEMS: DrillItem[] = [
   ...e4Items(),
   ...e5Items(),
   ...e6Items(),
+  ...e7Items(),
+  ...e8Items(),
+  ...e9Items(),
 ]
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]))

@@ -13,6 +13,9 @@ import { E3Item } from './items/E3Item'
 import { E4Item } from './items/E4Item'
 import { E5Item, type ChordTier } from './items/E5Item'
 import { E6Item } from './items/E6Item'
+import { E7Item } from './items/E7Item'
+import { E8Item } from './items/E8Item'
+import { E9Item } from './items/E9Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
 import type { DrillItem } from '../scheduler/items'
 
@@ -282,6 +285,40 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
       keyLine = t('e1.keyIs', { key: itemKey.label })
       recognitionItem = (
         <E6Item itemKey={itemKey} numeral={numeral} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else if (nodeId === 'E7') {
+      const drillMode = String(current.item.params.mode) as 'major' | 'minor'
+      const rank = Number(current.item.params.rank)
+      keyLine = t(drillMode === 'major' ? 'e7.keyIs.major' : 'e7.keyIs.minor', { key: itemKey.label })
+      recognitionItem = (
+        <E7Item
+          itemKey={itemKey}
+          mode={drillMode}
+          rank={rank}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'E8') {
+      const drillMode = String(current.item.params.mode) as 'major' | 'minor'
+      const rank = Number(current.item.params.rank)
+      keyLine = t(drillMode === 'major' ? 'e8.keyIs.major' : 'e8.keyIs.minor', { key: itemKey.label })
+      recognitionItem = (
+        <E8Item
+          itemKey={itemKey}
+          mode={drillMode}
+          rank={rank}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'E9') {
+      const rank = Number(current.item.params.rank)
+      keyLine = t('e1.keyIs', { key: itemKey.label })
+      recognitionItem = (
+        <E9Item itemKey={itemKey} rank={rank} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
       )
     } else {
       const degree = Number(current.item.params.degree)
