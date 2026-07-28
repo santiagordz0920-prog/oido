@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+# The app has to be reachable over https for the microphone to work at all:
+# getUserMedia refuses to run in an insecure context, so a file:// copy or a
+# plain-http host would silently break every mic drill. Pages gives us https
+# and a stable URL, and this runs on every push so the deployed build is
+# never behind the branch.
+
+on:
+  push:
+    branches: [claude/phase-0-setup-build-v3iq14]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          BASE_PATH: /oido/
+      - uses: actions/configure-pages@v5
+        with:
+          # Turns Pages on the first time this runs, so no manual setup step.
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
