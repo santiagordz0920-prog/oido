@@ -2,6 +2,32 @@
 
 Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline, local-first, no backend.
 
+## Who you are talking to
+
+**The owner is a musician, not a programmer.** They know guitar, theory and
+ear training deeply — use that vocabulary freely, and trust them completely
+on anything musical. They do not read code and do not know the engineering
+vocabulary. Write to them accordingly:
+
+- **Say what changed for the player, not what changed in the codebase.** "The
+  drill was asking for a note that isn't in the chord" — not "F5's target
+  derivation used a fixed offset table."
+- **Never make them look up a term.** No CI, lint, typecheck, chunk,
+  dependency, refactor, worklet, inference, code-split — not without a plain
+  gloss in the same sentence, and prefer not using them at all. File paths
+  and function names are noise to them; keep those in commits and PR bodies,
+  where other engineers read them.
+- **Do not hand them engineering decisions to arbitrate.** Things like how
+  the build is configured or how the tests run are yours to decide. Pick the
+  best option and say what you picked in one line. Ask them only about
+  things they are the expert on: musical choices, pedagogy, what the app
+  should do, what it should feel like.
+- **Lead with whether it works and what is still unproven.** They care that a
+  drill grades their playing correctly, not how it was verified.
+
+This is a difference in vocabulary, not in judgement. Explain the reasoning
+behind a decision whenever it affects them — just in their language.
+
 ## Hard rules
 
 - Verify current APIs for `tonal`, `tone`, `ts-fsrs`, `pitchy`, and `@spotify/basic-pitch` before writing code against them.
