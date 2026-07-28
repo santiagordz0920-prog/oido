@@ -1280,6 +1280,28 @@ const strings = {
     en: 'Tapped, not played: this checks that you know where they are, not that you can use them in time.',
   },
 
+  // Quick drill — P3/P4 without sitting through a session
+  'quick.eyebrow': { es: 'Práctica suelta', en: 'Single drill' },
+  'quick.title': { es: 'Tocar sobre cambios', en: 'Play over changes' },
+  'quick.body': {
+    es: 'Los dos ejercicios de improvisación, sueltos y cuando quieras, sin esperar al último bloque de una sesión. Se corrigen igual y cuentan igual: elegir qué practicar no lo hace menos práctica.',
+    en: 'Both improvisation drills, on their own and whenever you want, without waiting for the last block of a session. Same grading, and they count the same: choosing what to practise does not make it count less.',
+  },
+  'quick.track.p3': { es: 'Caer en la nota', en: 'Land the tone' },
+  'quick.track.p4': { es: 'Improvisar sobre cambios', en: 'Improvise over changes' },
+  'quick.pickTarget': { es: 'Nota que persigues:', en: 'Tone you are chasing:' },
+  'quick.pickConstraint': { es: 'Restricción:', en: 'Constraint:' },
+  'quick.again': { es: 'Otra vez', en: 'Again' },
+
+  // Home — quick drill card
+  'home.quick.eyebrow': { es: 'Guitarra en mano', en: 'Guitar in hand' },
+  'home.quick.title': { es: 'Tocar sobre cambios', en: 'Play over changes' },
+  'home.quick.body': {
+    es: 'Caer en la nota del acorde, o improvisar con las notas guía, sobre una base que se repite.',
+    en: 'Land the chord tone, or improvise on guide tones, over a looping backing track.',
+  },
+  'home.quick.cta': { es: 'Empezar', en: 'Start' },
+
   // Mic check — one drill per input tier, plus what the chord model measured
   'miccheck.again.chord': { es: 'Otro acorde', en: 'Another chord' },
   'miccheck.tier.note': { es: 'Una nota', en: 'One note' },

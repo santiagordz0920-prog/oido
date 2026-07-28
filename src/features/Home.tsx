@@ -11,6 +11,7 @@ type Props = {
   onOpenCalibration: () => void
   onOpenMicCheck: () => void
   onOpenPlayAlong: () => void
+  onOpenQuickDrill: () => void
 }
 
 export function Home({
@@ -21,6 +22,7 @@ export function Home({
   onOpenCalibration,
   onOpenMicCheck,
   onOpenPlayAlong,
+  onOpenQuickDrill,
 }: Props) {
   const t = useT()
   const t2Complete = useNodeCompleted('T2')
@@ -79,6 +81,15 @@ export function Home({
             {t('home.locked', { id: 'T2' })}
           </p>
         )}
+      </section>
+
+      <section className={card}>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.quick.eyebrow')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('home.quick.title')}</h2>
+        <p className="mb-3 max-w-[65ch]">{t('home.quick.body')}</p>
+        <button className={action} onClick={onOpenQuickDrill}>
+          {t('home.quick.cta')}
+        </button>
       </section>
 
       <section className={card}>
