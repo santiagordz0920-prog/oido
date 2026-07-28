@@ -16,6 +16,8 @@ Ship something usable at every phase boundary.
 
 **Phase 4, chords in.** Basic Pitch and Tier 2 capture-and-grade. Track F triads (F2). P3 and P4. Play-Along Engine.
 
+> **Built, gate not yet attempted.** Everything is verified against synthesized chords, unit tests and the tap paths. Nothing has been played into a real microphone. Phase 3's gate found two bugs that the whole test suite had missed — a noise floor measured from the room's loudest moment, and attacks judged across a window that smears them — and neither was the kind of thing a test would have thought to ask. Assume Phase 4 has its own pair waiting. **The gate:** strum a triad from each of the four string sets into the laptop mic and have F2 grade them correctly, then play eight bars of P3 landing the named tone on the downbeats. Until that happens the Tier 2 path is unproven, whatever the tests say.
+
 **Phase 5, practice system.** Transcription Workbench, Assignments, Recording Archive with longitudinal comparison, Practice Log. P5 post-hoc analysis.
 
 **Phase 6, depth.** T13 through T19, E10 through E14, F6. Full PWA and offline. Export.
@@ -40,6 +42,10 @@ Resolve before the phase noted.
    Well under the 3-second threshold, so **no eager preload during Track T and E**. Cold start was never the risk; the ~1.1 MB that has to arrive over the wire is, and that is a download problem rather than a startup one. Keep it behind a dynamic import so Tracks T and E cost zero extra bytes — the airport case — and warm it in the background only once a session that actually includes Track F or P begins.
 
    Inference measured 4.5 s for a 3-second buffer, but on the **CPU backend**: the test container has no GPU, so TFJS fell back from WebGL. That figure is a pessimistic floor, not a real-world number, and it needs re-measuring on the target machine before any latency decision rests on it.
+
+   **Re-measured during Phase 4, and it changed the design.** Timing the same CPU backend across repeated runs showed the cost is not per-inference at all: the *first* inference took 7–8.5 s and every one after it settled at about 3.2 s, because TensorFlow.js compiles its kernels on first use. Window length barely mattered (2.0 s and 3.0 s of audio cost the same). So warming means loading the graph **and** running one throwaway inference over a silent buffer — about 7.5 s in the background at session start, after which each graded chord is steady. Without it the user's first chord of the session would take twice as long as every other one, which is the worst possible place to put the cost.
+
+   The figures remain a CPU-backend floor. The mic check screen (`src/features/MicCheck.tsx`) now runs one drill per input tier and reports the load and inference times it measured, so the number for the machine that matters comes from that machine rather than from this note.
 
    Two integration facts verified in the source, not assumed: audio must be **mono at 22050 Hz** or `evaluateModel` throws (`AUDIO_SAMPLE_RATE` in `src/inference.ts`), so the 48 kHz capture path has to resample; and the constructor takes a model path or a `Promise<tf.GraphModel>`, which is the seam for lazy loading.
 4. **Before Phase 5.** Recording Archive storage budget. How many minutes of audio before pruning, and what the user sees when the budget is hit.

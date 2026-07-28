@@ -189,11 +189,17 @@ export function F2Item({
       </p>
       <p className="mono text-[length:var(--fs-2)]">{t('f2.bassIs', { degree: bassDegree })}</p>
 
-      <Fretboard
-        markers={markers}
-        highlightStrings={stringSet}
-        onTap={tapMode && phase !== 'feedback' ? handleTap : undefined}
-      />
+      {/* The fretboard is shown when it carries something: the tap surface,
+          or the shape being revealed. Before a mic answer it would be an
+          empty diagram whose only content is the shape we must not give
+          away. */}
+      {tapMode || phase === 'feedback' ? (
+        <Fretboard
+          markers={markers}
+          highlightStrings={stringSet}
+          onTap={tapMode && phase !== 'feedback' ? handleTap : undefined}
+        />
+      ) : null}
 
       {phase === 'ready' ? (
         tapMode ? (

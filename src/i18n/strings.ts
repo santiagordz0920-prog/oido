@@ -1289,8 +1289,8 @@ const strings = {
     en: 'Chord detection: getting ready.',
   },
   'miccheck.timings.loaded': {
-    es: 'Detección de acordes lista en {load} ms. Aún no ha analizado nada.',
-    en: 'Chord detection ready in {load} ms. Nothing analysed yet.',
+    es: 'Modelo cargado en {load} ms; calentando.',
+    en: 'Model loaded in {load} ms; warming up.',
   },
   'miccheck.timings.full': {
     es: 'Detección de acordes: lista en {load} ms, {grade} ms para analizar {seconds} s de audio en esta máquina.',
