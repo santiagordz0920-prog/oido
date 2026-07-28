@@ -1216,6 +1216,70 @@ const strings = {
   },
   'f5.replay': { es: 'Repetir', en: 'Replay' },
 
+  // P3 — target practice over a vamp
+  'p3.prompt': { es: 'Cae en el {degree} en el primer tiempo de cada compás', en: 'Land the {degree} on beat 1 of every bar' },
+  'p3.vampIs': { es: 'Vamp: {numerals}', en: 'Vamp: {numerals}' },
+  'p3.body': {
+    es: 'Improvisa libremente durante {bars} compases. Lo único que se corrige es si el {degree} del acorde cae en el primer tiempo; lo que toques entre medias es tuyo.',
+    en: 'Improvise freely for {bars} bars. The only thing graded is whether the chord’s {degree} lands on beat 1; what you play in between is yours.',
+  },
+  'p3.start': { es: 'Empezar el vamp', en: 'Start the vamp' },
+  'p3.stop': { es: 'Parar y corregir', en: 'Stop and grade' },
+  'p3.bar': { es: 'Compás {n} de {total}', en: 'Bar {n} of {total}' },
+  'p3.correct': { es: 'Caíste {hits} de {total}.', en: 'You landed {hits} of {total}.' },
+  'p3.incorrect': { es: 'Caíste {hits} de {total}.', en: 'You landed {hits} of {total}.' },
+  'p3.legend': {
+    es: 'Cada casilla es un compás: ✓ si cayó el {degree}, y si no, el grado que cayó en su lugar. Un guion es que no llegó nada a tiempo.',
+    en: 'One box per bar: ✓ when the {degree} landed, otherwise the degree that landed instead. A dash means nothing arrived in time.',
+  },
+  'p3.tap.switch': { es: 'Marcarlo en el diapasón', en: 'Tap it on the fretboard' },
+  'p3.tap.body': {
+    es: 'Sin micrófono no se puede ensayar caer a tiempo, así que la pregunta es la otra mitad: ¿dónde está esa nota en el acorde {numeral}?',
+    en: 'Without the mic there is no way to rehearse landing in time, so the question is the other half: where is that note on the {numeral} chord?',
+  },
+  'p3.tap.progress': { es: '{n} de {total} acordes', en: '{n} of {total} chords' },
+
+  // P4 — constrained improvisation over changes
+  'p4.prompt.guide': { es: 'Solo notas guía', en: 'Guide tones only' },
+  'p4.prompt.approach': { es: 'Notas guía y notas de aproximación', en: 'Guide tones and approach notes' },
+  'p4.prompt.open': { es: 'Libre, pero toca los cambios', en: 'Open, but play the changes' },
+  'p4.changesAre': { es: 'Cambios: {numerals}', en: 'Changes: {numerals}' },
+  'p4.body.guide': {
+    es: 'Improvisa {bars} compases usando solo el 3 y el 7 de cada acorde. Es un tamiz estrecho a propósito: son las dos notas que llevan la armonía.',
+    en: 'Improvise for {bars} bars using only the 3rd and the 7th of each chord. The sieve is narrow on purpose: those are the two notes that carry the harmony.',
+  },
+  'p4.body.approach': {
+    es: 'Improvisa {bars} compases con notas guía, y llega a ellas por grado conjunto. Una nota de aproximación vale por dónde va: tiene que resolver en la nota guía siguiente.',
+    en: 'Improvise for {bars} bars on guide tones, approached by step. An approach note earns its place by where it goes: the very next note has to be the guide tone.',
+  },
+  'p4.body.open': {
+    es: 'Improvisa {bars} compases con las notas que quieras. Lo único que se pide es que cada acorde reciba una nota guía: tocar sobre los cambios, no por encima de ellos.',
+    en: 'Improvise for {bars} bars on whatever notes you like. The only requirement is that every chord gets a guide tone: play over the changes, not past them.',
+  },
+  'p4.start': { es: 'Empezar los cambios', en: 'Start the changes' },
+  'p4.stop': { es: 'Parar y corregir', en: 'Stop and grade' },
+  'p4.bar': { es: 'Compás {n} de {total}', en: 'Bar {n} of {total}' },
+  'p4.correct': { es: 'Dentro de la restricción.', en: 'Inside the constraint.' },
+  'p4.incorrect': { es: 'Todavía no.', en: 'Not yet.' },
+  'p4.score': { es: '{pct}% de las notas cumplían.', en: '{pct}% of your notes qualified.' },
+  'p4.score.tap': { es: '{pct}% de los acordes.', en: '{pct}% of the chords.' },
+  'p4.score.open': { es: '{missed} acordes se quedaron sin nota guía.', en: '{missed} chords went by without a guide tone.' },
+  'p4.legend': {
+    es: 'Una casilla por nota, en orden: rellena si cumplía, hueca si no. El número es el grado que esa nota tenía en el acorde que sonaba; un punto es que estaba fuera del acorde.',
+    en: 'One box per note, in order: filled when it qualified, hollow when it did not. The number is that note’s degree in the chord that was sounding; a dot means it was outside the chord.',
+  },
+  'p4.missed': { es: 'Sin nota guía: {numerals}.', en: 'No guide tone on: {numerals}.' },
+  'p4.tap.switch': { es: 'Marcarlo en el diapasón', en: 'Tap it on the fretboard' },
+  'p4.tap.body': {
+    es: 'Sin micrófono no se puede ensayar una línea, pero sí saber dónde están las notas guía. Marca una del acorde {numeral}.',
+    en: 'Without the mic there is no rehearsing a line, but there is knowing where the guide tones are. Tap one on the {numeral} chord.',
+  },
+  'p4.tap.progress': { es: '{n} de {total} acordes', en: '{n} of {total} chords' },
+  'p4.tap.note': {
+    es: 'Marcado, no tocado: esto comprueba que sabes dónde están, no que puedas usarlas sobre el tempo.',
+    en: 'Tapped, not played: this checks that you know where they are, not that you can use them in time.',
+  },
+
   // Mic check — one drill per input tier, plus what the chord model measured
   'miccheck.again.chord': { es: 'Otro acorde', en: 'Another chord' },
   'miccheck.tier.note': { es: 'Una nota', en: 'One note' },

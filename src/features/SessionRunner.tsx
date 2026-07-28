@@ -19,6 +19,8 @@ import { E9Item } from './items/E9Item'
 import { P0Item } from './items/P0Item'
 import { P1Item } from './items/P1Item'
 import { P2Item } from './items/P2Item'
+import { P3Item } from './items/P3Item'
+import { P4Item } from './items/P4Item'
 import { F0Item } from './items/F0Item'
 import { F1Item } from './items/F1Item'
 import { F2Item } from './items/F2Item'
@@ -27,6 +29,8 @@ import { TheoryCheckItem } from './items/TheoryCheckItem'
 import type { DrillItem } from '../scheduler/items'
 import { parseStringSet, type Inversion } from '../lib/triads'
 import { warmPoly } from '../audio/input/poly'
+import type { Constraint } from '../audio/input/improv'
+import type { ChordDegree } from '../theory'
 
 // Each fretboard node keys its "current key" hue off a different params
 // field — F0's is a bare pitch class, F1 and F5 are rooted keys — so the
@@ -378,6 +382,28 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
     if (nodeId === 'P1') {
       productionItem = (
         <P1Item itemKey={itemKey} nextLabel={nextLabel} onResult={handleResult} onNext={handleNext} />
+      )
+    } else if (nodeId === 'P3') {
+      productionItem = (
+        <P3Item
+          itemKey={itemKey}
+          rank={Number(current.item.params.rank)}
+          target={Number(current.item.params.target) as ChordDegree}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'P4') {
+      productionItem = (
+        <P4Item
+          itemKey={itemKey}
+          rank={Number(current.item.params.rank)}
+          constraint={String(current.item.params.constraint) as Constraint}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
       )
     } else if (nodeId === 'P2') {
       productionItem = (

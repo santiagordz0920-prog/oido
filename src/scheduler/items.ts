@@ -1,7 +1,8 @@
 import { KEYS } from '../theory/keys'
 import { LESSON_CHECKS } from '../curriculum/checks'
 import { F2_STRING_SETS, INVERSIONS, stringSetId } from '../lib/triads'
-import type { ChordQuality, ScaleForm } from '../theory'
+import { CONSTRAINTS } from '../audio/input/improv'
+import type { ChordDegree, ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
 // names the FSRS card it belongs to; its seed rating positions it for Elo
@@ -451,6 +452,72 @@ function p2Items(): DrillItem[] {
   return items
 }
 
+// P3: target practice. A vamp loops and the user improvises freely, but a
+// named chord tone has to land on beat 1 of each bar (§8 P3). The vamp is a
+// corpus two-chord motion, read at render time from the frequency table the
+// same way E7 reads its own (rank → numerals), because "what is worth
+// improvising over" is the same question as "what actually occurs".
+//
+// Targets are 1, 3 and 5 — the tones every triad has. Seed ratings follow
+// how easy the tone is to find under pressure: the root is already where the
+// hand is, the 5th is a fixed shape away, and the 3rd is the one that moves
+// with the chord's quality, which is exactly why it is worth drilling.
+export const P3_POOL_SIZE = 6
+export const P3_TARGETS: ChordDegree[] = [1, 5, 3]
+const P3_TARGET_SEED: Record<number, number> = { 1: 1000, 5: 1080, 3: 1160 }
+const P3_RANK_STEP = 8
+
+function p3Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let rank = 0; rank < P3_POOL_SIZE; rank++) {
+      for (const target of P3_TARGETS) {
+        items.push({
+          id: `P3|${key.tonic}|${rank}|${target}`,
+          nodeId: 'P3',
+          kind: 'production',
+          context: key.tonic,
+          params: { tonic: key.tonic, rank, target },
+          seedRating: P3_TARGET_SEED[target] + rank * P3_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
+// P4: constrained improvisation over changes — guide tones only, then
+// approach tones, then open (§8 P4). Four-chord corpus progressions, read at
+// render time like E8's.
+//
+// The three constraints are a ladder, not three flavours, so they seed far
+// apart: guide-tones-only is the narrowest sieve and the hardest to satisfy
+// note for note; approach tones widen it; open removes the per-note
+// constraint entirely and asks only that the changes are played over rather
+// than through.
+export const P4_POOL_SIZE = 6
+const P4_CONSTRAINT_SEED: Record<string, number> = { guide: 1180, approach: 1080, open: 1000 }
+const P4_RANK_STEP = 10
+
+function p4Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let rank = 0; rank < P4_POOL_SIZE; rank++) {
+      for (const constraint of CONSTRAINTS) {
+        items.push({
+          id: `P4|${key.tonic}|${rank}|${constraint}`,
+          nodeId: 'P4',
+          kind: 'production',
+          context: key.tonic,
+          params: { tonic: key.tonic, rank, constraint },
+          seedRating: P4_CONSTRAINT_SEED[constraint] + rank * P4_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
 // F0: note names in all positions under time pressure, over all 12 pitch
 // classes (`pitchClass` reuses the KEYS tonic spelling so the item's context
 // carries a hue for free — every pitch class already sits somewhere on the
@@ -604,6 +671,8 @@ export const ITEMS: DrillItem[] = [
   ...p0Items(),
   ...p1Items(),
   ...p2Items(),
+  ...p3Items(),
+  ...p4Items(),
   ...e0Items(),
   ...e1Items(),
   ...e2Items(),
