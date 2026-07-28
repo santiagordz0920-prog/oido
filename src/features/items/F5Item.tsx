@@ -10,7 +10,7 @@ import { Fretboard, type Marker } from '../../components/Fretboard'
 import { midiAt } from '../../lib/fretboardMath'
 import { parseNumeral } from '../../theory'
 import { displayNote, type KeyDef } from '../../theory/keys'
-import { F5_DEGREE_OFFSET, F5_NUMERALS } from '../../scheduler/items'
+import { f5TargetPitchClass, F5_NUMERALS } from '../../scheduler/items'
 import type { ItemResult } from './E1Item'
 
 // F5: scale degree relative to a moving root (docs/curriculum.md §7,
@@ -18,8 +18,8 @@ import type { ItemResult } from './E1Item'
 // (audio/engine.ts playProgression); the last chord played is always the
 // target, so its extra hold (chordSeconds * 1.6, built into playProgression)
 // is what gives the user room to answer while it still rings. The target
-// pitch class is the chord's root (parseNumeral, src/theory) transposed by
-// the degree's semitone offset — 1/3/5/♭7, never an interval name.
+// pitch class comes from f5TargetPitchClass, which reads the degree off the
+// sounding chord's own quality — 1/3/5/♭7, never an interval name.
 
 const FRETS = 12
 
@@ -88,7 +88,7 @@ export function F5Item({
   const numeral = F5_NUMERALS[numeralIndex]
   const chordRoot = parseNumeral(itemKey.tonic, numeral).root
   const chordRootPc = tonicPitchClassOf(chordRoot)
-  const targetPc = (chordRootPc + F5_DEGREE_OFFSET[degree]) % 12
+  const targetPc = f5TargetPitchClass(itemKey.tonic, numeral, degree)
 
   async function withAudio(fn: () => Promise<void>) {
     try {

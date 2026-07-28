@@ -2,6 +2,8 @@ import { KEYS } from '../theory/keys'
 import { LESSON_CHECKS } from '../curriculum/checks'
 import { F2_STRING_SETS, INVERSIONS, stringSetId } from '../lib/triads'
 import { CONSTRAINTS } from '../audio/input/improv'
+import { tonicPitchClassOf } from '../audio/input/notes'
+import { chordDegreePitchClass, parseNumeral } from '../theory'
 import type { ChordDegree, ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
@@ -640,11 +642,32 @@ export function f2StringSetOf(itemId: string): string | null {
 // fixed and deliberately simple — I-IV-V-vi, drawn from the four numerals
 // the brief allows — so item generation never touches the corpus tables
 // (that is E-track work). `degree` is a string so '♭7' can be written 'b7'
-// without a separate type; F5Item transposes chordRootPc + the offset below
-// and grades the result by pitch class, same as every other fretboard item.
+// without a separate type; F5Item resolves it through f5TargetPitchClass
+// below and grades by pitch class, same as every other fretboard item.
 export const F5_NUMERALS = ['I', 'IV', 'V', 'vi']
 export const F5_DEGREES = ['1', '3', '5', 'b7'] as const
-export const F5_DEGREE_OFFSET: Record<string, number> = { '1': 0, '3': 4, '5': 7, b7: 10 }
+
+// The pitch class F5 is asking for: a chord degree of the chord currently
+// sounding, which means it has to come from that chord's quality.
+//
+// This replaces a fixed offset table ({1:0, 3:4, 5:7, b7:10}) that was wrong
+// on any chord that is not major. F5's progression ends on `vi`, a minor
+// triad, where a fixed major third put the target a semitone above the
+// chord's actual 3rd — in C, it asked for C♯ over A minor, a note in neither
+// the chord nor the key.
+//
+// ♭7 stays a fixed ten semitones above the root on purpose, and is the one
+// degree here that is not read from the chord: a triad has no 7th to read,
+// and the ♭7 above the root is the same note over a major or a minor triad.
+// That is exactly the "♭7 of the current chord" the curriculum names (§7 F5).
+export function f5TargetPitchClass(tonic: string, numeral: string, degree: string): number {
+  const spec = parseNumeral(tonic, numeral)
+  const rootPc = tonicPitchClassOf(spec.root)
+  if (degree === 'b7') return (rootPc + 10) % 12
+  const pc = chordDegreePitchClass(spec, Number(degree) as ChordDegree)
+  if (pc === null) throw new Error(`Chord ${numeral} in ${tonic} has no degree ${degree}`)
+  return tonicPitchClassOf(pc)
+}
 const F5_DEGREE_SEED: Record<string, number> = { '1': 1000, '5': 1020, '3': 1040, b7: 1080 }
 
 function f5Items(): DrillItem[] {

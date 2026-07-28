@@ -1,0 +1,44 @@
+name: CI
+
+# Runs on pull requests, which deploy.yml does not: it only fires on pushes
+# to the default branch, so until this existed a PR reported no checks at all
+# — an absence that reads exactly like a pass.
+#
+# It also covers the two things deploy.yml never ran, typecheck and lint, on
+# the default branch too. The duplicated test run there is worth the few
+# seconds: a deploy that fails its own build is a worse way to find out.
+
+on:
+  pull_request:
+  push:
+    branches: [claude/phase-0-setup-build-v3iq14]
+  workflow_dispatch:
+
+# A new push supersedes the run in flight for the same ref, except on the
+# default branch, where every commit's result is worth keeping.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc -b --force
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      # Built with the Pages base path, so a base-path mistake fails here
+      # rather than silently shipping an app whose assets 404.
+      - name: Build
+        run: npm run build
+        env:
+          BASE_PATH: /oido/
