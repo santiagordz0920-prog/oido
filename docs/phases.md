@@ -27,7 +27,21 @@ Resolve before the phase noted.
 
 1. **RESOLVED (Phase 2).** McGill Billboard 2.0 is CC0 ("the DDMAL has waived all copyright and related or neighbouring rights"), with a request to cite Burgoyne, Wild & Fujinaga (ISMIR 2011) — both artifacts ship legally and carry the citation in their metadata. Hooktheory rejected (restrictive API terms), Isophonics rejected ("research purposes only").
 2. **RESOLVED (Phase 2).** Calibration over the real corpus (890 songs, 5433 sections; see `scripts/calibrate-coverage.mts`): at the first chord-hearing milestone (E5+E6 mastered) coverage is 9.7% of songs / 30.1% of sections — not the feared near-zero — rising to 30.1% / 59.6% at full current grants. Decision: song-level percent stays the headline (the strong honest claim), with the per-section figure displayed beneath it as the early-progress signal. Before E5/E6, 0% is displayed and is simply true: no chord skill exists yet, and the constellation carries progress until then.
-3. **Before Phase 4.** Basic Pitch model download size and cold-start time in-browser. If cold start exceeds roughly 3 seconds, preload it during Track T and E work.
+3. **RESOLVED (Phase 4).** Measured against `@spotify/basic-pitch@1.0.1` in Chromium.
+
+   | | |
+   |---|---|
+   | Model files | 0.87 MB (`model.json` 170 KB + one 725 KB shard) |
+   | JS added (tfjs + basic-pitch) | 1.03 MB raw, **257 KB gzipped** |
+   | TFJS init | 33 ms |
+   | Model graph load, warm cache | 51 ms |
+   | **Cold start total** | **84 ms** |
+
+   Well under the 3-second threshold, so **no eager preload during Track T and E**. Cold start was never the risk; the ~1.1 MB that has to arrive over the wire is, and that is a download problem rather than a startup one. Keep it behind a dynamic import so Tracks T and E cost zero extra bytes — the airport case — and warm it in the background only once a session that actually includes Track F or P begins.
+
+   Inference measured 4.5 s for a 3-second buffer, but on the **CPU backend**: the test container has no GPU, so TFJS fell back from WebGL. That figure is a pessimistic floor, not a real-world number, and it needs re-measuring on the target machine before any latency decision rests on it.
+
+   Two integration facts verified in the source, not assumed: audio must be **mono at 22050 Hz** or `evaluateModel` throws (`AUDIO_SAMPLE_RATE` in `src/inference.ts`), so the 48 kHz capture path has to resample; and the constructor takes a model path or a `Promise<tf.GraphModel>`, which is the seam for lazy loading.
 4. **Before Phase 5.** Recording Archive storage budget. How many minutes of audio before pruning, and what the user sees when the budget is hit.
 5. **RESOLVED (Phase 3).** **Acoustic guitar into the laptop mic.** Tune every default for this case; an interface DI path is not a target. Consequences that drive the Tier 1 design:
    - Laptop mics roll off steeply below roughly 100–150 Hz, so the low E fundamental at 82.4 Hz arrives attenuated or effectively absent. MPM is the right choice precisely because it detects *periodicity* rather than a spectral fundamental — a missing fundamental does not change the period — but the octave-error guard is mandatory rather than optional.
