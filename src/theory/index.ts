@@ -104,7 +104,11 @@ function movement(from: string[], to: string[]): number {
   return a.reduce((sum, m, i) => sum + Math.abs(m - (b[i] ?? m)), 0)
 }
 
-function bassNote(root: string): string {
+// The bass register, E2..E3: low enough to sit under any voicing, high
+// enough that a laptop speaker still reproduces it. Exported because the
+// Play-Along Engine's bass part needs the same register the drill voicings
+// use, so a vamp and a drill stimulus sound like the same instrument.
+export function bassNote(root: string): string {
   for (let oct = 2; oct <= 3; oct++) {
     const midi = Note.midi(`${root}${oct}`)!
     if (midi >= 40 && midi <= 52) return `${root}${oct}`
@@ -217,11 +221,79 @@ export function chordSymbol(spec: ChordSpec): string {
   return `${spec.root}${QUALITY_TO_TONAL[spec.quality]}`
 }
 
+// The same chord written the way a chart writes it: a bare letter for major,
+// and the conventional glyphs for the rest. chordSymbol's spelling is what
+// tonal parses, which is not what a player reads — "CM" is not a chord
+// anyone writes.
+const QUALITY_DISPLAY: Record<ChordQuality, string> = {
+  maj: '',
+  min: 'm',
+  dim: '°',
+  aug: '+',
+  dom7: '7',
+  maj7: 'maj7',
+  min7: 'm7',
+  m7b5: 'ø7',
+  dim7: '°7',
+}
+
+export function chordDisplaySymbol(spec: ChordSpec): string {
+  return `${spec.root}${QUALITY_DISPLAY[spec.quality]}`
+}
+
 // Voice-led voicings for a Roman-numeral progression in a major key.
 // This is the primitive behind E6–E8 drills, checkpoints, and later the
 // Play-Along engine: everything renders from the same numeral data.
 export function progressionVoicings(tonic: string, numerals: string[]): Voicing[] {
   return voiceLead(numerals.map((n) => chordSymbol(parseNumeral(tonic, n))))
+}
+
+// ---------------------------------------------------------------------------
+// Chord tones by chord degree. A chord's own 1, 3, 5 and 7 — not scale
+// degrees of the key — which is what Track F shapes and Track P targets are
+// named by ("land the 3rd of the chord on beat 1"). Interval names still
+// never cross this boundary: the answer is a number.
+// ---------------------------------------------------------------------------
+
+export type ChordDegree = 1 | 3 | 5 | 7
+
+export const CHORD_DEGREES: ChordDegree[] = [1, 3, 5, 7]
+
+// Guide tones are the 3rd and the 7th: the two notes that carry a chord's
+// quality and its motion (docs/curriculum.md T11, F6). On a triad, which has
+// no 7th, the 3rd carries it alone.
+export const GUIDE_TONE_DEGREES: ChordDegree[] = [3, 7]
+
+export function chordPitchClasses(spec: ChordSpec): string[] {
+  const notes = Chord.get(chordSymbol(spec)).notes
+  if (notes.length < 3) throw new Error(`Unvoiceable chord: ${chordSymbol(spec)}`)
+  return notes
+}
+
+// The pitch class of one chord degree, or null when the chord does not have
+// that degree — asking a triad for its 7th is a question with no answer, and
+// returning the root instead would be a lie the drills would grade against.
+export function chordDegreePitchClass(spec: ChordSpec, degree: ChordDegree): string | null {
+  const notes = chordPitchClasses(spec)
+  const index = degree === 1 ? 0 : degree === 3 ? 1 : degree === 5 ? 2 : 3
+  return notes[index] ?? null
+}
+
+// Semitones above the chord root for each of its degrees, which is how the
+// input path compares what was heard against what was asked for: detection
+// yields pitch classes, and pitch classes have no spelling.
+export function chordDegreeSemitones(spec: ChordSpec): Map<number, ChordDegree> {
+  const root = Note.midi(`${spec.root}4`)
+  if (root === null) throw new Error(`Bad chord root: ${spec.root}`)
+  const map = new Map<number, ChordDegree>()
+  for (const degree of CHORD_DEGREES) {
+    const pc = chordDegreePitchClass(spec, degree)
+    if (pc === null) continue
+    const midi = Note.midi(`${pc}4`)
+    if (midi === null) continue
+    map.set(((midi - root) % 12 + 12) % 12, degree)
+  }
+  return map
 }
 
 // A single chord in close position for quality drills (E5). The requested

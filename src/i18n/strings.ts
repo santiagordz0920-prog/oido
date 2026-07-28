@@ -1215,6 +1215,58 @@ const strings = {
     en: 'That is not degree {degree}. I hear {note}.',
   },
   'f5.replay': { es: 'Repetir', en: 'Replay' },
+
+  // Play-Along Engine (§9.3)
+  'playalong.eyebrow': { es: 'Acompañamiento', en: 'Play-along' },
+  'playalong.title': { es: 'Toca encima', en: 'Play along' },
+  'playalong.body': {
+    es: 'Una base de bajo, batería y acordes sobre cualquier progresión, en cualquier tonalidad, tempo y aire. Se repite hasta que la pares.',
+    en: 'A bass, drums and comping bed over any progression, in any key, tempo and feel. It loops until you stop it.',
+  },
+  'playalong.play': { es: 'Empezar', en: 'Start' },
+  'playalong.stop': { es: 'Parar', en: 'Stop' },
+  'playalong.countIn': { es: 'Entrada: {n}', en: 'Count-in: {n}' },
+  'playalong.chordIs': { es: 'Acorde: {numeral} · {chord}', en: 'Chord: {numeral} · {chord}' },
+  'playalong.progression': { es: 'Progresión', en: 'Progression' },
+  'playalong.loadingCorpus': {
+    es: 'Cargando progresiones del corpus…',
+    en: 'Loading corpus progressions…',
+  },
+  'playalong.loop': { es: 'Repetir solo estos acordes', en: 'Loop only these chords' },
+  'playalong.key': { es: 'Tonalidad', en: 'Key' },
+  'playalong.tempo': { es: 'Tempo', en: 'Tempo' },
+  'playalong.bpm': { es: '{n} ppm', en: '{n} bpm' },
+  'playalong.feel': { es: 'Aire', en: 'Feel' },
+  'playalong.feel.straight': { es: 'Recto', en: 'Straight' },
+  'playalong.feel.swing': { es: 'Swing', en: 'Swing' },
+  'playalong.feel.ballad': { es: 'Balada', en: 'Ballad' },
+  'playalong.barsPerChord': { es: 'Compases por acorde', en: 'Bars per chord' },
+  'playalong.drums': { es: 'Batería', en: 'Drums' },
+  'playalong.targets': { es: 'Objetivos en el diapasón', en: 'Fretboard targets' },
+  'playalong.targets.chord': { es: 'Notas del acorde', en: 'Chord tones' },
+  'playalong.targets.guide': { es: 'Notas guía', en: 'Guide tones' },
+  'playalong.targets.none': { es: 'Ninguno', en: 'None' },
+  'playalong.targets.off': {
+    es: 'Sin objetivos: el diapasón está limpio para improvisar sin mirar.',
+    en: 'No targets: a clean fretboard, for improvising without looking.',
+  },
+  'playalong.targets.chordNote': {
+    es: 'Cada posición donde suena el 1, 3, 5 o 7 del acorde que está sonando ahora.',
+    en: 'Every position that sounds the 1, 3, 5 or 7 of the chord playing right now.',
+  },
+  'playalong.targets.guideNote': {
+    es: 'Solo el 3 y el 7: las dos notas que llevan la calidad del acorde y su movimiento.',
+    en: 'Only the 3rd and the 7th: the two notes that carry the chord’s quality and its motion.',
+  },
+
+  // Home — play-along card
+  'home.playalong.eyebrow': { es: 'Práctica', en: 'Practice' },
+  'home.playalong.title': { es: 'Base para tocar encima', en: 'Backing track' },
+  'home.playalong.body': {
+    es: 'Genera un acompañamiento sobre cualquier progresión del corpus y toca encima.',
+    en: 'Generate a backing track over any corpus progression and play over it.',
+  },
+  'home.playalong.cta': { es: 'Abrir', en: 'Open' },
 } as const
 
 export type StringKey = keyof typeof strings

@@ -51,6 +51,16 @@ export function audioReady(): boolean {
   return sampler !== null
 }
 
+// The loaded piano, for the Play-Along Engine's own scheduling. Drills go
+// through the play() helper below, which owns the Transport; a backing track
+// loops instead of running once, so it schedules for itself and needs the
+// instrument rather than the helper. Same sampler either way, so a vamp and
+// a drill stimulus are the same instrument.
+export function pianoSampler(): Tone.Sampler {
+  if (!sampler) throw new Error('Audio is not loaded; await ensureAudio() first')
+  return sampler
+}
+
 function stopPlayback() {
   const transport = Tone.getTransport()
   transport.stop()
