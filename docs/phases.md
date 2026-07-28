@@ -16,7 +16,13 @@ Ship something usable at every phase boundary.
 
 **Phase 4, chords in.** Basic Pitch and Tier 2 capture-and-grade. Track F triads (F2). P3 and P4. Play-Along Engine.
 
-> **Built, gate not yet attempted.** Everything is verified against synthesized chords, unit tests and the tap paths. Nothing has been played into a real microphone. Phase 3's gate found two bugs that the whole test suite had missed — a noise floor measured from the room's loudest moment, and attacks judged across a window that smears them — and neither was the kind of thing a test would have thought to ask. Assume Phase 4 has its own pair waiting. **The gate:** strum a triad from each of the four string sets into the laptop mic and have F2 grade them correctly, then play eight bars of P3 landing the named tone on the downbeats. Until that happens the Tier 2 path is unproven, whatever the tests say.
+> **Gate passed for Tier 2** on a real acoustic guitar into a laptop mic: F2 graded correctly-played triads correctly, and named deliberate mistakes — wrong quality, wrong note underneath, an added ♭7 — as the specific thing that was wrong rather than a bare fail. The polyphonic path works on real playing.
+>
+> The bug it found was not in the grading. An open A major was played where the closed triad on strings {3,4,5} was asked for; the app passed it, correctly, since the pitch classes and the bass degree were right — and then drew the closed shape with ticks on it, as though that were what had just been played. **The diagram was claiming knowledge the microphone cannot have.** String and fret are not recoverable from audio: the same pitch lives in several places on the neck. The feedback diagram is now always drawn as the target and captioned as such, and register — which *is* audible, since an open voicing sits an octave below a closed one — is reported without failing the attempt.
+>
+> Worth noting for later phases: the bug was a false claim in the UI, not a detection error. Phase 3's pair were both in the signal path, which is where attention naturally goes. This one was in what the screen asserted about the signal.
+>
+> **Still unplayed: P3 and P4.** They live in the last block of a Bench session, eighteen minutes in, so the improvisation half of the gate has not been attempted. That reachability is itself worth fixing — a drill nobody can get to deliberately is hard to practise and hard to test.
 
 **Phase 5, practice system.** Transcription Workbench, Assignments, Recording Archive with longitudinal comparison, Practice Log. P5 post-hoc analysis.
 
