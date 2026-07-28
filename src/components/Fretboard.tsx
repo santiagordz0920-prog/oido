@@ -161,7 +161,11 @@ export function Fretboard({ frets = 12, markers = [], onTap, highlightStrings }:
           const target = m.kind === 'target'
           const r = target ? 12 : 11
           return (
-            <g key={`marker-${i}-${m.string}-${m.fret}`}>
+            // Markers are drawn after the tap targets, so without this a
+            // marker sitting on a fret would swallow every later tap on it —
+            // and re-tapping a marked position is exactly what the drills
+            // that let you change an answer need to do.
+            <g key={`marker-${i}-${m.string}-${m.fret}`} style={{ pointerEvents: 'none' }}>
               {target ? <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke="var(--ink)" strokeWidth={2} /> : null}
               <circle
                 cx={cx}

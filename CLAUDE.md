@@ -2,6 +2,32 @@
 
 Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline, local-first, no backend.
 
+## Who you are talking to
+
+**The owner is a musician, not a programmer.** They know guitar, theory and
+ear training deeply — use that vocabulary freely, and trust them completely
+on anything musical. They do not read code and do not know the engineering
+vocabulary. Write to them accordingly:
+
+- **Say what changed for the player, not what changed in the codebase.** "The
+  drill was asking for a note that isn't in the chord" — not "F5's target
+  derivation used a fixed offset table."
+- **Never make them look up a term.** No CI, lint, typecheck, chunk,
+  dependency, refactor, worklet, inference, code-split — not without a plain
+  gloss in the same sentence, and prefer not using them at all. File paths
+  and function names are noise to them; keep those in commits and PR bodies,
+  where other engineers read them.
+- **Do not hand them engineering decisions to arbitrate.** Things like how
+  the build is configured or how the tests run are yours to decide. Pick the
+  best option and say what you picked in one line. Ask them only about
+  things they are the expert on: musical choices, pedagogy, what the app
+  should do, what it should feel like.
+- **Lead with whether it works and what is still unproven.** They care that a
+  drill grades their playing correctly, not how it was verified.
+
+This is a difference in vocabulary, not in judgement. Explain the reasoning
+behind a decision whenever it affects them — just in their language.
+
 ## Hard rules
 
 - Verify current APIs for `tonal`, `tone`, `ts-fsrs`, `pitchy`, and `@spotify/basic-pitch` before writing code against them.
@@ -38,8 +64,10 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 3 (ears open) **shipped, gate passed** with a real acoustic in a normal-noise room: calibration confirmed the open low E and P0 graded a played note correctly. Tier 1 mono pitch (`src/audio/input/`), calibration, P0–P2, F0/F1/F5, tap fallback on every mic drill. Deployed to GitHub Pages on every push (`.github/workflows/deploy.yml`).
+Phase 4 (chords in) **built, gate not yet attempted**. Tier 2 polyphonic capture and grading (`src/audio/input/poly.ts`, `chordGrade.ts`), F2 triads, P3 and P4, and the Play-Along Engine (`src/audio/playalong.ts`).
 
-**Input is an acoustic guitar into the laptop mic** (open question 5, resolved). Every detection default is tuned for it: attenuated low-E fundamental, low SNR, and a noise floor AND gate margin both measured per room in calibration — never fixed constants (docs/architecture.md, Phase 3 addendum). Tuning dials: `DEFAULT_CONFIG` in `src/audio/input/stabilize.ts`. A single P0 item is reachable straight from the mic card (`MicCheck`) for setup checks.
+**Basic Pitch is lazy and must stay lazy.** It reaches the browser only through a dynamic import, so Tracks T and E cost zero extra bytes — the airport case. `warmPoly()` runs at session start for blocks that include Track F or P, and warms the kernels with a throwaway inference as well as loading the graph, because the first inference costs twice what every later one does (docs/phases.md open question 3). The model lives in `public/models/basic-pitch/`, not in the bundle.
 
-Next: Phase 4 (chords in) — resolve open question 3 in docs/phases.md (Basic Pitch cold-start time) before building against it. Update this pointer at every phase boundary.
+**Nothing in Phase 4 has been played into a real microphone.** Phase 3's gate found two bugs that the whole test suite had missed, both only visible under real use. The Phase 4 gate is in docs/phases.md; treat the Tier 2 path as unproven until it passes. Tuning dials: `DEFAULT_GRADE_OPTIONS` in `chordGrade.ts`, the thresholds at the top of `poly.ts`, and `DETECTION_LATENCY_MS` in `improv.ts`.
+
+Next: Phase 5 (practice system) — resolve open question 4 in docs/phases.md (Recording Archive storage budget) before building against it. Update this pointer at every phase boundary.

@@ -10,6 +10,7 @@ type Props = {
   onOpenConstellation: () => void
   onOpenCalibration: () => void
   onOpenMicCheck: () => void
+  onOpenPlayAlong: () => void
 }
 
 export function Home({
@@ -19,6 +20,7 @@ export function Home({
   onOpenConstellation,
   onOpenCalibration,
   onOpenMicCheck,
+  onOpenPlayAlong,
 }: Props) {
   const t = useT()
   const t2Complete = useNodeCompleted('T2')
@@ -77,6 +79,15 @@ export function Home({
             {t('home.locked', { id: 'T2' })}
           </p>
         )}
+      </section>
+
+      <section className={card}>
+        <div className="mono text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">{t('home.playalong.eyebrow')}</div>
+        <h2 className="display mb-2 text-[length:var(--fs-4)] leading-tight">{t('home.playalong.title')}</h2>
+        <p className="mb-3 max-w-[65ch]">{t('home.playalong.body')}</p>
+        <button className={action} onClick={onOpenPlayAlong}>
+          {t('home.playalong.cta')}
+        </button>
       </section>
 
       <section className={card}>

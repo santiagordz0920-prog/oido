@@ -151,3 +151,25 @@ Each item shows a visible 12-second countdown starting when the stimulus finishe
 Checkpoints are timed corpus challenges, not FSRS items, and are kept out of the skill graph (`src/curriculum/graph.ts`) entirely rather than becoming a fourth track value. The graph only records which theory node each checkpoint gates (`CHECKPOINT_GATES`); item generation and pool selection live in `src/curriculum/checkpoints.ts`, and the challenge screen is `src/features/Checkpoint.tsx`, routed from the theory index once a lesson's only remaining gate is its checkpoint.
 
 ---
+
+## Track F and Track P as built (Phase 4 addendum)
+
+**F2, triads.** All 576 combinations — 12 roots × 4 qualities × 4 string sets × 3 inversions — are computed from `src/lib/triads.ts` rather than tabulated, because a table that size is a table with mistakes in it. Tests assert that every shape sounds exactly its chord, puts the named degree underneath, stays in close position, sits within fifteen frets, and spans no more than four: a shape nobody can hold is not a drill item.
+
+Mastery is **per string set**, which is what §7 says and not the same as 90% overall. Averaged, three fluent string sets carry a fourth the player never touches over the line, and a quarter of the fretboard stays unlearned behind a passing grade. Each partition clears the bar alone (`computePartitionedMastery`), and reported progress is the weakest one.
+
+**P3, target practice.** A corpus two-chord vamp loops for eight bars; only the landing is graded. Notes played between the downbeats are not wrong — the user is improvising — so the drill scores the target and leaves the rest alone. Targets are 1, 3 and 5, the tones every triad has, and the 3rd seeds hardest because it is the one that moves with the chord's quality.
+
+**P4, constrained improvisation.** The three constraints are a ladder, not three flavours, so each is a separate item seeded apart:
+
+| Stage | Rule | Fails when |
+|---|---|---|
+| Guide tones only | every note is the chord's 3rd or 7th | a chord tone that is not a guide tone |
+| Approach tones | guide tones, reached by step | the approach never resolves, or arrives by leap |
+| Open | any note | a chord goes by without a guide tone |
+
+An approach note earns its place by where it goes rather than by what it is, so the very next note has to be the guide tone. "Open" is not ungraded: dropping the per-note constraint leaves the question of whether the changes were played over or played past.
+
+A triad has no 7th, so its 3rd carries the quality alone; guide tones never fall back to the root, which would quietly turn a guide-tone drill into a root drill. Chord degrees come from the chord's actual quality throughout, so the 3rd of a minor chord is its minor third.
+
+**Tap fallbacks are smaller drills, not fake versions.** Tapping cannot rehearse landing a note in time. The tap paths for P3 and P4 ask the half they can — where is that tone on this chord — and the UI says which one the user did. F2's tap path is the exception: it runs through the identical grader as the mic path, so there the fallback really is the same question.

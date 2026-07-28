@@ -34,4 +34,8 @@ Phase 2 (curriculum): the McGill Billboard corpus (CC0) ingested into a progress
 
 Phase 3 (ears open): monophonic pitch input for **an acoustic guitar into the laptop mic** — MPM in an AudioWorklet, an octave-error guard that survives the mic's low-end roll-off, and a calibration screen that measures the room and confirms an open low E. Production drills P0–P2 and fretboard drills F0, F1 and F5, each with a tap fallback that records honestly whether the answer was verified or self-reported.
 
+Phase 4 (chords in): polyphonic capture and grading through Basic Pitch, lazy-loaded so Tracks T and E cost no extra bytes; closed-voicing triads across four string sets and all inversions (F2); target practice (P3) and constrained improvisation over changes (P4); and the Play-Along Engine — bass, drums and comping generated from any Roman-numeral progression, in any key, tempo and feel. The chord grader answers with a diagnosis in scale degrees rather than a pass or a fail.
+
+> Phase 4 has **not** yet passed its gate. Everything is verified against synthesized chords and the tap paths; nothing has been checked with a real guitar strummed into a real mic, which is the only test that counts for the input tiers (Phase 3's gate found two bugs that no test had). The mic check screen now runs one drill per input tier and reports what the chord model measured on the machine it is running on.
+
 Phases are defined in `docs/phases.md`.

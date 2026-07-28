@@ -177,3 +177,23 @@ The summary screen shows all three figures — room, guitar, gate — so a misfi
 **Reaching the drills.** `MicCheck` (`src/features/MicCheck.tsx`) runs a single P0 item straight from the microphone card. P0 otherwise lives in a session's production block fifteen minutes in, which is right for practice and wrong for answering "is my mic working?". The attempt is recorded like any other, so a setup check is never wasted practice.
 
 **Dials.** `DEFAULT_CONFIG` in `src/audio/input/stabilize.ts` holds every threshold — clarity, gate margin, onset blanking, agreement window, release.
+
+---
+
+## Tier 2 input and the Play-Along Engine as built (Phase 4 addendum)
+
+**Lazy by construction, not by intention.** Basic Pitch and TensorFlow.js are ~1.03 MB raw / 257 KB gzipped, and the model another 0.87 MB. Everything reaches them through a dynamic `import()` in `src/audio/input/poly.ts`, so the production build emits them as a separate chunk that the entry bundle only references inside `import()` — verified in `dist/`, with no `modulepreload` for it. Tracks T and E cost nothing extra, which is the airport case. A session whose blocks include Track F or P calls `warmPoly()` at session start.
+
+**Warming is two things.** Loading the graph is fast; compiling the kernels is not. The first inference costs 7–8.5 s against ~3.2 s for every one after it (phases.md open question 3), so `warmPoly()` also runs one throwaway inference over a short silent buffer. Skipping that would put the entire one-time cost on the user's first graded chord.
+
+**The model is a public asset, not an import.** `public/models/basic-pitch/`. Its `model.json` names its weight shard by a relative path, so bundling the JSON alone emits a manifest pointing at a file nobody copied; and a public asset is fetched only when requested, which is the property the dynamic import exists to protect. Same arrangement as the piano samples.
+
+**Capture.** `src/audio/input/captureWorklet.ts` does no analysis at all — Tier 2 grades a window rather than streaming, so it only accumulates raw blocks and posts them in chunks. The capture `AudioContext` is opened at 22050 Hz directly, which makes the browser resample with its own polyphase filter; when a platform will not honour that, `resampleLinear` covers it. That fallback averages each output sample's whole input span, which gives roughly −12 dB near the new Nyquist rather than silence — it is a fallback, and the test pins the attenuation actually measured.
+
+**Grading is scoring, not transcription** (§12.2). `gradeChord` never asks what chord this is; it asks whether this is *that* chord and, if not, what specifically differs. It works in semitones above the expected root, so spelling never enters, and it names the confusions the brief calls for: added seventh, suspension, relative major/minor, another quality on the same root, a missing degree, and the right notes with the wrong one underneath. It also drops notes far quieter or shorter than the chord, because a strummed acoustic leaks sympathetic ringing and grading that as a wrong note would fail correct playing. Dials: `DEFAULT_GRADE_OPTIONS` in `src/audio/input/chordGrade.ts` and the thresholds at the top of `poly.ts`.
+
+**One grader, two input paths.** F2's tap answers are turned into the notes those frets would sound and handed to the same `gradeChord`. The tap fallback is a different way in, not a different standard.
+
+**The Play-Along Engine** (`src/audio/playalong.ts`, patterns in `src/audio/patterns.ts`) loops a Roman-numeral progression on `Tone.Transport` with bass, drums and comping. A count-in sits before `loopStart` so it sounds once rather than every pass. Looping a section is playing a slice of the progression — the engine loops whatever it is handed. The kit is synthesized rather than sampled: the sampled-instruments rule (§12.1) exists because sine-wave triads train the wrong thing about *pitch*, and a kit is unpitched.
+
+**Timing for graded improvisation.** The bar callback reports an audio-accurate `performance.now()` for each downbeat, computed inside the Transport callback from the event's audio time — a repaint cannot promise the tolerance P3 needs. Detector times are bridged to the same clock by a single offset taken at the first note (`createClockBridge`), and then corrected by `DETECTION_LATENCY_MS`: Tier 1 is systematically late by roughly 130 ms (a 4096-sample window, 45 ms of onset blanking, three frames of agreement at a 1024 hop), and grading "on the beat" without subtracting it marks good playing late. The correction lives in one place, in `src/audio/input/improv.ts`, where it can be argued with.

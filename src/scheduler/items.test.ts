@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { KEYS } from '../theory/keys'
+import { chordPitchClasses, parseNumeral } from '../theory'
+import { tonicPitchClassOf } from '../audio/input/notes'
 import { generateFragment, P2_POOL_BY_LENGTH } from '../features/items/P2Item'
 import {
   contextsForNode,
@@ -9,7 +11,7 @@ import {
   E9_RANK_COUNT,
   F1_STRING_SETS,
   F5_DEGREES,
-  F5_DEGREE_OFFSET,
+  f5TargetPitchClass,
   F5_NUMERALS,
   isDiatonicProgression,
   ITEMS,
@@ -305,8 +307,49 @@ describe('drill items', () => {
     }
   })
 
-  it('F5_DEGREE_OFFSET maps 1/3/5/b7 to their semitone offset from the chord root', () => {
-    expect(F5_DEGREE_OFFSET).toEqual({ '1': 0, '3': 4, '5': 7, b7: 10 })
+  describe('f5TargetPitchClass', () => {
+    const pc = (name: string) => tonicPitchClassOf(name)
+
+    it('reads 1, 3 and 5 off a major chord', () => {
+      expect(f5TargetPitchClass('C', 'I', '1')).toBe(pc('C'))
+      expect(f5TargetPitchClass('C', 'I', '3')).toBe(pc('E'))
+      expect(f5TargetPitchClass('C', 'I', '5')).toBe(pc('G'))
+      expect(f5TargetPitchClass('C', 'IV', '3')).toBe(pc('A'))
+    })
+
+    // The bug this replaced: a fixed major-third offset asked for C♯ over A
+    // minor — a note in neither the chord nor the key. F5's progression ends
+    // on vi, so this was one item in four.
+    it('takes the 3rd from a minor chord, not from a fixed offset', () => {
+      expect(f5TargetPitchClass('C', 'vi', '3')).toBe(pc('C'))
+      expect(f5TargetPitchClass('C', 'vi', '3')).not.toBe(pc('C#'))
+      expect(f5TargetPitchClass('G', 'vi', '3')).toBe(pc('G'))
+      expect(f5TargetPitchClass('Eb', 'vi', '3')).toBe(pc('Eb'))
+    })
+
+    it('keeps the root and fifth the same on major and minor', () => {
+      expect(f5TargetPitchClass('C', 'vi', '1')).toBe(pc('A'))
+      expect(f5TargetPitchClass('C', 'vi', '5')).toBe(pc('E'))
+    })
+
+    // ♭7 is the one degree not read from the chord: a triad has no 7th, and
+    // ten semitones above the root is the same note either way.
+    it('puts ♭7 ten semitones above the root, whatever the quality', () => {
+      expect(f5TargetPitchClass('C', 'I', 'b7')).toBe(pc('Bb'))
+      expect(f5TargetPitchClass('C', 'V', 'b7')).toBe(pc('F'))
+      expect(f5TargetPitchClass('C', 'vi', 'b7')).toBe(pc('G'))
+    })
+
+    it('lands inside the sounding chord for 1, 3 and 5, in every key', () => {
+      for (const key of KEYS) {
+        for (const numeral of F5_NUMERALS) {
+          const chordPcs = chordPitchClasses(parseNumeral(key.tonic, numeral)).map(tonicPitchClassOf)
+          for (const degree of ['1', '3', '5']) {
+            expect(chordPcs).toContain(f5TargetPitchClass(key.tonic, numeral, degree))
+          }
+        }
+      }
+    })
   })
 
   it('P1 params are well-formed: one item per key, tonic only, uniform seed rating', () => {

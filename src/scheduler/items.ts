@@ -1,6 +1,10 @@
 import { KEYS } from '../theory/keys'
 import { LESSON_CHECKS } from '../curriculum/checks'
-import type { ChordQuality, ScaleForm } from '../theory'
+import { F2_STRING_SETS, INVERSIONS, stringSetId } from '../lib/triads'
+import { CONSTRAINTS } from '../audio/input/improv'
+import { tonicPitchClassOf } from '../audio/input/notes'
+import { chordDegreePitchClass, parseNumeral } from '../theory'
+import type { ChordDegree, ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
 // names the FSRS card it belongs to; its seed rating positions it for Elo
@@ -450,6 +454,72 @@ function p2Items(): DrillItem[] {
   return items
 }
 
+// P3: target practice. A vamp loops and the user improvises freely, but a
+// named chord tone has to land on beat 1 of each bar (§8 P3). The vamp is a
+// corpus two-chord motion, read at render time from the frequency table the
+// same way E7 reads its own (rank → numerals), because "what is worth
+// improvising over" is the same question as "what actually occurs".
+//
+// Targets are 1, 3 and 5 — the tones every triad has. Seed ratings follow
+// how easy the tone is to find under pressure: the root is already where the
+// hand is, the 5th is a fixed shape away, and the 3rd is the one that moves
+// with the chord's quality, which is exactly why it is worth drilling.
+export const P3_POOL_SIZE = 6
+export const P3_TARGETS: ChordDegree[] = [1, 5, 3]
+const P3_TARGET_SEED: Record<number, number> = { 1: 1000, 5: 1080, 3: 1160 }
+const P3_RANK_STEP = 8
+
+function p3Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let rank = 0; rank < P3_POOL_SIZE; rank++) {
+      for (const target of P3_TARGETS) {
+        items.push({
+          id: `P3|${key.tonic}|${rank}|${target}`,
+          nodeId: 'P3',
+          kind: 'production',
+          context: key.tonic,
+          params: { tonic: key.tonic, rank, target },
+          seedRating: P3_TARGET_SEED[target] + rank * P3_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
+// P4: constrained improvisation over changes — guide tones only, then
+// approach tones, then open (§8 P4). Four-chord corpus progressions, read at
+// render time like E8's.
+//
+// The three constraints are a ladder, not three flavours, so they seed far
+// apart: guide-tones-only is the narrowest sieve and the hardest to satisfy
+// note for note; approach tones widen it; open removes the per-note
+// constraint entirely and asks only that the changes are played over rather
+// than through.
+export const P4_POOL_SIZE = 6
+const P4_CONSTRAINT_SEED: Record<string, number> = { guide: 1180, approach: 1080, open: 1000 }
+const P4_RANK_STEP = 10
+
+function p4Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (let rank = 0; rank < P4_POOL_SIZE; rank++) {
+      for (const constraint of CONSTRAINTS) {
+        items.push({
+          id: `P4|${key.tonic}|${rank}|${constraint}`,
+          nodeId: 'P4',
+          kind: 'production',
+          context: key.tonic,
+          params: { tonic: key.tonic, rank, constraint },
+          seedRating: P4_CONSTRAINT_SEED[constraint] + rank * P4_RANK_STEP,
+        })
+      }
+    }
+  }
+  return items
+}
+
 // F0: note names in all positions under time pressure, over all 12 pitch
 // classes (`pitchClass` reuses the KEYS tonic spelling so the item's context
 // carries a hue for free — every pitch class already sits somewhere on the
@@ -521,15 +591,83 @@ function f1Items(): DrillItem[] {
   return items
 }
 
+// F2: closed-voicing triads, all inversions, all four qualities, on the four
+// adjacent three-string sets (§7 F2 — "the highest-leverage block in the
+// app"). 12 roots × 4 qualities × 4 string sets × 3 inversions = 576 items;
+// the shapes themselves are computed at render time (src/lib/triads.ts), so
+// nothing here has to carry a fingering.
+//
+// Seed ratings stack three independent difficulties. Quality: maj and min
+// are the pair every player already owns, dim and aug are neither common nor
+// familiar under the fingers. Inversion: root position is the shape people
+// learned first, and both inversions are genuinely harder to find. String
+// set: the middle sets sit where the hand already lives, while {4,5,6} means
+// thick strings low on the neck and {1,2,3} means a set whose shapes are
+// distorted by the B string's tuning.
+export const F2_QUALITIES: ChordQuality[] = ['maj', 'min', 'dim', 'aug']
+const F2_QUALITY_SEED: Record<string, number> = { maj: 1000, min: 1020, dim: 1120, aug: 1160 }
+const F2_INVERSION_OFFSET: Record<number, number> = { 0: 0, 1: 60, 2: 80 }
+const F2_STRING_SET_OFFSET: Record<string, number> = { '5-4-3': 0, '4-3-2': 10, '3-2-1': 40, '6-5-4': 50 }
+
+function f2Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const quality of F2_QUALITIES) {
+      for (const stringSet of F2_STRING_SETS) {
+        const setId = stringSetId(stringSet)
+        for (const inversion of INVERSIONS) {
+          items.push({
+            id: `F2|${key.tonic}|${quality}|${setId}|${inversion}`,
+            nodeId: 'F2',
+            kind: 'fretboard',
+            context: key.tonic,
+            params: { root: key.tonic, quality, stringSet: setId, inversion },
+            seedRating:
+              F2_QUALITY_SEED[quality] + F2_INVERSION_OFFSET[inversion] + F2_STRING_SET_OFFSET[setId],
+          })
+        }
+      }
+    }
+  }
+  return items
+}
+
+/** The string set an F2 item drills, or null for any other item. */
+export function f2StringSetOf(itemId: string): string | null {
+  const parts = itemId.split('|')
+  return parts[0] === 'F2' ? parts[3] : null
+}
+
 // F5: scale degree relative to a moving root (§7 F5). The progression is
 // fixed and deliberately simple — I-IV-V-vi, drawn from the four numerals
 // the brief allows — so item generation never touches the corpus tables
 // (that is E-track work). `degree` is a string so '♭7' can be written 'b7'
-// without a separate type; F5Item transposes chordRootPc + the offset below
-// and grades the result by pitch class, same as every other fretboard item.
+// without a separate type; F5Item resolves it through f5TargetPitchClass
+// below and grades by pitch class, same as every other fretboard item.
 export const F5_NUMERALS = ['I', 'IV', 'V', 'vi']
 export const F5_DEGREES = ['1', '3', '5', 'b7'] as const
-export const F5_DEGREE_OFFSET: Record<string, number> = { '1': 0, '3': 4, '5': 7, b7: 10 }
+
+// The pitch class F5 is asking for: a chord degree of the chord currently
+// sounding, which means it has to come from that chord's quality.
+//
+// This replaces a fixed offset table ({1:0, 3:4, 5:7, b7:10}) that was wrong
+// on any chord that is not major. F5's progression ends on `vi`, a minor
+// triad, where a fixed major third put the target a semitone above the
+// chord's actual 3rd — in C, it asked for C♯ over A minor, a note in neither
+// the chord nor the key.
+//
+// ♭7 stays a fixed ten semitones above the root on purpose, and is the one
+// degree here that is not read from the chord: a triad has no 7th to read,
+// and the ♭7 above the root is the same note over a major or a minor triad.
+// That is exactly the "♭7 of the current chord" the curriculum names (§7 F5).
+export function f5TargetPitchClass(tonic: string, numeral: string, degree: string): number {
+  const spec = parseNumeral(tonic, numeral)
+  const rootPc = tonicPitchClassOf(spec.root)
+  if (degree === 'b7') return (rootPc + 10) % 12
+  const pc = chordDegreePitchClass(spec, Number(degree) as ChordDegree)
+  if (pc === null) throw new Error(`Chord ${numeral} in ${tonic} has no degree ${degree}`)
+  return tonicPitchClassOf(pc)
+}
 const F5_DEGREE_SEED: Record<string, number> = { '1': 1000, '5': 1020, '3': 1040, b7: 1080 }
 
 function f5Items(): DrillItem[] {
@@ -556,6 +694,8 @@ export const ITEMS: DrillItem[] = [
   ...p0Items(),
   ...p1Items(),
   ...p2Items(),
+  ...p3Items(),
+  ...p4Items(),
   ...e0Items(),
   ...e1Items(),
   ...e2Items(),
@@ -568,6 +708,7 @@ export const ITEMS: DrillItem[] = [
   ...e9Items(),
   ...f0Items(),
   ...f1Items(),
+  ...f2Items(),
   ...f5Items(),
 ]
 

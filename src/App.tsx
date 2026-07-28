@@ -21,6 +21,7 @@ import { Constellation } from './features/Constellation'
 import { Checkpoint } from './features/Checkpoint'
 import { Calibration } from './features/Calibration'
 import { MicCheck } from './features/MicCheck'
+import { PlayAlong } from './features/PlayAlong'
 import { useSettings } from './state/settings'
 import { useNodeCompleted } from './state/progress'
 import { keyByTonic, type KeyDef } from './theory/keys'
@@ -52,6 +53,7 @@ type View =
   | { name: 'checkpoint'; checkpointId: CheckpointId }
   | { name: 'calibration' }
   | { name: 'mic-check' }
+  | { name: 'play-along' }
 
 // Theory index → lesson view routing. Only lessons with a built screen are
 // listed here; TheoryIndex never offers a CTA for a node that has no entry.
@@ -107,6 +109,7 @@ export default function App() {
           onOpenConstellation={() => setView({ name: 'constellation' })}
           onOpenCalibration={() => setView({ name: 'calibration' })}
           onOpenMicCheck={() => setView({ name: 'mic-check' })}
+          onOpenPlayAlong={() => setView({ name: 'play-along' })}
         />
       ) : null}
       {view.name === 'theory' ? (
@@ -170,6 +173,7 @@ export default function App() {
         <SessionRunner mode={view.mode} onKeyChange={setActiveKey} onExit={goHome} />
       ) : null}
       {view.name === 'constellation' ? <Constellation /> : null}
+      {view.name === 'play-along' ? <PlayAlong onKeyChange={setActiveKey} /> : null}
       {view.name === 'calibration' ? (
         <Calibration onDone={goHome} onOpenCheck={() => setView({ name: 'mic-check' })} />
       ) : null}
