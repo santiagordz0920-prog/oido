@@ -131,3 +131,59 @@ describe('octave-error suppression', () => {
     expect(events[0]).toMatchObject({ midi: 52 })
   })
 })
+
+describe('re-attacking a string', () => {
+  // Reported from real use: a wrong note, then the right one, and the right
+  // one never registered. Two causes — attacks were being missed, and a held
+  // note was only replaced by a DIFFERENT pitch, never re-triggered.
+  const G2 = midiToHz(43)
+
+  function attack(startMs: number, hz: number, count = 8, level = LOUD): DetectorFrame[] {
+    return Array.from({ length: count }, (_, i) => ({
+      tMs: startMs + i * HOP,
+      hz,
+      clarity: 0.95,
+      // A pluck: the attack rises over a few frames, then decays.
+      rms: i < 3 ? level * (0.5 + i * 0.35) : level * Math.exp(-(i - 3) * 0.12),
+      halfHarmonicRatio: 0,
+    }))
+  }
+
+  it('reports the corrected note played over one still ringing', () => {
+    const stab = createStabilizer()
+    // wrong note first
+    const first = run(stab, attack(0, G2))
+    expect(first.some((e) => e.kind === 'note' && e.midi === 43)).toBe(true)
+    // the right note, plucked while the wrong one is still decaying
+    const second = run(stab, attack(8 * HOP, E2))
+    expect(second.some((e) => e.kind === 'note' && e.midi === 40)).toBe(true)
+    expect(stab.current()).toBe(40)
+  })
+
+  it('reports the same note played twice as two notes', () => {
+    // Playing the same note again is a new answer, not a non-event.
+    const stab = createStabilizer()
+    run(stab, attack(0, E2))
+    expect(stab.current()).toBe(40)
+    const again = run(stab, attack(8 * HOP, E2))
+    expect(again.filter((e) => e.kind === 'note' && e.midi === 40)).toHaveLength(1)
+  })
+
+  it('does not invent attacks while a note sustains or decays', () => {
+    const stab = createStabilizer()
+    run(stab, frames(5, { hz: E2 }))
+    // steady sustain, then a long decay: neither is a new attack
+    const sustain = run(stab, frames(10, { hz: E2 }, 200))
+    const decay = run(
+      stab,
+      Array.from({ length: 12 }, (_, i) => ({
+        tMs: 420 + i * HOP,
+        hz: E2,
+        clarity: 0.95,
+        rms: LOUD * Math.exp(-i * 0.15),
+        halfHarmonicRatio: 0,
+      })),
+    )
+    expect([...sustain, ...decay].filter((e) => e.kind === 'off')).toHaveLength(0)
+  })
+})

@@ -35,6 +35,7 @@ export type StabilizerConfig = {
   minHz: number
   maxHz: number
   onsetRiseRatio: number
+  onsetBaselineFrames: number
   onsetBlankMs: number
   windowFrames: number
   agreeFrames: number
@@ -50,7 +51,10 @@ export const DEFAULT_CONFIG: StabilizerConfig = {
   clarityThreshold: 0.85,
   minHz: 70,
   maxHz: 1400,
-  onsetRiseRatio: 3,
+  // Judged against the quietest of the last 5 frames (~105 ms), which is the
+  // level before the attack began rather than part-way up it.
+  onsetRiseRatio: 2.2,
+  onsetBaselineFrames: 5,
   onsetBlankMs: 45,
   windowFrames: 5,
   agreeFrames: 3,
@@ -88,15 +92,28 @@ export function createStabilizer(config: StabilizerConfig = DEFAULT_CONFIG): Sta
   let history: Entry[] = []
   let stableMidi: number | null = null
   let blankUntilMs = -Infinity
-  let lastRms = 0
+  let recentRms: number[] = []
   let quietSinceMs: number | null = null
 
   function reset() {
     history = []
     stableMidi = null
     blankUntilMs = -Infinity
-    lastRms = 0
+    recentRms = []
     quietSinceMs = null
+  }
+
+  // A new attack, judged against the level BEFORE it started rather than the
+  // previous frame. The analysis window is 85 ms wide, so a pluck's attack is
+  // smeared across several frames and the frame-to-frame rise is gradual —
+  // comparing neighbours misses almost every onset. Comparing against the
+  // quietest of the last few frames sees the whole rise, while staying flat
+  // during sustain (recent frames match the current one) and during decay
+  // (recent frames are louder, never quieter).
+  function isOnset(rms: number): boolean {
+    if (recentRms.length < config.onsetBaselineFrames) return false
+    const baseline = Math.min(...recentRms)
+    return baseline > 0 && rms / baseline >= config.onsetRiseRatio
   }
 
   function push(frame: DetectorFrame): NoteEvent | null {
@@ -105,7 +122,7 @@ export function createStabilizer(config: StabilizerConfig = DEFAULT_CONFIG): Sta
     // 1. Volume gate against the measured floor. Below it there is nothing
     //    to analyze, and holding a note through real silence would be a lie.
     if (rms < gateRms) {
-      lastRms = rms
+      recentRms = []
       history = []
       quietSinceMs ??= tMs
       if (stableMidi !== null && tMs - quietSinceMs >= config.releaseMs) {
@@ -116,13 +133,28 @@ export function createStabilizer(config: StabilizerConfig = DEFAULT_CONFIG): Sta
     }
     quietSinceMs = null
 
-    // 2. Onset blanking. A pick attack is broadband noise; anything the
-    //    detector says during it is guesswork.
-    const rose = lastRms > 0 && rms / lastRms >= config.onsetRiseRatio
-    lastRms = rms
-    if (rose) {
+    // 2. An attack ends the previous note and starts a new one.
+    //
+    //    Reporting only pitch CHANGES is not enough on a guitar. Playing the
+    //    same note twice is a new answer, and a note played over one that is
+    //    still ringing has to be able to win. Waiting for the old note to
+    //    decay under the gate does not work either: on an acoustic that takes
+    //    seconds, and the quieter the gate the longer it takes.
+    //
+    //    So each attack clears the held note. The old one is released now,
+    //    the new one is reported as soon as the frames agree — including when
+    //    it is the same pitch as before.
+    const onset = isOnset(rms)
+    recentRms.push(rms)
+    if (recentRms.length > config.onsetBaselineFrames) recentRms.shift()
+    if (onset) {
       blankUntilMs = tMs + config.onsetBlankMs
       history = []
+      recentRms = [rms]
+      if (stableMidi !== null) {
+        stableMidi = null
+        return { kind: 'off', tMs }
+      }
       return null
     }
     if (tMs < blankUntilMs) return null
