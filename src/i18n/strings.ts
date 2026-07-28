@@ -1324,6 +1324,18 @@ const strings = {
     es: 'Marcado, no tocado: se corrige igual, pero la mano todavía no lo sabe.',
     en: 'Tapped, not played: graded the same, but your hand has not learned it yet.',
   },
+  'f2.shapeCaption': {
+    es: 'Esta es la forma que te pedía, no lo que tocaste: por el micrófono se oyen las notas, no dónde pusiste los dedos.',
+    en: 'This is the shape you were asked for, not what you played: the mic hears the notes, not where your fingers were.',
+  },
+  'f2.registerLow': {
+    es: 'Las notas están bien, pero sonaron una octava más abajo: eso es una posición abierta, no la tríada cerrada en ese juego de cuerdas.',
+    en: 'The notes are right, but they sounded an octave lower: that is an open position, not the closed triad on that string set.',
+  },
+  'f2.registerHigh': {
+    es: 'Las notas están bien, pero sonaron más arriba de donde cae esa forma en el mástil.',
+    en: 'The notes are right, but they sounded higher than that shape sits on the neck.',
+  },
   'f2.d.match': {
     es: 'Las tres notas, y abajo la que tocaba.',
     en: 'All three notes, with the right one underneath.',

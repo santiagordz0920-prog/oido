@@ -165,3 +165,47 @@ describe('gradeNumeral', () => {
     expect(gradeNumeral('Eb', 'IV', heard(['G#3', 'C4', 'D#4'])).correct).toBe(true)
   })
 })
+
+// The case a real guitar found: an open A major played where the closed
+// triad on strings {3,4,5} was asked for. Same three pitch classes, same
+// note underneath — so the chord itself is right and stays right — but a
+// whole octave lower and with five notes instead of three.
+describe('register', () => {
+  const A: ChordSpec = { root: 'A', quality: 'maj' }
+  // The closed shape on {3,4,5}, root position: A3 C#4 E4.
+  const CLOSED_BASS = [Note.midi('A3')!]
+  const closed = () => heard(['A3', 'C#4', 'E4'])
+  const openPosition = () => heard(['A2', 'E3', 'A3', 'C#4', 'E4'])
+
+  it('says nothing when the caller does not ask about register', () => {
+    expect(gradeChord(A, openPosition()).register).toBeNull()
+  })
+
+  it('is content with the shape it asked for', () => {
+    const v = gradeChord(A, closed(), { expectedBass: 1, expectedBassMidis: CLOSED_BASS })
+    expect(v.correct).toBe(true)
+    expect(v.register?.matches).toBe(true)
+    expect(v.register?.offSemitones).toBe(0)
+  })
+
+  it('notices the open position, and still passes the chord', () => {
+    const v = gradeChord(A, openPosition(), { expectedBass: 1, expectedBassMidis: CLOSED_BASS })
+    expect(v.correct).toBe(true) // the notes and the bass degree are right
+    expect(v.diagnosis).toEqual({ kind: 'match' })
+    expect(v.register?.matches).toBe(false)
+    expect(v.register?.offSemitones).toBe(12)
+    expect(v.register!.playedBassMidi).toBeLessThan(CLOSED_BASS[0])
+  })
+
+  // The same shape twelve frets up is the same shape, so every place it fits
+  // counts as the right register.
+  it('accepts the same voicing an octave up the neck', () => {
+    const bothPositions = [Note.midi('A3')!, Note.midi('A4')!]
+    const v = gradeChord(A, heard(['A4', 'C#5', 'E5']), { expectedBass: 1, expectedBassMidis: bothPositions })
+    expect(v.register?.matches).toBe(true)
+  })
+
+  it('reports nothing to compare when nothing was heard', () => {
+    expect(gradeChord(A, [], { expectedBassMidis: CLOSED_BASS }).register).toBeNull()
+  })
+})

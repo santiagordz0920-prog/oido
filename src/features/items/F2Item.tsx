@@ -3,7 +3,7 @@ import { useT } from '../../state/settings'
 import { useMicSettings } from '../../state/mic'
 import { Fretboard, type Marker } from '../../components/Fretboard'
 import { midiAt } from '../../lib/fretboardMath'
-import { triadShape, stringSetLabel, type Inversion } from '../../lib/triads'
+import { allTriadShapes, triadShape, stringSetLabel, type Inversion } from '../../lib/triads'
 import { gradeChord, type ChordVerdict, type DetectedNote } from '../../audio/input/chordGrade'
 import { captureAndTranscribe, polyWarm, warmPoly } from '../../audio/input/poly'
 import type { ChordQuality, ChordDegree } from '../../theory'
@@ -67,6 +67,12 @@ export function F2Item({
   const spec = useMemo(() => ({ root: root.tonic, quality }), [root.tonic, quality])
   const shape = useMemo(() => triadShape(spec, stringSet, inversion), [spec, stringSet, inversion])
   const bassDegree: ChordDegree = shape?.bassDegree ?? 1
+  // The bass pitch of every place this shape fits on the neck. The same
+  // voicing twelve frets up is the same voicing, so all of them count.
+  const expectedBassMidis = useMemo(
+    () => allTriadShapes(spec, stringSet, inversion).map((s) => midiAt(s.positions[0].string, s.positions[0].fret)),
+    [spec, stringSet, inversion],
+  )
 
   const itemId = `${root.tonic}|${quality}|${stringSet.join('-')}|${inversion}`
   useEffect(() => {
@@ -133,7 +139,7 @@ export function F2Item({
       })
       if (!mounted.current) return
       setPhase('grading')
-      finish(gradeChord(spec, notes, { expectedBass: bassDegree }), 'played')
+      finish(gradeChord(spec, notes, { expectedBass: bassDegree, expectedBassMidis }), 'played')
     } catch (err) {
       if (!mounted.current) return
       if (err instanceof DOMException && err.name === 'AbortError') return
@@ -151,7 +157,7 @@ export function F2Item({
       durationSeconds: 1,
       amplitude: 1,
     }))
-    finish(gradeChord(spec, notes, { expectedBass: bassDegree }), 'tap')
+    finish(gradeChord(spec, notes, { expectedBass: bassDegree, expectedBassMidis }), 'tap')
   }
 
   function handleTap(string: number, fret: number) {
@@ -167,15 +173,20 @@ export function F2Item({
 
   const markers: Marker[] = useMemo(() => {
     if (phase === 'feedback' && shape) {
+      // Always 'target', never 'correct'. A tick here would read as "this is
+      // what you played", and the mic cannot know that: the same pitch lives
+      // in several places on the neck, so the string and fret are not
+      // recoverable from audio. This diagram is the shape that was asked
+      // for — nothing more.
       return shape.positions.map((p) => ({
         string: p.string,
         fret: p.fret,
         label: String(p.degree),
-        kind: verdict?.correct ? ('correct' as const) : ('target' as const),
+        kind: 'target' as const,
       }))
     }
     return tapped.map((p) => ({ string: p.string, fret: p.fret, label: '•' }))
-  }, [phase, shape, verdict, tapped])
+  }, [phase, shape, tapped])
 
   const qualityName = t(`e5.quality.${quality}` as never)
 
@@ -251,6 +262,18 @@ export function F2Item({
             {verdict.correct ? t('f2.correct') : t('f2.incorrect')}
           </p>
           <p className="max-w-[65ch]">{diagnosisLine(t, verdict, bassDegree)}</p>
+          {verdict.register && !verdict.register.matches ? (
+            <p className="max-w-[65ch]">
+              {t(
+                verdict.register.playedBassMidi < verdict.register.expectedMidis[0]
+                  ? 'f2.registerLow'
+                  : 'f2.registerHigh',
+              )}
+            </p>
+          ) : null}
+          <p className="mono max-w-[65ch] text-[length:var(--fs-1)] text-[color:var(--ink-dim)]">
+            {t('f2.shapeCaption')}
+          </p>
           {answeredWith === 'tap' ? <p className="max-w-[65ch]">{t('f2.tap.note')}</p> : null}
           <button className={chip} onClick={onNext}>
             {nextLabel}

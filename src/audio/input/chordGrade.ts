@@ -64,6 +64,13 @@ export type ChordVerdict = {
   missing: ChordDegree[]
   extra: number[]
   bass: { expected: ChordDegree; played: ChordDegree | null } | null
+  /**
+   * Set when the caller named the register it expected. `matches` is false
+   * when the chord sounded in a different octave than any valid position of
+   * the asked-for shape — an open voicing where a closed one was asked for,
+   * typically. It never changes `correct`.
+   */
+  register: { expectedMidis: number[]; playedBassMidi: number; offSemitones: number; matches: boolean } | null
   diagnosis: ChordDiagnosis
 }
 
@@ -82,11 +89,30 @@ export type GradeOptions = {
   amplitudeFloor?: number
   /** Notes shorter than this are transients, not chord tones. */
   minDurationSeconds?: number
+  /**
+   * The pitches the asked-for voicing could put underneath — one per place
+   * on the neck where that shape fits. A microphone cannot tell which string
+   * or fret was used (the same pitch lives in several places), but it does
+   * hear the actual pitch, and an open-position voicing sits a whole octave
+   * below a closed one on the named string set. That difference is real and
+   * audible, so it can be reported.
+   *
+   * Reported, not failed: the notes and the bass degree are what make the
+   * chord right, and they are graded as before.
+   */
+  expectedBassMidis?: number[]
+  /** How far from every candidate counts as a different register. */
+  registerToleranceSemitones?: number
 }
 
-export const DEFAULT_GRADE_OPTIONS: Required<Omit<GradeOptions, 'expectedBass'>> = {
+export const DEFAULT_GRADE_OPTIONS = {
   amplitudeFloor: 0.35,
   minDurationSeconds: 0.09,
+  // Half an octave. An octave error is the only register mistake that
+  // actually happens here — a voicing is either in the register asked for or
+  // a whole octave away from it — so the threshold only has to sit between
+  // those two, not discriminate finely.
+  registerToleranceSemitones: 6,
 }
 
 export function filterNotes(notes: DetectedNote[], options: GradeOptions = {}): DetectedNote[] {
@@ -188,11 +214,27 @@ export function gradeChord(
   missing.sort((a, b) => a - b)
   const extra = heard.filter((s) => !expectedSemitones.has(s))
 
+  const lowest = kept.reduce<DetectedNote | null>((low, n) => (low === null || n.midi < low.midi ? n : low), null)
+
   let bass: ChordVerdict['bass'] = null
   if (options.expectedBass !== undefined) {
-    const lowest = kept.reduce<DetectedNote | null>((low, n) => (low === null || n.midi < low.midi ? n : low), null)
     const playedBass = lowest === null ? null : degreeAt(expectedSemitones, semitonesAbove(lowest.midi, rootPc))
     bass = { expected: options.expectedBass, played: playedBass }
+  }
+
+  // Register is measured against every place the shape legitimately fits, so
+  // the same voicing played twelve frets higher is not reported as wrong —
+  // it is the same voicing.
+  let register: ChordVerdict['register'] = null
+  if (options.expectedBassMidis && options.expectedBassMidis.length > 0 && lowest !== null) {
+    const tolerance = options.registerToleranceSemitones ?? DEFAULT_GRADE_OPTIONS.registerToleranceSemitones
+    const offSemitones = Math.min(...options.expectedBassMidis.map((m) => Math.abs(lowest.midi - m)))
+    register = {
+      expectedMidis: options.expectedBassMidis,
+      playedBassMidi: lowest.midi,
+      offSemitones,
+      matches: offSemitones < tolerance,
+    }
   }
 
   const diagnosis = diagnose(expectedSemitones, heard, missing, extra, bass)
@@ -202,6 +244,7 @@ export function gradeChord(
     missing,
     extra,
     bass,
+    register,
     diagnosis,
   }
 }
