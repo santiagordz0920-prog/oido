@@ -64,10 +64,12 @@ behind a decision whenever it affects them — just in their language.
 
 ## Current phase
 
-Phase 4 (chords in) **built, gate not yet attempted**. Tier 2 polyphonic capture and grading (`src/audio/input/poly.ts`, `chordGrade.ts`), F2 triads, P3 and P4, and the Play-Along Engine (`src/audio/playalong.ts`).
+Phase 4 (chords in) built; **Tier 2 gate passed on a real guitar**, P3/P4 half still unplayed. Tier 2 polyphonic capture and grading (`src/audio/input/poly.ts`, `chordGrade.ts`), F2 triads, P3 and P4, and the Play-Along Engine (`src/audio/playalong.ts`).
 
 **Basic Pitch is lazy and must stay lazy.** It reaches the browser only through a dynamic import, so Tracks T and E cost zero extra bytes — the airport case. `warmPoly()` runs at session start for blocks that include Track F or P, and warms the kernels with a throwaway inference as well as loading the graph, because the first inference costs twice what every later one does (docs/phases.md open question 3). The model lives in `public/models/basic-pitch/`, not in the bundle.
 
-**Nothing in Phase 4 has been played into a real microphone.** Phase 3's gate found two bugs that the whole test suite had missed, both only visible under real use. The Phase 4 gate is in docs/phases.md; treat the Tier 2 path as unproven until it passes. Tuning dials: `DEFAULT_GRADE_OPTIONS` in `chordGrade.ts`, the thresholds at the top of `poly.ts`, and `DETECTION_LATENCY_MS` in `improv.ts`.
+**F2 works on real playing**: correct triads pass, and deliberate mistakes are named specifically. The bug the gate found was not in the grading but in the UI — the feedback diagram ticked the shape as though the mic had seen the fingering. It cannot: string and fret are not recoverable from audio, only pitch. Do not reintroduce any UI that implies otherwise; register (an octave difference) is the one positional thing that IS audible, and it is reported rather than failed.
+
+**P3 and P4 have still never been played into a microphone**, because they sit eighteen minutes into a Bench session. Treat the graded-improvisation path as unproven. Tuning dials: `DEFAULT_GRADE_OPTIONS` in `chordGrade.ts`, the thresholds at the top of `poly.ts`, and `DETECTION_LATENCY_MS` in `improv.ts`.
 
 Next: Phase 5 (practice system) — resolve open question 4 in docs/phases.md (Recording Archive storage budget) before building against it. Update this pointer at every phase boundary.
