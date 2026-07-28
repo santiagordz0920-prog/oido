@@ -1067,8 +1067,8 @@ const strings = {
   'miccheck.eyebrow': { es: 'Comprobación', en: 'Quick check' },
   'miccheck.title': { es: '¿Te oye?', en: 'Can it hear you?' },
   'miccheck.body': {
-    es: 'Un solo ejercicio de producción, fuera de sesión, para confirmar que el micrófono te registra antes de sentarte a practicar. Cuenta como intento real.',
-    en: 'A single production drill, outside any session, to confirm the mic registers you before you sit down to practise. It counts as a real attempt.',
+    es: 'Un ejercicio suelto, fuera de sesión, para confirmar que el micrófono te registra antes de sentarte a practicar. Una nota y un acorde se detectan de formas distintas, así que se comprueban por separado. Cuenta como intento real.',
+    en: 'One drill, outside any session, to confirm the mic registers you before you sit down to practise. A single note and a strummed chord are detected in completely different ways, so they are checked separately. It counts as a real attempt.',
   },
   'miccheck.again': { es: 'Otra nota', en: 'Another note' },
   'miccheck.needsCalibration': {
@@ -1215,6 +1215,87 @@ const strings = {
     en: 'That is not degree {degree}. I hear {note}.',
   },
   'f5.replay': { es: 'Repetir', en: 'Replay' },
+
+  // Mic check — one drill per input tier, plus what the chord model measured
+  'miccheck.again.chord': { es: 'Otro acorde', en: 'Another chord' },
+  'miccheck.tier.note': { es: 'Una nota', en: 'One note' },
+  'miccheck.tier.chord': { es: 'Un acorde', en: 'One chord' },
+  'miccheck.timings.pending': {
+    es: 'Detección de acordes: preparándose.',
+    en: 'Chord detection: getting ready.',
+  },
+  'miccheck.timings.loaded': {
+    es: 'Detección de acordes lista en {load} ms. Aún no ha analizado nada.',
+    en: 'Chord detection ready in {load} ms. Nothing analysed yet.',
+  },
+  'miccheck.timings.full': {
+    es: 'Detección de acordes: lista en {load} ms, {grade} ms para analizar {seconds} s de audio en esta máquina.',
+    en: 'Chord detection: ready in {load} ms, {grade} ms to analyse {seconds} s of audio on this machine.',
+  },
+
+  // F2 — closed-voicing triads, all inversions, four string sets
+  'f2.prompt': { es: 'Toca {chord} en las cuerdas {set}', en: 'Play {chord} on strings {set}' },
+  'f2.bassIs': { es: 'Con el {degree} abajo', en: 'With the {degree} underneath' },
+  'f2.strum': { es: 'Escuchar el acorde', en: 'Listen for the chord' },
+  'f2.strumBody': {
+    es: 'Toca el acorde una vez y déjalo sonar. Escucho durante dos segundos y medio.',
+    en: 'Strum the chord once and let it ring. I listen for two and a half seconds.',
+  },
+  'f2.loadingModel': {
+    es: 'Preparando la detección de acordes…',
+    en: 'Getting chord detection ready…',
+  },
+  'f2.strumNow': { es: 'Toca ahora', en: 'Strum now' },
+  'f2.letRing': { es: 'Déjalo sonar', en: 'Let it ring' },
+  'f2.capturing': { es: 'Escuchando', en: 'Listening' },
+  'f2.grading': { es: 'Analizando el acorde', en: 'Reading the chord' },
+  'f2.correct': { es: 'Ese es.', en: "That's it." },
+  'f2.incorrect': { es: 'Ese no es.', en: 'Not that one.' },
+  'f2.tap.switch': { es: 'Marcarlo en el diapasón', en: 'Tap it on the fretboard' },
+  'f2.tap.body': {
+    es: 'Marca una nota en cada cuerda. Faltan {n}.',
+    en: 'Tap one note on each string. {n} to go.',
+  },
+  'f2.tap.note': {
+    es: 'Marcado, no tocado: se corrige igual, pero la mano todavía no lo sabe.',
+    en: 'Tapped, not played: graded the same, but your hand has not learned it yet.',
+  },
+  'f2.d.match': {
+    es: 'Las tres notas, y abajo la que tocaba.',
+    en: 'All three notes, with the right one underneath.',
+  },
+  'f2.d.inversion': {
+    es: 'Las notas están bien, pero abajo suena el {played} y esta inversión pide el {expected}.',
+    en: 'The notes are right, but the {played} is underneath and this inversion asks for the {expected}.',
+  },
+  'f2.d.seventhAdded': {
+    es: 'Tocaste el 7. Este acorde es una tríada: solo 1, 3 y 5.',
+    en: 'You played the 7. This chord is a triad: 1, 3 and 5 only.',
+  },
+  'f2.d.suspended': {
+    es: 'En vez del 3 suena el {degree}. Es una suspensión, no la tríada.',
+    en: 'The {degree} is sounding instead of the 3. That is a suspension, not the triad.',
+  },
+  'f2.d.relative': {
+    es: 'Eso es el relativo: comparte dos notas con este acorde y mueve la tercera.',
+    en: 'That is the relative chord: two notes shared, the third one moved.',
+  },
+  'f2.d.quality': {
+    es: 'Misma nota base, otra calidad: suena {quality}.',
+    en: 'Same root, different quality: that is {quality}.',
+  },
+  'f2.d.incomplete': {
+    es: 'Falta el {degrees}.',
+    en: 'The {degrees} never arrived.',
+  },
+  'f2.d.extra': {
+    es: 'Suena alguna nota que no es del acorde. Comprueba que solo suenen esas tres cuerdas.',
+    en: 'Something outside the chord is sounding. Check that only those three strings ring.',
+  },
+  'f2.d.silence': {
+    es: 'No oí nada. Acércate al micrófono y toca con más fuerza.',
+    en: 'I heard nothing. Move closer to the mic and play harder.',
+  },
 
   // Play-Along Engine (§9.3)
   'playalong.eyebrow': { es: 'Acompañamiento', en: 'Play-along' },

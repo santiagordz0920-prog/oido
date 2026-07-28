@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeMastery } from './mastery'
+import { computeMastery, computePartitionedMastery, type MasteryAttempt } from './mastery'
 
 const acc90 = { accuracy: 0.9, minItems: 4 }
 const withRT = { accuracy: 0.9, minItems: 4, maxMedianRT: 3000 }
@@ -54,5 +54,48 @@ describe('computeMastery', () => {
     expect(result.windowSize).toBe(4)
     expect(result.accuracy).toBe(1)
     expect(result.mastered).toBe(true)
+  })
+})
+
+describe('computePartitionedMastery', () => {
+  const sets = ['a', 'b', 'c', 'd']
+  const full = (correct: number, total = 4): MasteryAttempt[] =>
+    Array.from({ length: total }, (_, i) => attempt(i < correct))
+
+  function byPartition(perSet: Record<string, MasteryAttempt[]>) {
+    return new Map(Object.entries(perSet))
+  }
+
+  it('masters only when every partition clears the bar on its own', () => {
+    const all = byPartition({ a: full(4), b: full(4), c: full(4), d: full(4) })
+    expect(computePartitionedMastery(all, sets, acc90).mastered).toBe(true)
+  })
+
+  // The reason F2 is partitioned at all: without this, three fluent string
+  // sets carry a fourth the player never touches over the line, leaving a
+  // quarter of the fretboard unlearned behind a passing grade.
+  it('refuses to let strong partitions carry a weak one', () => {
+    const uneven = byPartition({ a: full(4), b: full(4), c: full(4), d: full(1) })
+    const result = computePartitionedMastery(uneven, sets, acc90)
+    expect(result.mastered).toBe(false)
+    expect(result.accuracy).toBe(0.25)
+  })
+
+  it('refuses when a partition has no attempts at all', () => {
+    const missing = byPartition({ a: full(4), b: full(4), c: full(4) })
+    const result = computePartitionedMastery(missing, sets, acc90)
+    expect(result.mastered).toBe(false)
+    expect(result.windowSize).toBe(0)
+  })
+
+  it('reports the weakest partition, so progress cannot be bought elsewhere', () => {
+    const uneven = byPartition({ a: full(4), b: full(4), c: full(3), d: full(2) })
+    const result = computePartitionedMastery(uneven, sets, acc90)
+    expect(result.accuracy).toBe(0.5)
+    expect(result.windowSize).toBe(4)
+  })
+
+  it('is not mastered when there are no partitions to check', () => {
+    expect(computePartitionedMastery(new Map(), [], acc90).mastered).toBe(false)
   })
 })

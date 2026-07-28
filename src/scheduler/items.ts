@@ -1,5 +1,6 @@
 import { KEYS } from '../theory/keys'
 import { LESSON_CHECKS } from '../curriculum/checks'
+import { F2_STRING_SETS, INVERSIONS, stringSetId } from '../lib/triads'
 import type { ChordQuality, ScaleForm } from '../theory'
 
 // Concrete drill items for the nodes that have content. An item's context
@@ -521,6 +522,53 @@ function f1Items(): DrillItem[] {
   return items
 }
 
+// F2: closed-voicing triads, all inversions, all four qualities, on the four
+// adjacent three-string sets (§7 F2 — "the highest-leverage block in the
+// app"). 12 roots × 4 qualities × 4 string sets × 3 inversions = 576 items;
+// the shapes themselves are computed at render time (src/lib/triads.ts), so
+// nothing here has to carry a fingering.
+//
+// Seed ratings stack three independent difficulties. Quality: maj and min
+// are the pair every player already owns, dim and aug are neither common nor
+// familiar under the fingers. Inversion: root position is the shape people
+// learned first, and both inversions are genuinely harder to find. String
+// set: the middle sets sit where the hand already lives, while {4,5,6} means
+// thick strings low on the neck and {1,2,3} means a set whose shapes are
+// distorted by the B string's tuning.
+export const F2_QUALITIES: ChordQuality[] = ['maj', 'min', 'dim', 'aug']
+const F2_QUALITY_SEED: Record<string, number> = { maj: 1000, min: 1020, dim: 1120, aug: 1160 }
+const F2_INVERSION_OFFSET: Record<number, number> = { 0: 0, 1: 60, 2: 80 }
+const F2_STRING_SET_OFFSET: Record<string, number> = { '5-4-3': 0, '4-3-2': 10, '3-2-1': 40, '6-5-4': 50 }
+
+function f2Items(): DrillItem[] {
+  const items: DrillItem[] = []
+  for (const key of KEYS) {
+    for (const quality of F2_QUALITIES) {
+      for (const stringSet of F2_STRING_SETS) {
+        const setId = stringSetId(stringSet)
+        for (const inversion of INVERSIONS) {
+          items.push({
+            id: `F2|${key.tonic}|${quality}|${setId}|${inversion}`,
+            nodeId: 'F2',
+            kind: 'fretboard',
+            context: key.tonic,
+            params: { root: key.tonic, quality, stringSet: setId, inversion },
+            seedRating:
+              F2_QUALITY_SEED[quality] + F2_INVERSION_OFFSET[inversion] + F2_STRING_SET_OFFSET[setId],
+          })
+        }
+      }
+    }
+  }
+  return items
+}
+
+/** The string set an F2 item drills, or null for any other item. */
+export function f2StringSetOf(itemId: string): string | null {
+  const parts = itemId.split('|')
+  return parts[0] === 'F2' ? parts[3] : null
+}
+
 // F5: scale degree relative to a moving root (§7 F5). The progression is
 // fixed and deliberately simple — I-IV-V-vi, drawn from the four numerals
 // the brief allows — so item generation never touches the corpus tables
@@ -568,6 +616,7 @@ export const ITEMS: DrillItem[] = [
   ...e9Items(),
   ...f0Items(),
   ...f1Items(),
+  ...f2Items(),
   ...f5Items(),
 ]
 

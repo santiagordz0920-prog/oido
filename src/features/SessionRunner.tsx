@@ -21,9 +21,12 @@ import { P1Item } from './items/P1Item'
 import { P2Item } from './items/P2Item'
 import { F0Item } from './items/F0Item'
 import { F1Item } from './items/F1Item'
+import { F2Item } from './items/F2Item'
 import { F5Item } from './items/F5Item'
 import { TheoryCheckItem } from './items/TheoryCheckItem'
 import type { DrillItem } from '../scheduler/items'
+import { parseStringSet, type Inversion } from '../lib/triads'
+import { warmPoly } from '../audio/input/poly'
 
 // Each fretboard node keys its "current key" hue off a different params
 // field — F0's is a bare pitch class, F1 and F5 are rooted keys — so the
@@ -32,6 +35,7 @@ import type { DrillItem } from '../scheduler/items'
 function fretboardTonic(item: DrillItem): string {
   if (item.nodeId === 'F0') return String(item.params.pitchClass)
   if (item.nodeId === 'F1') return String(item.params.rootPitchClass)
+  if (item.nodeId === 'F2') return String(item.params.root)
   return String(item.params.tonic)
 }
 
@@ -149,6 +153,12 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
 
   useEffect(() => {
     void loadNext(0)
+    // Basic Pitch is ~1.1 MB and its first inference compiles TensorFlow.js
+    // kernels, so a session that will reach Track F or P starts the download
+    // and one throwaway inference now. Tracks T and E never pay for it
+    // (docs/phases.md open question 3).
+    const needsPoly = def.blocks.some((b) => b.kind === 'drill' && (b.tracks.includes('F') || b.tracks.includes('P')))
+    if (needsPoly) warmPoly()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -416,6 +426,19 @@ export function SessionRunner({ mode, onKeyChange, onExit }: Props) {
         <F0Item
           pitchClass={itemKey}
           stringNumber={Number(current.item.params.stringIndex)}
+          nextLabel={nextLabel}
+          onResult={handleResult}
+          onNext={handleNext}
+        />
+      )
+    } else if (nodeId === 'F2') {
+      keyLine = t('fretboard.rootIs', { key: itemKey.label })
+      fretboardItem = (
+        <F2Item
+          root={itemKey}
+          quality={String(current.item.params.quality) as ChordQuality}
+          stringSet={parseStringSet(String(current.item.params.stringSet))}
+          inversion={Number(current.item.params.inversion) as Inversion}
           nextLabel={nextLabel}
           onResult={handleResult}
           onNext={handleNext}

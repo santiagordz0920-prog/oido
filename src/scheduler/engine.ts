@@ -2,9 +2,10 @@ import { db, type AttemptRow, type NodeStatRow } from '../db'
 import { ALL_NODES, isAvailable, node, type Track } from '../curriculum/graph'
 import { INITIAL_USER_RATING, pickByDifficulty, updateElo } from './elo'
 import { cardId, newCardRow, reviewCard, type CardRow } from './cards'
-import { contextsForNode, itemsForCard, type DrillItem } from './items'
+import { contextsForNode, f2StringSetOf, itemsForCard, type DrillItem } from './items'
 import { selectNextCard } from './selector'
-import { computeMastery } from './mastery'
+import { computeMastery, computePartitionedMastery } from './mastery'
+import { F2_STRING_SETS, stringSetId } from '../lib/triads'
 
 // The scheduler's imperative shell: everything here reads and writes Dexie,
 // while the decisions live in the pure modules (selector, elo, cards).
@@ -139,6 +140,21 @@ export async function recordAttempt({ item, correct, latencyMs, inputMode, respo
   await db.itemStats.put({ ...itemStat, rating: itemRating, attempts: itemStat.attempts + 1 })
 }
 
+// F2 is the one node whose criterion is per string set rather than overall
+// (docs/curriculum.md §7). Attempts carry the string set in their item id,
+// so the partition is read back from there rather than stored twice.
+function f2Mastery(recent: AttemptRow[]) {
+  const byStringSet = new Map<string, AttemptRow[]>()
+  for (const attempt of recent) {
+    const set = f2StringSetOf(attempt.itemId)
+    if (set === null) continue
+    const list = byStringSet.get(set)
+    if (list) list.push(attempt)
+    else byStringSet.set(set, [attempt])
+  }
+  return computePartitionedMastery(byStringSet, F2_STRING_SETS.map(stringSetId), node('F2').masteryCriteria)
+}
+
 export type Mastery = {
   progress: number // 0..1, sizes the constellation node
   mastered: boolean
@@ -153,7 +169,8 @@ export type Mastery = {
 export async function masteryOf(nodeId: string): Promise<Mastery> {
   const { masteryCriteria: c, track } = node(nodeId)
   const recent = await db.attempts.where('nodeId').equals(nodeId).reverse().sortBy('ts')
-  const { accuracy, windowSize, mastered: retained } = computeMastery(recent, c)
+  const { accuracy, windowSize, mastered: retained } =
+    nodeId === 'F2' ? f2Mastery(recent) : computeMastery(recent, c)
   if (track === 'T') {
     const completed = await isCompleted(nodeId)
     return {
