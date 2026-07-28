@@ -38,7 +38,7 @@ Functional-ear, theory, and fretboard trainer for guitarists. React PWA, offline
 
 ## Current phase
 
-Phase 3 (ears open) built, awaiting its gate: Tier 1 mono pitch (`src/audio/input/`), calibration, P0–P2, F0/F1/F5, tap fallback on every mic drill. Gate: the human passes calibration with a real guitar and P0 grades a played note correctly.
+Phase 3 (ears open) **shipped, gate passed** with a real acoustic in a normal-noise room: calibration confirmed the open low E and P0 graded a played note correctly. Tier 1 mono pitch (`src/audio/input/`), calibration, P0–P2, F0/F1/F5, tap fallback on every mic drill. Deployed to GitHub Pages on every push (`.github/workflows/deploy.yml`).
 
 **Input is an acoustic guitar into the laptop mic** (open question 5, resolved). Every detection default is tuned for it: attenuated low-E fundamental, low SNR, and a noise floor AND gate margin both measured per room in calibration — never fixed constants (docs/architecture.md, Phase 3 addendum). Tuning dials: `DEFAULT_CONFIG` in `src/audio/input/stabilize.ts`. A single P0 item is reachable straight from the mic card (`MicCheck`) for setup checks.
 

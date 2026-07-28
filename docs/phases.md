@@ -12,6 +12,8 @@ Ship something usable at every phase boundary.
 
 **Phase 3, ears open.** Mic input Tier 1. Calibration screen. P0 through P2, plus F0, F1 and F5. Tap fallback everywhere.
 
+> **Gate passed** on a real acoustic guitar into a laptop mic, in a room with normal background noise: calibration confirmed the open low E, and P0 graded a played note correctly. Two bugs surfaced only under real use and neither was visible to the test suite — the noise floor was estimated from the room's loudest moment rather than its resting level, and attacks were judged frame-against-frame across an 85 ms analysis window that smears them, so a corrected note played over a ringing one never registered. Both are fixed and covered by tests written from the reported symptoms.
+
 **Phase 4, chords in.** Basic Pitch and Tier 2 capture-and-grade. Track F triads (F2). P3 and P4. Play-Along Engine.
 
 **Phase 5, practice system.** Transcription Workbench, Assignments, Recording Archive with longitudinal comparison, Practice Log. P5 post-hoc analysis.
